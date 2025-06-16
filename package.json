@@ -33,6 +33,7 @@
     "test": "run-p 'test:*'",
     "test:storage": "pnpm --filter=@extension/storage test",
     "test:options": "pnpm --filter=@extension/options test",
+    "test:content": "pnpm --filter=@extension/content-script test",
     "test:sample-html": "pnpm --filter=sample-html-server test",
     "test:mock-api": "pnpm --filter=mock-api-server test",
     "test:coverage": "pnpm test:storage:coverage",
