@@ -501,6 +501,9 @@ importers:
 
   pages/content:
     dependencies:
+      '@extension/ai-api':
+        specifier: workspace:*
+        version: link:../../packages/ai-api
       '@extension/env':
         specifier: workspace:*
         version: link:../../packages/env
