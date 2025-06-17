@@ -104,27 +104,45 @@
 
 ## フェーズ6: AI API統合機能
 
-### 6.1 OpenAI APIクライアント
-- [ ] OpenAI APIクライアントのテスト作成
-- [ ] AI SDKの統合実装
-- [ ] APIキー管理機能の実装
-- [ ] モデル選択機能の実装
-- [ ] エラーハンドリングの実装
-- [ ] APIクライアントの動作テスト
+### 6.1 @ai-sdk/react統合
+- [x] @ai-sdk/reactパッケージの統合
+- [x] AI APIクライアントのテスト作成（11テスト）
+- [x] AI SDK統合実装（useChat活用）
+- [x] APIキー管理機能の実装
+- [x] モデル選択機能の実装
+- [x] エラーハンドリングの実装
+- [x] APIクライアントの動作テスト
 
 ### 6.2 プロンプト生成機能
-- [ ] システムプロンプト生成のテスト作成
-- [ ] システムプロンプト生成の実装
-- [ ] ユーザープロンプト統合の実装
-- [ ] テーブルデータ埋め込みの実装
-- [ ] プロンプト生成機能の動作テスト
+- [x] システムプロンプト生成のテスト作成
+- [x] システムプロンプト生成の実装
+- [x] ユーザープロンプト統合の実装
+- [x] テーブルデータ埋め込みの実装
+- [x] SPECIFICATION.md準拠プロンプト実装
+- [x] プロンプト生成機能の動作テスト
 
 ### 6.3 Background Script統合
-- [ ] Background ScriptのAPI通信機能のテスト作成
-- [ ] Background ScriptのAPI通信機能の実装
-- [ ] Content ScriptとBackground Script間通信のテスト作成
-- [ ] Content ScriptとBackground Script間通信の実装
-- [ ] Background Script全体の動作テスト
+- [x] Background ScriptのAPI通信機能のテスト作成（11テスト）
+- [x] Background ScriptのAPI通信機能の実装
+- [x] Content ScriptとBackground Script間通信のテスト作成
+- [x] Content ScriptとBackground Script間通信の実装
+- [x] Chrome messagingによる安全な通信実装
+- [x] Background Script全体の動作テスト
+
+### 6.4 Content Script AI統合
+- [x] Content Script AI分析機能のテスト作成（13テスト）
+- [x] AI分析機能の実装
+- [x] プログレス表示機能の実装
+- [x] 結果表示ダイアログの実装
+- [x] エラーハンドリングとユーザーフィードバック
+- [x] Content Script AI統合の動作テスト
+
+### 6.5 JSDoc・品質保証・E2E
+- [ ] JSDocコメントの充実（TypeScript開発者向け）
+- [ ] ユニットテスト拡充（追加エッジケース）
+- [ ] E2Eテストスイート実装
+- [ ] ドキュメントカバレッジ測定
+- [ ] パフォーマンステスト
 
 ## フェーズ7: ポップアップ機能
 
