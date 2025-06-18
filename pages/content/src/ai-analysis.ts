@@ -1,21 +1,20 @@
 /**
  * @fileoverview AI分析機能
- * 
+ *
  * Content ScriptでのAI分析処理を実装します。
  * Background Scriptとの通信を通じて、
  * OpenAI APIを使用してテーブルデータの分析を行います。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
-import { sendChromeMessage } from '@extension/ai-api';
+import { sendChromeMessage, buildAnalysisPrompt } from '@extension/ai-api';
 import { aiSettingsStorage } from '@extension/storage';
-import { buildAnalysisPrompt } from '@extension/ai-api';
 
 /**
  * AI分析結果の型定義
- * 
+ *
  * @interface AnalysisResult
  */
 interface AnalysisResult {
@@ -33,7 +32,7 @@ interface AnalysisResult {
 
 /**
  * AI分析のエラー種別
- * 
+ *
  * @enum AnalysisErrorType
  */
 export enum AnalysisErrorType {
@@ -46,12 +45,12 @@ export enum AnalysisErrorType {
   /** API制限エラー */
   API_LIMIT_ERROR = 'api_limit_error',
   /** 不明なエラー */
-  UNKNOWN_ERROR = 'unknown_error'
+  UNKNOWN_ERROR = 'unknown_error',
 }
 
 /**
  * AI分析エラーの詳細情報
- * 
+ *
  * @interface AnalysisError
  */
 export interface AnalysisError extends Error {
@@ -65,7 +64,7 @@ export interface AnalysisError extends Error {
 
 /**
  * AI分析オプション
- * 
+ *
  * @interface AnalysisOptions
  */
 interface AnalysisOptions {
@@ -81,60 +80,54 @@ interface AnalysisOptions {
 
 /**
  * テーブルデータのAI分析を実行します
- * 
+ *
  * 1. AI設定の検証
  * 2. プロンプトの構築
  * 3. Background Scriptとの通信
  * 4. 分析結果の処理
- * 
+ *
  * @param tableData - 分析対象のテーブルデータ
  * @param options - 分析オプション
  * @returns 分析結果
- * 
+ *
  * @throws {AnalysisError} 分析処理でエラーが発生した場合
- * 
+ *
  * @example
  * ```typescript
  * const data = ['項目1のデータ', '項目2のデータ', '項目3のデータ'];
- * 
+ *
  * try {
  *   const result = await analyzeTableData(data, {
  *     onProgress: (stage) => console.log(`進捗: ${stage}`),
  *     onError: (error) => console.error('分析エラー:', error)
  *   });
- *   
+ *
  *   console.log('分析結果:', result.text);
  * } catch (error) {
  *   console.error('分析に失敗:', error);
  * }
  * ```
- * 
+ *
  * @since 1.0.0
  */
-export const analyzeTableData = async (
-  tableData: string[],
-  options: AnalysisOptions = {}
-): Promise<AnalysisResult> => {
+export const analyzeTableData = async (tableData: string[], options: AnalysisOptions = {}): Promise<AnalysisResult> => {
   const { customPrompt, useCustomPrompt, onProgress, onError } = options;
 
   try {
     // 1. データの検証
     onProgress?.('データ検証中...');
     if (!tableData || tableData.length === 0) {
-      throw createAnalysisError(
-        AnalysisErrorType.INVALID_SETTINGS,
-        '分析対象のデータが指定されていません'
-      );
+      throw createAnalysisError(AnalysisErrorType.INVALID_SETTINGS, '分析対象のデータが指定されていません');
     }
 
     // 2. AI設定の取得と検証
     onProgress?.('設定確認中...');
     const settings = await aiSettingsStorage.get();
-    
+
     if (!settings.apiKey || settings.apiKey.trim().length === 0) {
       throw createAnalysisError(
         AnalysisErrorType.NO_API_KEY,
-        'OpenAI APIキーが設定されていません。設定ページで設定してください。'
+        'OpenAI APIキーが設定されていません。設定ページで設定してください。',
       );
     }
 
@@ -147,8 +140,8 @@ export const analyzeTableData = async (
     const messages = [
       {
         role: 'user',
-        content: prompt
-      }
+        content: prompt,
+      },
     ];
 
     // 5. Background Scriptとの通信
@@ -162,25 +155,18 @@ export const analyzeTableData = async (
           model: settings.model,
           temperature: 0.7,
           maxTokens: 1000,
-        }
-      }
+        },
+      },
     });
 
     // 6. レスポンスの検証
     if (!response.success) {
       const errorType = classifyAPIError(response.errorCode);
-      throw createAnalysisError(
-        errorType,
-        response.error || '分析処理でエラーが発生しました',
-        response.errorCode
-      );
+      throw createAnalysisError(errorType, response.error || '分析処理でエラーが発生しました', response.errorCode);
     }
 
     if (!response.data) {
-      throw createAnalysisError(
-        AnalysisErrorType.UNKNOWN_ERROR,
-        '分析結果を取得できませんでした'
-      );
+      throw createAnalysisError(AnalysisErrorType.UNKNOWN_ERROR, '分析結果を取得できませんでした');
     }
 
     onProgress?.('分析完了');
@@ -188,17 +174,16 @@ export const analyzeTableData = async (
     return {
       text: response.data.text,
       usage: response.data.usage,
-      processingTime: response.data.processingTime
+      processingTime: response.data.processingTime,
     };
-
   } catch (error) {
     console.error('AI Analysis Error:', error);
-    
+
     // AnalysisError以外のエラーを変換
     if (!(error instanceof Error) || !('type' in error)) {
       const analysisError = createAnalysisError(
         AnalysisErrorType.UNKNOWN_ERROR,
-        error instanceof Error ? error.message : '不明なエラーが発生しました'
+        error instanceof Error ? error.message : '不明なエラーが発生しました',
       );
       onError?.(analysisError);
       throw analysisError;
@@ -211,9 +196,9 @@ export const analyzeTableData = async (
 
 /**
  * AI設定が正しく設定されているかチェックします
- * 
+ *
  * @returns 設定状況の詳細
- * 
+ *
  * @since 1.0.0
  */
 export const checkAISettings = async (): Promise<{
@@ -239,7 +224,7 @@ export const checkAISettings = async (): Promise<{
       isValid: errors.length === 0,
       hasApiKey,
       model: settings.model || 'gpt-4o-mini',
-      errors
+      errors,
     };
   } catch (error) {
     console.error('Failed to check AI settings:', error);
@@ -247,26 +232,22 @@ export const checkAISettings = async (): Promise<{
       isValid: false,
       hasApiKey: false,
       model: '',
-      errors: ['設定の読み込みに失敗しました']
+      errors: ['設定の読み込みに失敗しました'],
     };
   }
 };
 
 /**
  * AnalysisErrorを作成するヘルパー関数
- * 
+ *
  * @param type - エラーの種別
  * @param message - エラーメッセージ
  * @param code - エラーコード（オプション）
  * @returns AnalysisError
- * 
+ *
  * @private
  */
-const createAnalysisError = (
-  type: AnalysisErrorType,
-  message: string,
-  code?: string
-): AnalysisError => {
+const createAnalysisError = (type: AnalysisErrorType, message: string, code?: string): AnalysisError => {
   const error = new Error(message) as AnalysisError;
   error.type = type;
   error.code = code;
@@ -275,10 +256,10 @@ const createAnalysisError = (
 
 /**
  * APIエラーコードからAnalysisErrorTypeに分類します
- * 
+ *
  * @param errorCode - APIエラーコード
  * @returns 分析エラーの種別
- * 
+ *
  * @private
  */
 const classifyAPIError = (errorCode?: string): AnalysisErrorType => {
@@ -299,10 +280,10 @@ const classifyAPIError = (errorCode?: string): AnalysisErrorType => {
 
 /**
  * 分析結果を表示用に整形します
- * 
+ *
  * @param result - 分析結果
  * @returns 整形されたテキスト
- * 
+ *
  * @since 1.0.0
  */
 export const formatAnalysisResult = (result: AnalysisResult): string => {

@@ -1,27 +1,22 @@
 /**
  * @fileoverview AI分析機能のテスト
- * 
+ *
  * Content ScriptでのAI分析処理の
  * 単体テストを提供します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
+import { analyzeTableData, checkAISettings, formatAnalysisResult, AnalysisErrorType } from './ai-analysis';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { 
-  analyzeTableData, 
-  checkAISettings, 
-  formatAnalysisResult,
-  AnalysisErrorType,
-  type AnalysisError
-} from './ai-analysis';
+import type { AnalysisError } from './ai-analysis';
 
 // Chrome Message Utils のモック
 vi.mock('@extension/ai-api', () => ({
   sendChromeMessage: vi.fn(),
-  buildAnalysisPrompt: vi.fn((data, prompt) => 
-    `以下のデータを分析してください: ${data.join(', ')}${prompt ? ` 指示: ${prompt}` : ''}`
+  buildAnalysisPrompt: vi.fn(
+    (data, prompt) => `以下のデータを分析してください: ${data.join(', ')}${prompt ? ` 指示: ${prompt}` : ''}`,
   ),
 }));
 
@@ -41,7 +36,7 @@ describe('AI分析機能', () => {
     it('正常な分析が実行される', async () => {
       const { sendChromeMessage } = await import('@extension/ai-api');
       const { aiSettingsStorage } = await import('@extension/storage');
-      
+
       const mockSendMessage = sendChromeMessage as ReturnType<typeof vi.fn>;
       const mockStorage = aiSettingsStorage.get as ReturnType<typeof vi.fn>;
 
@@ -70,7 +65,7 @@ describe('AI分析機能', () => {
       const progressStages: string[] = [];
 
       const result = await analyzeTableData(tableData, {
-        onProgress: (stage) => progressStages.push(stage),
+        onProgress: stage => progressStages.push(stage),
       });
 
       // 結果の検証
@@ -113,7 +108,7 @@ describe('AI分析機能', () => {
     it('カスタムプロンプトが使用される', async () => {
       const { sendChromeMessage } = await import('@extension/ai-api');
       const { aiSettingsStorage } = await import('@extension/storage');
-      
+
       const mockSendMessage = sendChromeMessage as ReturnType<typeof vi.fn>;
       const mockStorage = aiSettingsStorage.get as ReturnType<typeof vi.fn>;
 
@@ -133,7 +128,7 @@ describe('AI分析機能', () => {
       });
 
       const tableData = ['データA', 'データB'];
-      
+
       await analyzeTableData(tableData, {
         customPrompt: 'カスタム指示',
         useCustomPrompt: true,
@@ -149,7 +144,7 @@ describe('AI分析機能', () => {
               },
             ],
           }),
-        })
+        }),
       );
     });
 
@@ -180,7 +175,7 @@ describe('AI分析機能', () => {
     it('API呼び出しエラーが適切に処理される', async () => {
       const { sendChromeMessage } = await import('@extension/ai-api');
       const { aiSettingsStorage } = await import('@extension/storage');
-      
+
       const mockSendMessage = sendChromeMessage as ReturnType<typeof vi.fn>;
       const mockStorage = aiSettingsStorage.get as ReturnType<typeof vi.fn>;
 
@@ -199,9 +194,7 @@ describe('AI分析機能', () => {
 
       const errorCallback = vi.fn();
 
-      await expect(
-        analyzeTableData(['データ'], { onError: errorCallback })
-      ).rejects.toMatchObject({
+      await expect(analyzeTableData(['データ'], { onError: errorCallback })).rejects.toMatchObject({
         type: AnalysisErrorType.API_LIMIT_ERROR,
         message: 'Rate limit exceeded',
         code: 'RATE_LIMIT_EXCEEDED',
@@ -213,7 +206,7 @@ describe('AI分析機能', () => {
     it('ネットワークエラーが適切に処理される', async () => {
       const { sendChromeMessage } = await import('@extension/ai-api');
       const { aiSettingsStorage } = await import('@extension/storage');
-      
+
       const mockSendMessage = sendChromeMessage as ReturnType<typeof vi.fn>;
       const mockStorage = aiSettingsStorage.get as ReturnType<typeof vi.fn>;
 

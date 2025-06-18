@@ -1,15 +1,15 @@
 /**
  * @fileoverview AI APIハンドラーのテスト
- * 
+ *
  * Background ScriptでのAI API通信処理の
  * 単体テストを提供します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AIAPIHandler } from './ai-api-handler';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Chrome API のモック
 const mockChrome = {
@@ -62,7 +62,7 @@ describe('AIAPIHandler', () => {
   describe('初期化', () => {
     it('正常に初期化される', () => {
       handler.initialize();
-      
+
       expect(handler.isReady()).toBe(true);
       expect(mockChrome.runtime.onMessage.addListener).toHaveBeenCalledOnce();
     });
@@ -70,7 +70,7 @@ describe('AIAPIHandler', () => {
     it('重複初期化が防がれる', () => {
       handler.initialize();
       handler.initialize();
-      
+
       expect(mockChrome.runtime.onMessage.addListener).toHaveBeenCalledOnce();
     });
   });
@@ -83,7 +83,7 @@ describe('AIAPIHandler', () => {
     it('AI_ANALYSIS_REQUESTメッセージを処理する', async () => {
       const { generateText } = await import('ai');
       const mockGenerateText = generateText as ReturnType<typeof vi.fn>;
-      
+
       mockGenerateText.mockResolvedValue({
         text: 'AI分析結果',
         usage: {
@@ -100,9 +100,7 @@ describe('AIAPIHandler', () => {
       const mockMessage = {
         type: 'AI_ANALYSIS_REQUEST',
         data: {
-          messages: [
-            { role: 'user', content: 'テストメッセージ' },
-          ],
+          messages: [{ role: 'user', content: 'テストメッセージ' }],
         },
         requestId: 'test-request-123',
       };
@@ -120,9 +118,7 @@ describe('AIAPIHandler', () => {
 
       expect(mockGenerateText).toHaveBeenCalledWith({
         model: 'gpt-4o-mini',
-        messages: [
-          { role: 'user', content: 'テストメッセージ' },
-        ],
+        messages: [{ role: 'user', content: 'テストメッセージ' }],
         temperature: 0.7,
         maxTokens: 1000,
       });
@@ -190,7 +186,7 @@ describe('AIAPIHandler', () => {
     it('API キーエラーを適切に分類する', async () => {
       const { generateText } = await import('ai');
       const mockGenerateText = generateText as ReturnType<typeof vi.fn>;
-      
+
       mockGenerateText.mockRejectedValue(new Error('Invalid API key provided'));
 
       const addListenerCall = mockChrome.runtime.onMessage.addListener.mock.calls[0];
@@ -221,7 +217,7 @@ describe('AIAPIHandler', () => {
     it('レート制限エラーを適切に分類する', async () => {
       const { generateText } = await import('ai');
       const mockGenerateText = generateText as ReturnType<typeof vi.fn>;
-      
+
       mockGenerateText.mockRejectedValue(new Error('Rate limit exceeded'));
 
       const addListenerCall = mockChrome.runtime.onMessage.addListener.mock.calls[0];
@@ -259,7 +255,7 @@ describe('AIAPIHandler', () => {
       const { generateText } = await import('ai');
       const { aiSettingsStorage } = await import('@extension/storage');
       const mockGenerateText = generateText as ReturnType<typeof vi.fn>;
-      
+
       mockGenerateText.mockResolvedValue({
         text: 'result',
         usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
@@ -278,14 +274,14 @@ describe('AIAPIHandler', () => {
       messageListener(mockMessage, {}, vi.fn());
 
       await new Promise(resolve => setTimeout(resolve, 10));
-      
+
       expect(aiSettingsStorage.get).toHaveBeenCalled();
     });
 
     it('リクエスト設定が優先される', async () => {
       const { generateText } = await import('ai');
       const mockGenerateText = generateText as ReturnType<typeof vi.fn>;
-      
+
       mockGenerateText.mockResolvedValue({
         text: 'result',
         usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },

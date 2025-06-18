@@ -1,11 +1,6 @@
+import { analyzeTableData, checkAISettings, formatAnalysisResult, AnalysisErrorType } from '@src/ai-analysis';
 import { detectAndExtractTableData } from '@src/table-detection';
 import { injectAnalyzeButton } from '@src/ui-injection';
-import { 
-  analyzeTableData, 
-  checkAISettings, 
-  formatAnalysisResult,
-  AnalysisErrorType 
-} from '@src/ai-analysis';
 
 console.log('[CEB] All content script loaded');
 
@@ -41,13 +36,13 @@ const handleAnalyzeClick = async () => {
 
     // AI分析の実行
     const result = await analyzeTableData(data, {
-      onProgress: (stage) => {
+      onProgress: stage => {
         console.log('[CEB] Analysis progress:', stage);
         progressDiv.querySelector('div')!.textContent = stage;
       },
-      onError: (error) => {
+      onError: error => {
         console.error('[CEB] Analysis error:', error);
-      }
+      },
     });
 
     // プログレス表示を削除
@@ -55,7 +50,7 @@ const handleAnalyzeClick = async () => {
 
     // 結果を表示
     const formattedResult = formatAnalysisResult(result);
-    
+
     // 結果表示用のダイアログを作成
     const resultDiv = document.createElement('div');
     resultDiv.style.cssText = `
@@ -64,7 +59,7 @@ const handleAnalyzeClick = async () => {
       z-index: 10000; font-family: system-ui, -apple-system, sans-serif;
       max-width: 600px; max-height: 500px; overflow-y: auto;
     `;
-    
+
     resultDiv.innerHTML = `
       <h3 style="margin: 0 0 15px 0; color: #333;">AI分析結果</h3>
       <div style="white-space: pre-wrap; line-height: 1.5; color: #555; margin-bottom: 15px;">${formattedResult}</div>
@@ -81,10 +76,9 @@ const handleAnalyzeClick = async () => {
     document.body.appendChild(resultDiv);
 
     console.log('[CEB] AI analysis completed:', result);
-
   } catch (error) {
     console.error('[CEB] Analysis failed:', error);
-    
+
     // プログレス表示を削除（エラー時）
     const progressDiv = document.querySelector('div[style*="position: fixed"][style*="z-index: 10000"]');
     if (progressDiv) {
@@ -93,7 +87,7 @@ const handleAnalyzeClick = async () => {
 
     // エラーメッセージの生成
     let errorMessage = '分析中にエラーが発生しました。';
-    
+
     if (error && typeof error === 'object' && 'type' in error) {
       const analysisError = error as any;
       switch (analysisError.type) {

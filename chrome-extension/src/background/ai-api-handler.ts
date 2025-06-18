@@ -1,26 +1,23 @@
 /**
  * @fileoverview Background Script AI API ハンドラー
- * 
+ *
  * Content ScriptからのAI分析リクエストを受信し、
  * OpenAI APIとの実際の通信を行います。
  * Chrome拡張機能のセキュリティポリシーに従い、
  * API通信はBackground Scriptで集中管理されます。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
 import { openai } from '@ai-sdk/openai';
-import { generateText } from 'ai';
 import { aiSettingsStorage } from '@extension/storage';
-import type { 
-  ChromeMessage, 
-  ChromeMessageResponse 
-} from '@extension/ai-api';
+import { generateText } from 'ai';
+import type { ChromeMessage, ChromeMessageResponse } from '@extension/ai-api';
 
 /**
  * AI分析リクエストの型定義
- * 
+ *
  * @interface AIAnalysisRequest
  */
 interface AIAnalysisRequest {
@@ -37,7 +34,7 @@ interface AIAnalysisRequest {
 
 /**
  * AI分析レスポンスの型定義
- * 
+ *
  * @interface AIAnalysisResponse
  */
 interface AIAnalysisResponse {
@@ -55,16 +52,16 @@ interface AIAnalysisResponse {
 
 /**
  * AI API ハンドラークラス
- * 
+ *
  * OpenAI APIとの通信を管理し、エラーハンドリングと
  * セキュリティ対策を提供します。
- * 
+ *
  * @example
  * ```typescript
  * const handler = new AIAPIHandler();
  * handler.initialize();
  * ```
- * 
+ *
  * @since 1.0.0
  */
 export class AIAPIHandler {
@@ -73,7 +70,7 @@ export class AIAPIHandler {
   /**
    * ハンドラーを初期化します
    * Chrome拡張機能のメッセージリスナーを設定します
-   * 
+   *
    * @since 1.0.0
    */
   public initialize(): void {
@@ -87,7 +84,7 @@ export class AIAPIHandler {
       (
         message: ChromeMessage<AIAnalysisRequest>,
         sender: chrome.runtime.MessageSender,
-        sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void
+        sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void,
       ) => {
         // AI分析リクエストのみを処理
         if (message.type === 'AI_ANALYSIS_REQUEST') {
@@ -95,7 +92,7 @@ export class AIAPIHandler {
           return true; // 非同期レスポンスを示す
         }
         return false;
-      }
+      },
     );
 
     this.isInitialized = true;
@@ -104,17 +101,17 @@ export class AIAPIHandler {
 
   /**
    * AI分析リクエストを処理します
-   * 
+   *
    * @param message - Chrome メッセージ
    * @param sender - 送信者情報
    * @param sendResponse - レスポンス関数
-   * 
+   *
    * @private
    */
   private async handleAIAnalysisRequest(
     message: ChromeMessage<AIAnalysisRequest>,
     sender: chrome.runtime.MessageSender,
-    sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void
+    sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void,
   ): Promise<void> {
     const startTime = Date.now();
 
@@ -126,7 +123,7 @@ export class AIAPIHandler {
 
       // AI設定の取得
       const settings = await this.getAISettings(message.data.settings);
-      
+
       // APIキーの検証
       if (!settings.apiKey) {
         throw new Error('OpenAI API key is not configured');
@@ -155,21 +152,22 @@ export class AIAPIHandler {
         success: true,
         data: {
           text: result.text,
-          usage: result.usage ? {
-            promptTokens: result.usage.promptTokens,
-            completionTokens: result.usage.completionTokens,
-            totalTokens: result.usage.totalTokens,
-          } : undefined,
+          usage: result.usage
+            ? {
+                promptTokens: result.usage.promptTokens,
+                completionTokens: result.usage.completionTokens,
+                totalTokens: result.usage.totalTokens,
+              }
+            : undefined,
           processingTime,
         },
         requestId: message.requestId,
       };
 
       sendResponse(response);
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      
+
       console.error('AI Analysis Error:', error);
 
       // エラーレスポンス
@@ -187,17 +185,17 @@ export class AIAPIHandler {
   /**
    * AI設定を取得します
    * リクエストの設定とストレージの設定をマージします
-   * 
+   *
    * @param requestSettings - リクエストに含まれる設定
    * @returns マージされた設定
-   * 
+   *
    * @private
    */
   private async getAISettings(requestSettings?: AIAnalysisRequest['settings']) {
     try {
       // ストレージから基本設定を取得
       const storedSettings = await aiSettingsStorage.get();
-      
+
       // リクエスト設定とマージ（リクエスト設定が優先）
       return {
         apiKey: requestSettings?.apiKey || storedSettings.apiKey,
@@ -219,10 +217,10 @@ export class AIAPIHandler {
 
   /**
    * エラーコードを生成します
-   * 
+   *
    * @param error - エラーオブジェクト
    * @returns エラーコード
-   * 
+   *
    * @private
    */
   private getErrorCode(error: unknown): string {
@@ -247,9 +245,9 @@ export class AIAPIHandler {
 
   /**
    * ハンドラーの状態をチェックします
-   * 
+   *
    * @returns 初期化済みかどうか
-   * 
+   *
    * @since 1.0.0
    */
   public isReady(): boolean {
@@ -259,7 +257,7 @@ export class AIAPIHandler {
   /**
    * ハンドラーをシャットダウンします
    * リスナーを削除し、リソースをクリーンアップします
-   * 
+   *
    * @since 1.0.0
    */
   public shutdown(): void {
@@ -270,7 +268,7 @@ export class AIAPIHandler {
     // リスナーの削除
     // Note: chrome.runtime.onMessage.removeListener は特定のリスナー関数が必要
     // 実装上は通常拡張機能のライフサイクル終了時に自動的にクリーンアップされる
-    
+
     this.isInitialized = false;
     console.log('AI API Handler shutdown completed');
   }
