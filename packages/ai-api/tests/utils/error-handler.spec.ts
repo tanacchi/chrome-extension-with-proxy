@@ -2,24 +2,20 @@
  * @fileoverview エラーハンドリング機能のテスト
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { APIErrorHandler, createAPIError, isRetryableError } from '../../lib/utils/error-handler';
 import { APIErrorType } from '../../lib/client/api-types';
+import { APIErrorHandler, createAPIError, isRetryableError } from '../../lib/utils/error-handler';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-describe('APIErrorHandler', () => {
+describe('APIエラーハンドラー', () => {
   let errorHandler: APIErrorHandler;
 
   beforeEach(() => {
     errorHandler = new APIErrorHandler();
   });
 
-  describe('createAPIError', () => {
-    it('should create APIError with basic properties', () => {
-      const error = createAPIError(
-        APIErrorType.AUTHENTICATION,
-        'Invalid API key',
-        401
-      );
+  describe('APIエラー作成', () => {
+    it('基本プロパティ付きのAPIエラーを作成する', () => {
+      const error = createAPIError(APIErrorType.AUTHENTICATION, 'Invalid API key', 401);
 
       expect(error.type).toBe(APIErrorType.AUTHENTICATION);
       expect(error.message).toBe('Invalid API key');
@@ -27,13 +23,8 @@ describe('APIErrorHandler', () => {
       expect(error.name).toBe('APIError');
     });
 
-    it('should create APIError with retry information', () => {
-      const error = createAPIError(
-        APIErrorType.RATE_LIMIT,
-        'Rate limit exceeded',
-        429,
-        60
-      );
+    it('リトライ情報付きのAPIエラーを作成する', () => {
+      const error = createAPIError(APIErrorType.RATE_LIMIT, 'Rate limit exceeded', 429, 60);
 
       expect(error.type).toBe(APIErrorType.RATE_LIMIT);
       expect(error.retryAfter).toBe(60);
@@ -41,13 +32,7 @@ describe('APIErrorHandler', () => {
 
     it('should create APIError with details', () => {
       const details = { code: 'insufficient_quota', param: null };
-      const error = createAPIError(
-        APIErrorType.QUOTA_EXCEEDED,
-        'Quota exceeded',
-        429,
-        undefined,
-        details
-      );
+      const error = createAPIError(APIErrorType.QUOTA_EXCEEDED, 'Quota exceeded', 429, undefined, details);
 
       expect(error.details).toEqual(details);
     });
@@ -55,11 +40,7 @@ describe('APIErrorHandler', () => {
 
   describe('isRetryableError', () => {
     it('should return true for retryable errors', () => {
-      const retryableTypes = [
-        APIErrorType.RATE_LIMIT,
-        APIErrorType.NETWORK,
-        APIErrorType.SERVER_ERROR
-      ];
+      const retryableTypes = [APIErrorType.RATE_LIMIT, APIErrorType.NETWORK, APIErrorType.SERVER_ERROR];
 
       retryableTypes.forEach(type => {
         const error = createAPIError(type, 'Test error');
@@ -71,7 +52,7 @@ describe('APIErrorHandler', () => {
       const nonRetryableTypes = [
         APIErrorType.AUTHENTICATION,
         APIErrorType.INVALID_REQUEST,
-        APIErrorType.QUOTA_EXCEEDED
+        APIErrorType.QUOTA_EXCEEDED,
       ];
 
       nonRetryableTypes.forEach(type => {
@@ -89,7 +70,7 @@ describe('APIErrorHandler', () => {
         { status: 429, expectedType: APIErrorType.RATE_LIMIT },
         { status: 500, expectedType: APIErrorType.SERVER_ERROR },
         { status: 502, expectedType: APIErrorType.SERVER_ERROR },
-        { status: 400, expectedType: APIErrorType.INVALID_REQUEST }
+        { status: 400, expectedType: APIErrorType.INVALID_REQUEST },
       ];
 
       testCases.forEach(({ status, expectedType }) => {
@@ -109,7 +90,7 @@ describe('APIErrorHandler', () => {
         { status: 504, expectedType: APIErrorType.SERVER_ERROR },
         { status: 404, expectedType: APIErrorType.INVALID_REQUEST },
         { status: 418, expectedType: APIErrorType.INVALID_REQUEST }, // Client error
-        { status: 599, expectedType: APIErrorType.SERVER_ERROR } // Server error
+        { status: 599, expectedType: APIErrorType.SERVER_ERROR }, // Server error
       ];
 
       additionalTestCases.forEach(({ status, expectedType }) => {
@@ -143,7 +124,7 @@ describe('APIErrorHandler', () => {
     it('should handle errors with statusCode property instead of status', () => {
       const httpError = {
         message: 'HTTP Error',
-        statusCode: 401
+        statusCode: 401,
       };
 
       const apiError = errorHandler.handleError(httpError);
@@ -155,7 +136,7 @@ describe('APIErrorHandler', () => {
       const httpError = new Error('HTTP Error');
       (httpError as any).status = 400;
       (httpError as any).response = {
-        data: { error: { message: 'Invalid parameter', code: 'invalid_param' } }
+        data: { error: { message: 'Invalid parameter', code: 'invalid_param' } },
       };
 
       const apiError = errorHandler.handleError(httpError);
@@ -189,7 +170,7 @@ describe('APIErrorHandler', () => {
 
     it('should handle connection errors by code', () => {
       const connectionErrors = ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'];
-      
+
       connectionErrors.forEach(code => {
         const connectionError = new Error('Connection failed');
         (connectionError as any).code = code;
@@ -205,9 +186,9 @@ describe('APIErrorHandler', () => {
         'timeout while connecting',
         'connection refused',
         'request failed',
-        'fetch error occurred'
+        'fetch error occurred',
       ];
-      
+
       networkMessages.forEach(message => {
         const networkError = new Error(message);
 
@@ -219,7 +200,7 @@ describe('APIErrorHandler', () => {
     it('should handle non-Error objects', () => {
       const plainObject = {
         message: 'Something went wrong',
-        status: 500
+        status: 500,
       };
 
       const apiError = errorHandler.handleError(plainObject);
@@ -241,7 +222,7 @@ describe('APIErrorHandler', () => {
       const rateLimitError = new Error('Rate limit exceeded');
       (rateLimitError as any).status = 429;
       (rateLimitError as any).headers = {
-        'retry-after': '60'
+        'retry-after': '60',
       };
 
       const apiError = errorHandler.handleError(rateLimitError);
@@ -253,7 +234,7 @@ describe('APIErrorHandler', () => {
       const rateLimitError = new Error('Rate limit exceeded');
       (rateLimitError as any).status = 429;
       (rateLimitError as any).headers = {
-        'Retry-After': '120'
+        'Retry-After': '120',
       };
 
       const apiError = errorHandler.handleError(rateLimitError);
@@ -265,7 +246,7 @@ describe('APIErrorHandler', () => {
       const rateLimitError = new Error('Rate limit exceeded');
       (rateLimitError as any).status = 429;
       (rateLimitError as any).headers = {
-        'retry-after': 'invalid-number'
+        'retry-after': 'invalid-number',
       };
 
       const apiError = errorHandler.handleError(rateLimitError);
@@ -338,9 +319,7 @@ describe('APIErrorHandler', () => {
     });
 
     it('should add jitter to prevent thundering herd', () => {
-      const delays = Array.from({ length: 10 }, () =>
-        errorHandler.calculateBackoffDelay(1, 1000, 10000, 2)
-      );
+      const delays = Array.from({ length: 10 }, () => errorHandler.calculateBackoffDelay(1, 1000, 10000, 2));
 
       // Not all delays should be exactly the same due to jitter
       const uniqueDelays = new Set(delays);
@@ -355,11 +334,11 @@ describe('APIErrorHandler', () => {
         'Invalid API key: sk-proj-1234567890abcdefghijklmnopqrstuvwxyz1234567890',
         401,
         undefined,
-        { 
+        {
           apiKey: 'sk-proj-1234567890abcdefghijklmnopqrstuvwxyz1234567890',
           userToken: 'sensitive-token',
-          publicInfo: 'safe-data'
-        }
+          publicInfo: 'safe-data',
+        },
       );
 
       const sanitized = errorHandler.sanitizeErrorForLogging(error);
@@ -372,11 +351,7 @@ describe('APIErrorHandler', () => {
     });
 
     it('should preserve non-sensitive information', () => {
-      const error = createAPIError(
-        APIErrorType.RATE_LIMIT,
-        'Rate limit exceeded for requests',
-        429
-      );
+      const error = createAPIError(APIErrorType.RATE_LIMIT, 'Rate limit exceeded for requests', 429);
 
       const sanitized = errorHandler.sanitizeErrorForLogging(error);
       expect(sanitized.message).toBe('Rate limit exceeded for requests');
@@ -390,15 +365,11 @@ describe('APIErrorHandler', () => {
         'Bearer abc123def456ghi789',
         'api_key="test-key-123"',
         'token: sensitive_token_value',
-        'password="secret123"'
+        'password="secret123"',
       ];
 
       apiKeyFormats.forEach(sensitiveText => {
-        const error = createAPIError(
-          APIErrorType.AUTHENTICATION,
-          `Error with ${sensitiveText}`,
-          401
-        );
+        const error = createAPIError(APIErrorType.AUTHENTICATION, `Error with ${sensitiveText}`, 401);
 
         const sanitized = errorHandler.sanitizeErrorForLogging(error);
         expect(sanitized.message).toContain('[REDACTED]');
@@ -407,25 +378,19 @@ describe('APIErrorHandler', () => {
     });
 
     it('should handle nested object sanitization', () => {
-      const error = createAPIError(
-        APIErrorType.AUTHENTICATION,
-        'Auth error',
-        401,
-        undefined,
-        {
-          user: {
-            apiKey: 'sk-secret123',
-            metadata: {
-              token: 'nested-token',
-              publicId: 'user-123'
-            }
+      const error = createAPIError(APIErrorType.AUTHENTICATION, 'Auth error', 401, undefined, {
+        user: {
+          apiKey: 'sk-secret123',
+          metadata: {
+            token: 'nested-token',
+            publicId: 'user-123',
           },
-          config: {
-            password: 'secret-password',
-            timeout: 5000
-          }
-        }
-      );
+        },
+        config: {
+          password: 'secret-password',
+          timeout: 5000,
+        },
+      });
 
       const sanitized = errorHandler.sanitizeErrorForLogging(error);
       expect(sanitized.details.user.apiKey).toBe('[REDACTED]');
@@ -436,54 +401,33 @@ describe('APIErrorHandler', () => {
     });
 
     it('should handle null and undefined details', () => {
-      const errorWithNull = createAPIError(
-        APIErrorType.NETWORK,
-        'Network error',
-        undefined,
-        undefined,
-        null
-      );
+      const errorWithNull = createAPIError(APIErrorType.NETWORK, 'Network error', undefined, undefined, null);
 
       const sanitizedNull = errorHandler.sanitizeErrorForLogging(errorWithNull);
       expect(sanitizedNull.details).toBeNull();
 
-      const errorWithUndefined = createAPIError(
-        APIErrorType.NETWORK,
-        'Network error'
-      );
+      const errorWithUndefined = createAPIError(APIErrorType.NETWORK, 'Network error');
 
       const sanitizedUndefined = errorHandler.sanitizeErrorForLogging(errorWithUndefined);
       expect(sanitizedUndefined.details).toBeUndefined();
     });
 
     it('should handle non-object details', () => {
-      const error = createAPIError(
-        APIErrorType.NETWORK,
-        'Network error',
-        undefined,
-        undefined,
-        'string-details'
-      );
+      const error = createAPIError(APIErrorType.NETWORK, 'Network error', undefined, undefined, 'string-details');
 
       const sanitized = errorHandler.sanitizeErrorForLogging(error);
       expect(sanitized.details).toBe('string-details');
     });
 
     it('should handle case-insensitive sensitive key detection', () => {
-      const error = createAPIError(
-        APIErrorType.AUTHENTICATION,
-        'Auth error',
-        401,
-        undefined,
-        {
-          ApiKey: 'should-be-redacted',
-          API_KEY: 'should-be-redacted-too',
-          userTOKEN: 'also-redacted',
-          PASSWORD: 'redacted-password',
-          SECRET: 'redacted-secret',
-          normalField: 'should-remain'
-        }
-      );
+      const error = createAPIError(APIErrorType.AUTHENTICATION, 'Auth error', 401, undefined, {
+        ApiKey: 'should-be-redacted',
+        API_KEY: 'should-be-redacted-too',
+        userTOKEN: 'also-redacted',
+        PASSWORD: 'redacted-password',
+        SECRET: 'redacted-secret',
+        normalField: 'should-remain',
+      });
 
       const sanitized = errorHandler.sanitizeErrorForLogging(error);
       expect(sanitized.details.ApiKey).toBe('[REDACTED]');

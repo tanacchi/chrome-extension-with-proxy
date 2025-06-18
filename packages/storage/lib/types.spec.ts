@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import type { AISettings, AnalysisResult } from './types.js';
 
-describe('AI Settings Types', () => {
-  describe('AISettings', () => {
-    it('should have correct structure for AISettings type', () => {
+describe('AI設定の型テスト', () => {
+  describe('AISettings型', () => {
+    it('AISettings型の構造が正しい', () => {
       const mockSettings: AISettings = {
         apiKey: 'test-api-key',
         model: 'gpt-3.5-turbo',
@@ -17,7 +17,7 @@ describe('AI Settings Types', () => {
       expect(mockSettings.useCustomPrompt).toBe(true);
     });
 
-    it('should allow optional customPrompt', () => {
+    it('カスタムプロンプトがオプションである', () => {
       const mockSettings: AISettings = {
         apiKey: 'test-api-key',
         model: 'gpt-4',
@@ -28,7 +28,7 @@ describe('AI Settings Types', () => {
       expect(mockSettings.useCustomPrompt).toBe(false);
     });
 
-    it('should support different model types', () => {
+    it('異なるモデルタイプをサポートする', () => {
       const gpt4Settings: AISettings = {
         apiKey: 'test-key',
         model: 'gpt-4',
@@ -46,8 +46,8 @@ describe('AI Settings Types', () => {
     });
   });
 
-  describe('AnalysisResult', () => {
-    it('should have correct structure for AnalysisResult type', () => {
+  describe('AnalysisResult型', () => {
+    it('AnalysisResult型の構造が正しい', () => {
       const mockResult: AnalysisResult = {
         content: 'AI分析結果のテキスト',
         timestamp: new Date('2024-01-01T10:00:00Z'),
@@ -63,7 +63,7 @@ describe('AI Settings Types', () => {
       expect(mockResult.tableData).toEqual(['データ1', 'データ2', 'データ3']);
     });
 
-    it('should allow optional tableData', () => {
+    it('テーブルデータがオプションである', () => {
       const mockResult: AnalysisResult = {
         content: 'AI分析結果のテキスト',
         timestamp: new Date(),
