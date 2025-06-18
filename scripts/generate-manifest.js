@@ -2,7 +2,7 @@
 
 /**
  * manifest.json生成スクリプト
- * 
+ *
  * manifest.tsからmanifest.jsonを生成してdistディレクトリに配置します。
  */
 
@@ -10,12 +10,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const currentFilename = fileURLToPath(import.meta.url);
+const currentDirname = path.dirname(currentFilename);
 
 async function generateManifest() {
   try {
-    const projectRoot = path.resolve(__dirname, '..');
+    const projectRoot = path.resolve(currentDirname, '...');
     const manifestPath = path.join(projectRoot, 'chrome-extension', 'manifest.js');
     const distDir = path.join(projectRoot, 'dist');
     const outputPath = path.join(distDir, 'manifest.json');
@@ -49,22 +49,20 @@ async function generateManifest() {
 
     // 開発環境の場合はHMR用のスクリプトを追加
     const isDev = process.env.CLI_CEB_DEV === 'true' || process.env.NODE_ENV === 'development';
-    
+
     if (isDev) {
       console.log('🛠️ 開発モード: HMRスクリプトを追加');
-      
+
       // HMR用のrefreshスクリプトを追加
       manifest.content_scripts = manifest.content_scripts || [];
-      
+
       // 既にrefresh.jsが追加されていない場合のみ追加
-      const hasRefreshScript = manifest.content_scripts.some(script => 
-        script.js && script.js.includes('refresh.js')
-      );
-      
+      const hasRefreshScript = manifest.content_scripts.some(script => script.js && script.js.includes('refresh.js'));
+
       if (!hasRefreshScript) {
         manifest.content_scripts.push({
           matches: ['http://*/*', 'https://*/*', '<all_urls>'],
-          js: ['refresh.js']
+          js: ['refresh.js'],
         });
       }
     }
@@ -75,7 +73,7 @@ async function generateManifest() {
 
     console.log('✅ manifest.json生成完了!');
     console.log(`📄 ファイルサイズ: ${manifestJson.length} bytes`);
-    
+
     // 主要な設定を表示
     console.log('\n📋 manifest.json 概要:');
     console.log(`   • 名前: ${manifest.name}`);
@@ -92,7 +90,6 @@ async function generateManifest() {
       console.log('   3. "パッケージ化されていない拡張機能を読み込む"をクリック');
       console.log(`   4. "${distDir}" フォルダを選択`);
     }
-
   } catch (error) {
     console.error('❌ manifest.json生成エラー:', error.message);
     console.error(error.stack);
@@ -101,7 +98,7 @@ async function generateManifest() {
 }
 
 // スクリプトが直接実行された場合のみ実行
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && process.argv[1].endsWith('generate-manifest.js')) {
   generateManifest();
 }
 

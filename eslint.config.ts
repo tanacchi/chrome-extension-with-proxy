@@ -27,6 +27,34 @@ export default config(
   {
     ignores: ['**/build/**', '**/dist/**', '**/node_modules/**', 'chrome-extension/manifest.js', 'dev-servers/**'],
   },
+  // Node.js scripts configuration
+  {
+    files: ['scripts/**/*.{js,cjs,mjs}', '*.config.{js,cjs,mjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'script', // CommonJS for .cjs files
+      globals: {
+        ...node,
+        console: 'readonly',
+        process: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        Buffer: 'readonly',
+        global: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
+      'func-style': 'off', // Node.js scripts can use function declarations
+      'import-x/no-commonjs': 'off',
+      'import-x/exports-last': 'off',
+      'no-undef': 'off', // Node globals are handled by globals config
+    },
+  },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
