@@ -26,3 +26,5 @@ export const createAISettingsStorage = (): BaseStorageType<AISettings> =>
       },
     },
   });
+
+export const aiSettingsStorage = createAISettingsStorage();

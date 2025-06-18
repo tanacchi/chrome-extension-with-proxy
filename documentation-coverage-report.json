@@ -1,0 +1,207 @@
+{
+  "timestamp": "2025-06-18T13:40:51.577Z",
+  "stats": {
+    "totalFiles": 10,
+    "totalFunctions": 1,
+    "totalInterfaces": 54,
+    "totalClasses": 2,
+    "documentedFunctions": 0,
+    "documentedInterfaces": 30,
+    "documentedClasses": 2,
+    "filesWithFileOverview": 9,
+    "functionsWithExamples": 0,
+    "functionsWithParamDocs": 0,
+    "functionsWithReturnDocs": 0,
+    "details": [
+      {
+        "file": "packages/ai-api/lib/client/api-types.ts",
+        "functions": 0,
+        "interfaces": 32,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 17,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "インターフェース ChatCompletionRequest にJSDocコメントがありません",
+          "インターフェース ChatCompletionResponse にJSDocコメントがありません",
+          "インターフェース ChatCompletionChoice にJSDocコメントがありません",
+          "インターフェース ChatCompletionUsage にJSDocコメントがありません",
+          "インターフェース ChatCompletionChunk にJSDocコメントがありません",
+          "インターフェース ChatCompletionDelta にJSDocコメントがありません",
+          "インターフェース APIError にJSDocコメントがありません",
+          "インターフェース RetryConfig にJSDocコメントがありません",
+          "インターフェース RateLimitStatus にJSDocコメントがありません",
+          "インターフェース AnalysisResult にJSDocコメントがありません",
+          "インターフェース ValidationResult にJSDocコメントがありません",
+          "インターフェース CacheEntry にJSDocコメントがありません",
+          "インターフェース ExtendedAISettings にJSDocコメントがありません",
+          "インターフェース ClientConfig にJSDocコメントがありません",
+          "インターフェース HealthCheckResult にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/lib/client/openai-client.ts",
+        "functions": 0,
+        "interfaces": 0,
+        "classes": 1,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 0,
+        "documentedClasses": 1,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": []
+      },
+      {
+        "file": "packages/ai-api/lib/hooks/use-ai-settings.ts",
+        "functions": 1,
+        "interfaces": 2,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 1,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "関数 handleStorageChange (const arrow function) にJSDocコメントがありません",
+          "インターフェース UseAISettingsReturn にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/lib/hooks/use-analysis.ts",
+        "functions": 0,
+        "interfaces": 4,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 2,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "インターフェース UseAnalysisOptions にJSDocコメントがありません",
+          "インターフェース UseAnalysisReturn にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/lib/index.ts",
+        "functions": 0,
+        "interfaces": 0,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 0,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": []
+      },
+      {
+        "file": "packages/ai-api/lib/services/prompt-service.ts",
+        "functions": 0,
+        "interfaces": 4,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 2,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "インターフェース PromptBuildOptions にJSDocコメントがありません",
+          "インターフェース PromptBuildResult にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/lib/types/analysis.ts",
+        "functions": 0,
+        "interfaces": 6,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 4,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "インターフェース TableAnalysisRequest にJSDocコメントがありません",
+          "インターフェース AnalysisHistoryEntry にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/lib/utils/error-handler.ts",
+        "functions": 0,
+        "interfaces": 0,
+        "classes": 1,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 0,
+        "documentedClasses": 1,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": []
+      },
+      {
+        "file": "packages/ai-api/lib/utils/message-utils.ts",
+        "functions": 0,
+        "interfaces": 6,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 4,
+        "documentedClasses": 0,
+        "hasFileOverview": true,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": [
+          "インターフェース ChromeMessageResponse にJSDocコメントがありません",
+          "インターフェース MessageOptions にJSDocコメントがありません"
+        ]
+      },
+      {
+        "file": "packages/ai-api/vitest.config.ts",
+        "functions": 0,
+        "interfaces": 0,
+        "classes": 0,
+        "documentedFunctions": 0,
+        "documentedInterfaces": 0,
+        "documentedClasses": 0,
+        "hasFileOverview": false,
+        "functionsWithExamples": 0,
+        "functionsWithParamDocs": 0,
+        "functionsWithReturnDocs": 0,
+        "issues": []
+      }
+    ]
+  },
+  "coverage": {
+    "functionCoverage": 0,
+    "interfaceCoverage": 55.6,
+    "classCoverage": 100,
+    "fileOverviewCoverage": 90,
+    "paramDocCoverage": 0,
+    "returnDocCoverage": 0,
+    "exampleCoverage": 0
+  },
+  "overallScore": {
+    "score": 40,
+    "grade": "F"
+  },
+  "summary": {
+    "totalFiles": 10,
+    "functionCoverage": 0,
+    "overallGrade": "F"
+  }
+}

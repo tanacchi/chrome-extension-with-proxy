@@ -54,7 +54,7 @@ export class APIErrorHandler {
    */
   public handleError(error: unknown): APIError {
     // HTTPエラーの場合
-    if (error.status || error.statusCode) {
+    if (error && typeof error === 'object' && ('status' in error || 'statusCode' in error)) {
       return this.handleHTTPError(error);
     }
 
@@ -62,22 +62,22 @@ export class APIErrorHandler {
     if (this.isNetworkError(error)) {
       return createAPIError(
         APIErrorType.NETWORK,
-        error.message || 'Network request failed',
+        (error instanceof Error ? error.message : 'Network request failed'),
         undefined,
         undefined,
         undefined,
-        error
+        error instanceof Error ? error : undefined
       );
     }
 
     // その他の不明なエラー
     return createAPIError(
       APIErrorType.UNKNOWN,
-      error.message || 'An unknown error occurred',
+      (error instanceof Error ? error.message : 'An unknown error occurred'),
       undefined,
       undefined,
       undefined,
-      error
+      error instanceof Error ? error : undefined
     );
   }
 
@@ -150,19 +150,26 @@ export class APIErrorHandler {
    * @private
    */
   private isNetworkError(error: unknown): boolean {
+    if (!error || typeof error !== 'object') {
+      return false;
+    }
+    
+    const err = error as any;
     return (
-      error.name === 'NetworkError' ||
-      error.name === 'TimeoutError' ||
-      error.name === 'AbortError' ||
-      error.code === 'ECONNREFUSED' ||
-      error.code === 'ENOTFOUND' ||
-      error.code === 'ETIMEDOUT' ||
-      error.message?.toLowerCase().includes('network') ||
-      error.message?.toLowerCase().includes('timeout') ||
-      error.message?.toLowerCase().includes('connection') ||
-      error.message?.toLowerCase().includes('failed') ||
-      error.message?.toLowerCase().includes('request timeout') ||
-      error.message?.includes('fetch')
+      err.name === 'NetworkError' ||
+      err.name === 'TimeoutError' ||
+      err.name === 'AbortError' ||
+      err.code === 'ECONNREFUSED' ||
+      err.code === 'ENOTFOUND' ||
+      err.code === 'ETIMEDOUT' ||
+      (err.message && typeof err.message === 'string' && (
+        err.message.toLowerCase().includes('network') ||
+        err.message.toLowerCase().includes('timeout') ||
+        err.message.toLowerCase().includes('connection') ||
+        err.message.toLowerCase().includes('failed') ||
+        err.message.toLowerCase().includes('request timeout') ||
+        err.message.includes('fetch')
+      ))
     );
   }
 

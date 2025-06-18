@@ -265,7 +265,9 @@ export class OpenAIClient {
       return response;
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout');
+        const timeoutError = new Error('Request timeout');
+        timeoutError.name = 'TimeoutError';
+        throw timeoutError;
       }
       throw error;
     } finally {
@@ -343,7 +345,7 @@ export class OpenAIClient {
    * @private
    */
   private async handleHTTPError(response: Response): Promise<APIError> {
-    let errorData: unknown;
+    let errorData: any;
     
     try {
       errorData = await response.json();
@@ -353,21 +355,19 @@ export class OpenAIClient {
 
     // ヘッダーの安全な変換
     const headers: Record<string, string> = {};
-    if (response.headers.entries) {
+    if (response.headers && typeof response.headers.entries === 'function') {
       for (const [key, value] of response.headers.entries()) {
-        headers[key] = value;
-      }
-    } else if (response.headers instanceof Map) {
-      for (const [key, value] of response.headers) {
         headers[key] = value;
       }
     }
 
-    const error = new Error(errorData.error?.message || `HTTP Error ${response.status}`) as any;
-    error.status = response.status;
-    error.statusCode = response.status;
-    error.headers = headers;
-    error.data = errorData;
+    const error = {
+      message: errorData?.error?.message || `HTTP Error ${response.status}`,
+      status: response.status,
+      statusCode: response.status,
+      headers: headers,
+      data: errorData
+    };
 
     return this.errorHandler.handleError(error);
   }
