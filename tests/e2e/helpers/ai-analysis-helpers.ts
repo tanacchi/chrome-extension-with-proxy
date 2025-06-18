@@ -46,8 +46,8 @@ export async function waitForTableDetection(timeout: number = 10000): Promise<vo
     },
     {
       timeout,
-      timeoutMsg: `Table with ai-target-table-table class not found within ${timeout}ms`
-    }
+      timeoutMsg: `Table with ai-target-table-table class not found within ${timeout}ms`,
+    },
   );
 }
 
@@ -62,8 +62,8 @@ export async function waitForContentScriptInjection(timeout: number = 15000): Pr
     },
     {
       timeout,
-      timeoutMsg: `Content script not injected within ${timeout}ms`
-    }
+      timeoutMsg: `Content script not injected within ${timeout}ms`,
+    },
   );
 }
 
@@ -79,8 +79,8 @@ export async function waitForAnalysisButton(timeout: number = 10000): Promise<We
       },
       {
         timeout,
-        timeoutMsg: `Analysis button not found within ${timeout}ms`
-      }
+        timeoutMsg: `Analysis button not found within ${timeout}ms`,
+      },
     );
     return await browser.$('[data-testid="ai-analysis-button"]');
   } catch (error) {
@@ -102,13 +102,13 @@ export async function waitForAnalysisCompletion(timeout: number = 30000): Promis
       async () => {
         const resultDialog = await browser.$('[data-testid="analysis-result"]');
         const errorDialog = await browser.$('[data-testid="analysis-error"]');
-        
+
         return (await resultDialog.isExisting()) || (await errorDialog.isExisting());
       },
       {
         timeout,
-        timeoutMsg: `Analysis did not complete within ${timeout}ms`
-      }
+        timeoutMsg: `Analysis did not complete within ${timeout}ms`,
+      },
     );
 
     const resultDialog = await browser.$('[data-testid="analysis-result"]');
@@ -136,7 +136,7 @@ export async function configureExtensionSettings(settings: {
   useCustomPrompt?: boolean;
 }): Promise<void> {
   await openExtensionPage('options');
-  
+
   // APIキーの設定
   if (settings.apiKey !== undefined) {
     const apiKeyInput = await browser.$('input[type="password"]');
@@ -145,13 +145,13 @@ export async function configureExtensionSettings(settings: {
       await apiKeyInput.setValue(settings.apiKey);
     }
   }
-  
+
   // モデルの選択
   if (settings.model) {
     const modelSelect = await browser.$('select[name="model"]');
     await modelSelect.selectByValue(settings.model);
   }
-  
+
   // カスタムプロンプトの設定
   if (settings.customPrompt !== undefined) {
     const customPromptTextarea = await browser.$('textarea[name="customPrompt"]');
@@ -160,21 +160,21 @@ export async function configureExtensionSettings(settings: {
       await customPromptTextarea.setValue(settings.customPrompt);
     }
   }
-  
+
   // カスタムプロンプト使用フラグの設定
   if (settings.useCustomPrompt !== undefined) {
     const useCustomPromptCheckbox = await browser.$('input[name="useCustomPrompt"]');
     const isChecked = await useCustomPromptCheckbox.isSelected();
-    
+
     if (isChecked !== settings.useCustomPrompt) {
       await useCustomPromptCheckbox.click();
     }
   }
-  
+
   // 設定を保存
   const saveButton = await browser.$('button[type="submit"]');
   await saveButton.click();
-  
+
   // 保存完了を待機
   await browser.waitUntil(
     async () => {
@@ -183,8 +183,8 @@ export async function configureExtensionSettings(settings: {
     },
     {
       timeout: 5000,
-      timeoutMsg: 'Settings save confirmation not received'
-    }
+      timeoutMsg: 'Settings save confirmation not received',
+    },
   );
 }
 
@@ -202,7 +202,7 @@ export async function measurePagePerformance(): Promise<{
       loadTime: timing.loadEventEnd - timing.loadEventStart,
       domContentLoaded: timing.domContentLoadedEventEnd - timing.domContentLoadedEventStart,
       responseStart: timing.responseStart,
-      responseEnd: timing.responseEnd
+      responseEnd: timing.responseEnd,
     };
   });
 
@@ -222,7 +222,7 @@ export async function measurePagePerformance(): Promise<{
   return {
     loadTime: navigationTiming.loadTime,
     domContentLoaded: navigationTiming.domContentLoaded,
-    firstContentfulPaint
+    firstContentfulPaint,
   };
 }
 
@@ -231,14 +231,14 @@ export async function measurePagePerformance(): Promise<{
  */
 export async function collectConsoleLogs(): Promise<string[]> {
   const logs: string[] = [];
-  
+
   try {
     await browser.sessionSubscribe({ events: ['log.entryAdded'] });
-    
-    browser.on('log.entryAdded', (logEntry) => {
+
+    browser.on('log.entryAdded', logEntry => {
       logs.push(`[${logEntry.level}] ${logEntry.text}`);
     });
-    
+
     // 既存のログも収集
     const existingLogs = await browser.getLogs('browser');
     existingLogs.forEach(log => {
@@ -247,7 +247,7 @@ export async function collectConsoleLogs(): Promise<string[]> {
   } catch (error) {
     console.warn('Could not collect console logs:', error);
   }
-  
+
   return logs;
 }
 
@@ -263,13 +263,15 @@ export async function measureMemoryUsage(): Promise<{
     const memoryInfo = await browser.execute(() => {
       // @ts-ignore - performance.memory is not in standard types
       const memory = (performance as any).memory;
-      return memory ? {
-        usedJSHeapSize: memory.usedJSHeapSize,
-        totalJSHeapSize: memory.totalJSHeapSize,
-        jsHeapSizeLimit: memory.jsHeapSizeLimit
-      } : {};
+      return memory
+        ? {
+            usedJSHeapSize: memory.usedJSHeapSize,
+            totalJSHeapSize: memory.totalJSHeapSize,
+            jsHeapSizeLimit: memory.jsHeapSizeLimit,
+          }
+        : {};
     });
-    
+
     return memoryInfo;
   } catch (error) {
     console.warn('Could not measure memory usage:', error);
@@ -289,7 +291,7 @@ export async function cleanupTestData(): Promise<void> {
         chrome.storage.sync.clear();
       }
     });
-    
+
     // セッションストレージとローカルストレージをクリア
     await browser.execute(() => {
       localStorage.clear();

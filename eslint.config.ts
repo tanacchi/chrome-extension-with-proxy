@@ -130,4 +130,14 @@ export default config(
       'no-restricted-imports': 'off',
     },
   },
+  // Test files configuration
+  {
+    files: ['**/tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      'func-style': 'off', // Allow function declarations in test files
+      '@typescript-eslint/ban-ts-comment': 'off', // Allow @ts-ignore in tests
+      '@typescript-eslint/no-explicit-any': 'off', // Allow any type in tests
+      '@typescript-eslint/no-unused-vars': 'off', // Allow unused vars in tests for clarity
+    },
+  },
 );
