@@ -129,14 +129,10 @@ export class AIAPIHandler {
         throw new Error('OpenAI API key is not configured');
       }
 
-      // OpenAI API クライアントの初期化
-      const client = openai({
-        apiKey: settings.apiKey,
-      });
-
       // AI分析の実行
       const result = await generateText({
-        model: client(settings.model),
+        model: openai(settings.model),
+        apiKey: settings.apiKey,
         messages: message.data.messages.map(msg => ({
           role: msg.role as 'system' | 'user' | 'assistant',
           content: msg.content,
