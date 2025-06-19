@@ -129,10 +129,28 @@ export class AIAPIHandler {
         throw new Error('OpenAI API key is not configured');
       }
 
+      // 開発時はmock-api、本番時はOpenAI APIを使用
+      const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
+
+      let client: ReturnType<typeof openai>;
+      if (isDevelopment) {
+        // Mock API サーバーを使用
+        console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
+        client = openai({
+          apiKey: 'mock-api-key',
+          baseURL: 'http://localhost:3001/v1',
+        });
+      } else {
+        // OpenAI API を使用
+        console.log('AI Analysis: OpenAI API使用');
+        client = openai({
+          apiKey: settings.apiKey,
+        });
+      }
+
       // AI分析の実行
       const result = await generateText({
-        model: openai(settings.model),
-        apiKey: settings.apiKey,
+        model: client(settings.model),
         messages: message.data.messages.map(msg => ({
           role: msg.role as 'system' | 'user' | 'assistant',
           content: msg.content,
