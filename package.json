@@ -30,6 +30,9 @@
     "lint": "turbo lint --continue",
     "lint:fix": "turbo lint:fix --continue",
     "format": "turbo format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
+    "test": "run-p 'test:*'",
+    "test:sample-html": "pnpm --filter=sample-html-server test",
+    "test:mock-api": "pnpm --filter=mock-api-server test",
     "prepare": "husky",
     "update-version": "bash bash-scripts/update_version.sh",
     "copy-env": "bash bash-scripts/copy_env.sh",
@@ -38,8 +41,11 @@
     "postinstall": "pnpm copy-env"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.3.22",
+    "@ai-sdk/react": "^1.2.12",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "vitest": "^3.2.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.9",
@@ -69,6 +75,7 @@
     "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "lint-staged": "^16.0.0",
+    "npm-run-all2": "^8.0.4",
     "postcss": "^8.5.3",
     "postcss-load-config": "^6.0.1",
     "prettier": "^3.5.3",
@@ -93,5 +100,8 @@
   "packageManager": "pnpm@10.11.0",
   "engines": {
     "node": ">=22.15.1"
+  },
+  "volta": {
+    "node": "22.16.0"
   }
 }
