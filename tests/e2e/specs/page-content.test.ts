@@ -1,5 +1,5 @@
-describe('Webextension Content Script', () => {
-  it('should log "example content script loaded" in console on example.com', async () => {
+describe('拡張機能コンテンツスクリプト', () => {
+  it('example.comでコンソールに"example content script loaded"がログ出力される', async () => {
     await browser.sessionSubscribe({ events: ['log.entryAdded'] });
     const logs: (string | null)[] = [];
 
@@ -15,7 +15,7 @@ describe('Webextension Content Script', () => {
     expect(logs).toContain(EXPECTED_LOG_MESSAGE);
   });
 
-  it('should log "all content script loaded" in console on any page', async () => {
+  it('任意のページでコンソールに"all content script loaded"がログ出力される', async () => {
     await browser.sessionSubscribe({ events: ['log.entryAdded'] });
     const logs: (string | null)[] = [];
 

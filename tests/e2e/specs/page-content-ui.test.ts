@@ -1,5 +1,5 @@
-describe('Content UI Injection', () => {
-  it('should locate the injected content UI (all and example) div on example.com`', async () => {
+describe('コンテンツUIの注入', () => {
+  it('example.comで注入されたコンテンツUI(allとexample)のdivが見つかる', async () => {
     await browser.url('https://example.com');
 
     const contentAllDiv = await $('#CEB-extension-all').getElement();
@@ -9,7 +9,7 @@ describe('Content UI Injection', () => {
     await expect(contentExampleDiv).toBeDisplayed();
   });
 
-  it('should locate the injected content UI all div and not locate example div on google.com', async () => {
+  it('google.comで注入されたコンテンツUI all divが見つかり、example divが見つからない', async () => {
     await browser.url('https://www.google.com');
 
     const contentAllDiv = await $('#CEB-extension-all').getElement();

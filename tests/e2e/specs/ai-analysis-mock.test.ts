@@ -11,7 +11,7 @@ import {
   cleanupTestData,
 } from '../helpers/ai-analysis-helpers.js';
 
-describe('AI Analysis with Mock API Server', () => {
+describe('モックAPIサーバーを使用したAI分析', () => {
   const SAMPLE_HTML_URL = 'http://localhost:3000';
   const MOCK_API_URL = 'http://localhost:3001';
 
@@ -46,8 +46,8 @@ describe('AI Analysis with Mock API Server', () => {
     await cleanupTestData();
   });
 
-  describe('Mock API Integration', () => {
-    it('should successfully analyze table data with mock API', async () => {
+  describe('モックAPI連携', () => {
+    it('モックAPIでテーブルデータを正常に分析できる', async () => {
       // モックAPIを使用するよう設定
       await configureExtensionSettings({
         apiKey: 'mock-api-key-for-testing',
@@ -97,7 +97,7 @@ describe('AI Analysis with Mock API Server', () => {
       }
     });
 
-    it('should handle mock API error responses gracefully', async () => {
+    it('モックAPIのエラーレスポンスを適切に処理できる', async () => {
       // 無効なAPIキーでテスト
       await configureExtensionSettings({
         apiKey: 'invalid-mock-api-key',
@@ -127,7 +127,7 @@ describe('AI Analysis with Mock API Server', () => {
       }
     });
 
-    it('should display streaming response progressively', async () => {
+    it('ストリーミングレスポンスを逐次表示できる', async () => {
       await configureExtensionSettings({
         apiKey: 'mock-streaming-api-key',
         model: 'gpt-4o-mini',
@@ -169,8 +169,8 @@ describe('AI Analysis with Mock API Server', () => {
     });
   });
 
-  describe('Performance with Mock API', () => {
-    it('should complete analysis within acceptable time', async () => {
+  describe('モックAPIのパフォーマンス', () => {
+    it('許容可能な時間内で分析を完了できる', async () => {
       await configureExtensionSettings({
         apiKey: 'mock-performance-test-key',
         model: 'gpt-4o-mini',
@@ -203,7 +203,7 @@ describe('AI Analysis with Mock API Server', () => {
       }
     });
 
-    it('should handle multiple rapid analysis requests', async () => {
+    it('複数の連続分析リクエストを処理できる', async () => {
       await configureExtensionSettings({
         apiKey: 'mock-rapid-test-key',
         model: 'gpt-4o-mini',
@@ -237,8 +237,8 @@ describe('AI Analysis with Mock API Server', () => {
     });
   });
 
-  describe('Different Table Configurations', () => {
-    it('should handle table with different data types', async () => {
+  describe('異なるテーブル構成', () => {
+    it('異なるデータ型のテーブルを処理できる', async () => {
       // 異なるテーブル構造のテストページを作成
       const customTableHTML = `
         <html>
@@ -283,7 +283,7 @@ describe('AI Analysis with Mock API Server', () => {
       }
     });
 
-    it('should handle empty table gracefully', async () => {
+    it('空のテーブルを適切に処理できる', async () => {
       const emptyTableHTML = `
         <html>
         <body>

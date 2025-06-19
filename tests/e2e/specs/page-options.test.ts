@@ -1,7 +1,7 @@
 import { canSwitchTheme } from '../helpers/theme.js';
 
-describe('Webextension Options Page', () => {
-  it('should make options page accessible', async () => {
+describe('拡張機能オプションページ', () => {
+  it('オプションページにアクセスできる', async () => {
     const extensionPath = await browser.getExtensionPath();
     const optionsUrl = `${extensionPath}/options/index.html`;
 

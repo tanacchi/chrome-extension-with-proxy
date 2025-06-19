@@ -1,7 +1,7 @@
 import { canSwitchTheme } from '../helpers/theme.js';
 
-describe('Webextension Side Panel', () => {
-  it('should make side panel accessible', async () => {
+describe('拡張機能サイドパネル', () => {
+  it('サイドパネルにアクセスできる', async () => {
     const extensionPath = await browser.getExtensionPath();
     const sidePanelUrl = `${extensionPath}/side-panel/index.html`;
 

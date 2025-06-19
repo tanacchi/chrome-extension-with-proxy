@@ -1,7 +1,7 @@
 import { canSwitchTheme } from '../helpers/theme.js';
 
-describe('Webextension New Tab', () => {
-  it('should open the extension page when a new tab is opened', async () => {
+describe('拡張機能新しいタブ', () => {
+  it('新しいタブを開いたときに拡張機能ページが開く', async () => {
     const extensionPath = await browser.getExtensionPath();
     const newTabUrl =
       process.env.CLI_CEB_FIREFOX === 'true' ? `${extensionPath}/new-tab/index.html` : 'chrome://newtab';

@@ -2,7 +2,7 @@
  * AI分析機能のE2Eテスト
  */
 
-describe('AI Analysis Feature', () => {
+describe('AI分析機能', () => {
   const SAMPLE_HTML_URL = 'http://localhost:3000';
 
   beforeEach(async () => {
@@ -11,20 +11,20 @@ describe('AI Analysis Feature', () => {
     await browser.pause(1000); // ページロード待機
   });
 
-  describe('Table Detection', () => {
-    it('should detect target table with ai-target-table-table class', async () => {
+  describe('テーブル検出', () => {
+    it('ai-target-table-tableクラスを持つターゲットテーブルを検出できる', async () => {
       // テーブルが存在することを確認
       const table = await browser.$('.ai-target-table-table');
       await expect(table).toBeExisting();
     });
 
-    it('should detect table rows in tbody', async () => {
+    it('tbody内のテーブル行を検出できる', async () => {
       // tbody内の行数を確認
       const rows = await browser.$$('.ai-target-table-table tbody tr');
       expect(rows).toHaveLength(3);
     });
 
-    it('should extract second column data correctly', async () => {
+    it('2列目のデータを正しく抽出できる', async () => {
       // 2列目のデータを確認
       const secondColumns = await browser.$$('.ai-target-table-table tbody tr td:nth-child(2)');
       expect(secondColumns).toHaveLength(3);
@@ -35,8 +35,8 @@ describe('AI Analysis Feature', () => {
     });
   });
 
-  describe('Content Script Integration', () => {
-    it('should inject analysis button near the table', async () => {
+  describe('コンテンツスクリプト連携', () => {
+    it('テーブルの近くに分析ボタンを注入できる', async () => {
       // Content Scriptの読み込み待機
       await browser.pause(2000);
 
@@ -56,7 +56,7 @@ describe('AI Analysis Feature', () => {
       );
     });
 
-    it('should show loading state when analysis is triggered', async () => {
+    it('分析がトリガーされたときにローディング状態を表示できる', async () => {
       // Content Scriptの読み込み待機
       await browser.pause(2000);
 
@@ -79,8 +79,8 @@ describe('AI Analysis Feature', () => {
     });
   });
 
-  describe('Options Page Integration', () => {
-    it('should be accessible and show AI settings form', async () => {
+  describe('オプションページ連携', () => {
+    it('アクセス可能でAI設定フォームを表示できる', async () => {
       // オプションページを開く
       await browser.url('chrome-extension://test-extension-id/pages/options/index.html');
 
@@ -105,7 +105,7 @@ describe('AI Analysis Feature', () => {
       await expect(customPromptTextarea).toBeExisting();
     });
 
-    it('should save and load settings correctly', async () => {
+    it('設定を正しく保存および読み込みできる', async () => {
       // オプションページを開く
       await browser.url('chrome-extension://test-extension-id/pages/options/index.html');
 
@@ -147,8 +147,8 @@ describe('AI Analysis Feature', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle missing API key gracefully', async () => {
+  describe('エラーハンドリング', () => {
+    it('APIキーの缶失を適切に処理できる', async () => {
       // オプションページでAPIキーを空にする
       await browser.url('chrome-extension://test-extension-id/pages/options/index.html');
 
@@ -185,7 +185,7 @@ describe('AI Analysis Feature', () => {
       }
     });
 
-    it('should handle table not found scenario', async () => {
+    it('テーブルが見つからないシナリオを処理できる', async () => {
       // テーブルのないページを作成
       await browser.url('data:text/html,<html><body><h1>No Table Here</h1></body></html>');
       await browser.pause(1000);
@@ -201,8 +201,8 @@ describe('AI Analysis Feature', () => {
     });
   });
 
-  describe('Performance and Usability', () => {
-    it('should complete analysis within reasonable time', async () => {
+  describe('パフォーマンスと使いやすさ', () => {
+    it('合理的な時間内で分析を完了できる', async () => {
       const startTime = Date.now();
 
       // Content Scriptの読み込み待機
@@ -237,7 +237,7 @@ describe('AI Analysis Feature', () => {
       }
     });
 
-    it('should not interfere with original page layout', async () => {
+    it('元のページレイアウトに干渉しない', async () => {
       // 元のテーブルレイアウトを記録
       const originalTable = await browser.$('.ai-target-table-table');
       const originalPosition = await originalTable.getLocation();

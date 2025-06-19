@@ -1,7 +1,7 @@
 import { canSwitchTheme } from '../helpers/theme.js';
 
-describe('Webextension DevTools Panel', () => {
-  it('should make DevTools panel available', async () => {
+describe('拡張機能開発者ツールパネル', () => {
+  it('開発者ツールパネルが利用できる', async () => {
     const extensionPath = await browser.getExtensionPath();
     const devtoolsPanelUrl = `${extensionPath}/devtools-panel/index.html`;
 

@@ -150,7 +150,7 @@
 - [ ] E2E テストファイルを１つずつ実行し、失敗する場合は１つずつ修正してコミット
 - [ ] E2E テスト実行時に mock-api, sample-html サーバを起動するように package.json ないしスクリプトを修正（すでに起動していたらスキップする）
 
-### mock-api のテスト実装
+### 6.7 mock-api のテスト実装
 
 - [ ] mock-api の OpenAPI Schema を作成し、リクエストの手動テストができるようにする
 - [ ] mock-api の簡単な E2E テストを postman で作成する

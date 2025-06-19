@@ -1,4 +1,4 @@
-describe('Webextension Content Runtime Script', () => {
+describe('拡張機能コンテンツランタイムスクリプト', () => {
   before(function () {
     // Chrome doesn't allow content scripts on the extension pages
     if ((browser.capabilities as WebdriverIO.Capabilities).browserName === 'chrome') {
@@ -6,7 +6,7 @@ describe('Webextension Content Runtime Script', () => {
     }
   });
 
-  it('should create all runtime elements on the page', async function () {
+  it('ページ上にすべてのランタイム要素を作成する', async function () {
     // Open the popup
     const extensionPath = await browser.getExtensionPath();
     const popupUrl = `${extensionPath}/popup/index.html`;
