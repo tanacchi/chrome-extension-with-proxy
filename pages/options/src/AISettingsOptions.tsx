@@ -47,10 +47,36 @@ const AISettingsOptionsComponent = () => {
     setSaveMessage('');
   };
 
+  const handleLoadDevConfig = () => {
+    // 開発用のデフォルト設定をロード
+    const devConfig: AISettings = {
+      apiKey: 'sk-test-development-api-key-placeholder',
+      model: 'gpt-4o-mini',
+      customPrompt: '以下のテーブルデータを分析して、パターンや傾向を教えてください：',
+      useCustomPrompt: false,
+    };
+
+    setFormData(devConfig);
+    setSaveMessage('開発用設定をロードしました。APIキーを実際の値に変更してください。');
+    setTimeout(() => setSaveMessage(''), 5000);
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
       <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
         <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">AI Analysis Settings</h2>
+
+        {/* Development Info */}
+        <div className="mb-6 rounded-md bg-blue-50 p-4 dark:bg-blue-900/20">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                <strong>開発時のヒント:</strong> 「開発用設定をロード」ボタンで仮の設定値を簡単にロードできます。
+                APIキーのみ実際の値に変更してご利用ください。
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="space-y-6">
           {/* API Key Input */}
@@ -90,9 +116,8 @@ const AISettingsOptionsComponent = () => {
                 'rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'dark:bg-gray-700 dark:text-gray-100',
               )}>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-4-turbo">GPT-4 Turbo</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+              <option value="gpt-4o">GPT-4o</option>
             </select>
           </div>
 
@@ -171,7 +196,7 @@ const AISettingsOptionsComponent = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-wrap gap-3 pt-4">
             <button
               onClick={handleSave}
               disabled={isSaving || !formData.apiKey.trim()}
@@ -192,6 +217,17 @@ const AISettingsOptionsComponent = () => {
                 'disabled:cursor-not-allowed disabled:opacity-50',
               )}>
               Reset
+            </button>
+
+            <button
+              onClick={handleLoadDevConfig}
+              disabled={isSaving}
+              className={cn(
+                'rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700',
+                'focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+              )}>
+              開発用設定をロード
             </button>
           </div>
         </div>
