@@ -6,3 +6,19 @@ export type BaseStorageType<D> = {
   getSnapshot: () => D | null;
   subscribe: (listener: () => void) => () => void;
 };
+
+// AI Analysis Tool Types
+export interface AISettings {
+  apiKey: string;
+  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo';
+  customPrompt?: string;
+  useCustomPrompt: boolean;
+}
+
+export interface AnalysisResult {
+  content: string;
+  timestamp: Date;
+  model: string;
+  promptUsed: string;
+  tableData?: string[];
+}
