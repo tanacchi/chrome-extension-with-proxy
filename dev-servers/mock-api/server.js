@@ -1,14 +1,66 @@
-import express, { json } from 'express';
+import express, { json, static as staticFiles } from 'express';
 import cors from 'cors';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export function createServer() {
   const app = express();
 
-  // Enable CORS for all routes
-  app.use(cors());
+  // Enable CORS for localhost
+  app.use(
+    cors({
+      origin: [
+        'http://localhost:3000', // sample-html-server
+        'http://localhost:3001', // mock-api-server (self)
+        'http://localhost:3002', // alternative mock-api port
+        'http://localhost:8080', // common dev server port
+        'http://localhost:8000', // alternative dev server port
+        'http://localhost:5173', // Vite dev server
+        'http://localhost:4173', // Vite preview server
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://127.0.0.1:3002',
+        'http://127.0.0.1:8080',
+        'http://127.0.0.1:8000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:4173',
+        // Chrome Extension origins
+        /^chrome-extension:\/\//,
+        /^moz-extension:\/\//,
+        // Any localhost port pattern
+        /^http:\/\/localhost:\d+$/,
+        /^http:\/\/127\.0\.0\.1:\d+$/,
+      ],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+      ],
+      exposedHeaders: ['Content-Length', 'Content-Type', 'X-Response-Time'],
+      optionsSuccessStatus: 200,
+    }),
+  );
 
   // Parse JSON bodies
   app.use(json());
+
+  // CORS debugging middleware
+  app.use((req, res, next) => {
+    const origin = req.get('Origin');
+    if (origin && process.env.NODE_ENV !== 'production') {
+      console.log(`CORS request from origin: ${origin}`);
+    }
+    next();
+  });
 
   // Mock OpenAI Chat Completions API
   app.post('/v1/chat/completions', (req, res) => {
@@ -66,6 +118,59 @@ export function createServer() {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // OpenAPI Schema endpoint
+  app.get('/openapi.yaml', (req, res) => {
+    try {
+      const openApiContent = readFileSync(join(__dirname, 'openapi.yaml'), 'utf8');
+      res.setHeader('Content-Type', 'application/x-yaml');
+      res.send(openApiContent);
+    } catch (error) {
+      res.status(404).json({ error: 'OpenAPI schema not found' });
+    }
+  });
+
+  // Swagger UI endpoint
+  app.get('/docs', (req, res) => {
+    try {
+      const swaggerHtml = readFileSync(join(__dirname, 'swagger-ui.html'), 'utf8');
+      res.setHeader('Content-Type', 'text/html');
+      res.send(swaggerHtml);
+    } catch (error) {
+      res.status(404).json({ error: 'Swagger UI not found' });
+    }
+  });
+
+  // CORS test endpoint
+  app.get('/cors-test', (req, res) => {
+    res.json({
+      message: 'CORS is working!',
+      origin: req.get('Origin') || 'No origin header',
+      timestamp: new Date().toISOString(),
+      headers: {
+        'access-control-allow-origin': res.get('Access-Control-Allow-Origin'),
+        'access-control-allow-credentials': res.get('Access-Control-Allow-Credentials'),
+      },
+    });
+  });
+
+  // Root endpoint with API info
+  app.get('/', (req, res) => {
+    res.json({
+      name: 'Mock API Server',
+      description: 'OpenAI互換のモックAPIサーバー',
+      version: '1.0.0',
+      endpoints: {
+        chat_completions: '/v1/chat/completions',
+        health: '/health',
+        docs: '/docs',
+        openapi: '/openapi.yaml',
+        cors_test: '/cors-test',
+      },
+      documentation: `http://localhost:${req.get('host')}/docs`,
+      cors: 'Configured for localhost and Chrome extensions',
+    });
+  });
+
   return app;
 }
 
@@ -98,8 +203,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   app.listen(PORT, () => {
     console.log(`Mock API Server running on http://localhost:${PORT}`);
-    console.log('OpenAI-compatible endpoints:');
-    console.log(`  POST http://localhost:${PORT}/v1/chat/completions`);
-    console.log(`  GET  http://localhost:${PORT}/health`);
+    console.log('Available endpoints:');
+    console.log(`  API Documentation: http://localhost:${PORT}/docs`);
+    console.log(`  Health Check:      http://localhost:${PORT}/health`);
+    console.log(`  OpenAPI Schema:    http://localhost:${PORT}/openapi.yaml`);
+    console.log(`  Chat Completions:  http://localhost:${PORT}/v1/chat/completions`);
+    console.log('');
+    console.log(`🌐 Open API Documentation: http://localhost:${PORT}/docs`);
   });
 }

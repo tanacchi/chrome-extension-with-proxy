@@ -1,0 +1,380 @@
+{
+  "info": {
+    "name": "Mock API Server E2E Tests",
+    "description": "Chrome拡張機能のMock APIサーバー用E2Eテストコレクション",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "サーバーヘルスチェック",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"レスポンスがJSONである\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"ステータスがokである\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"ok\");",
+                  "});",
+                  "",
+                  "pm.test(\"timestampが含まれている\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.timestamp).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Documentation",
+      "item": [
+        {
+          "name": "ルートエンドポイント情報取得",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"API情報が含まれている\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.name).to.eql(\"Mock API Server\");",
+                  "    pm.expect(jsonData.endpoints).to.exist;",
+                  "    pm.expect(jsonData.documentation).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "CORS設定テスト",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"CORSヘッダーが設定されている\", function () {",
+                  "    pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"レスポンスにCORS情報が含まれている\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql('CORS is working!');",
+                  "    pm.expect(jsonData.headers).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "description": "テスト用のOriginヘッダー"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cors-test",
+              "host": ["{{baseUrl}}"],
+              "path": ["cors-test"]
+            }
+          }
+        },
+        {
+          "name": "OpenAPI Schema取得",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-TypeがYAMLである\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('yaml');",
+                  "});",
+                  "",
+                  "pm.test(\"OpenAPI形式のYAMLが返される\", function () {",
+                  "    var responseText = pm.response.text();",
+                  "    pm.expect(responseText).to.include('openapi: 3.0.3');",
+                  "    pm.expect(responseText).to.include('/v1/chat/completions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/openapi.yaml",
+              "host": ["{{baseUrl}}"],
+              "path": ["openapi.yaml"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat Completions API",
+      "item": [
+        {
+          "name": "基本的なチャット補完リクエスト",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"レスポンス形式が正しい\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.exist;",
+                  "    pm.expect(jsonData.object).to.eql(\"chat.completion\");",
+                  "    pm.expect(jsonData.choices).to.be.an('array');",
+                  "    pm.expect(jsonData.choices.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test(\"メッセージが返される\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var message = jsonData.choices[0].message;",
+                  "    pm.expect(message.role).to.eql(\"assistant\");",
+                  "    pm.expect(message.content).to.be.a('string');",
+                  "    pm.expect(message.content.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test(\"使用量情報が含まれている\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.usage.prompt_tokens).to.be.a('number');",
+                  "    pm.expect(jsonData.usage.completion_tokens).to.be.a('number');",
+                  "    pm.expect(jsonData.usage.total_tokens).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "description": "Chrome拡張機能やWebアプリからのリクエストをシミュレート"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"あなたはテーブルデータの分析を行うAIアシスタントです。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"以下のテーブルデータを分析してください: りんご, バナナ, オレンジ\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            }
+          }
+        },
+        {
+          "name": "カスタムプロンプトでのリクエスト",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが200である\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"指定したモデルが使用される\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.model).to.eql(\"gpt-4o\");",
+                  "});",
+                  "",
+                  "pm.test(\"レスポンス時間が5秒以内\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "description": "Chrome拡張機能やWebアプリからのリクエストをシミュレート"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"データの特徴を詳しく分析してください。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"商品名: りんご, 価格: 100円, 在庫: 50個\\n商品名: バナナ, 価格: 80円, 在庫: 30個\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            }
+          }
+        },
+        {
+          "name": "エラーケース: 無効なリクエスト",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが400である\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"エラー情報が含まれている\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "    pm.expect(jsonData.error.message).to.be.a('string');",
+                  "    pm.expect(jsonData.error.type).to.exist;",
+                  "    pm.expect(jsonData.error.code).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "description": "Chrome拡張機能やWebアプリからのリクエストをシミュレート"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt-4o-mini\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            }
+          }
+        },
+        {
+          "name": "エラーケース: 空のメッセージ配列",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"ステータスコードが400である\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"適切なエラーメッセージが返される\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error.message).to.include('model and messages are required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "description": "Chrome拡張機能やWebアプリからのリクエストをシミュレート"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "description": "Mock API Server Base URL"
+    }
+  ]
+}
