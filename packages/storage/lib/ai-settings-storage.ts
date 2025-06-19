@@ -3,7 +3,7 @@ import type { AISettings, BaseStorageType } from './types.js';
 
 export const DEFAULT_AI_SETTINGS: AISettings = {
   apiKey: '',
-  model: 'gpt-3.5-turbo',
+  model: 'gpt-4o',
   customPrompt: '',
   useCustomPrompt: false,
 };

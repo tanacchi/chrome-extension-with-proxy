@@ -15,7 +15,7 @@ const currentDirname = path.dirname(currentFilename);
 
 async function generateManifest() {
   try {
-    const projectRoot = path.resolve(currentDirname, '...');
+    const projectRoot = path.resolve(currentDirname, '..');
     const manifestPath = path.join(projectRoot, 'chrome-extension', 'manifest.js');
     const distDir = path.join(projectRoot, 'dist');
     const outputPath = path.join(distDir, 'manifest.json');
