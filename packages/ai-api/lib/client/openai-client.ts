@@ -346,14 +346,18 @@ export class OpenAIClient {
 
     // ヘッダーの安全な変換
     const headers: Record<string, string> = {};
-    if (response.headers && typeof response.headers.entries === 'function') {
-      for (const [key, value] of response.headers.entries()) {
-        headers[key] = value;
+    try {
+      if (response.headers && response.headers.forEach) {
+        response.headers.forEach((value, key) => {
+          headers[key] = value;
+        });
       }
+    } catch {
+      // ヘッダー取得に失敗した場合は空オブジェクトを使用
     }
 
     const error = {
-      message: errorData?.error?.message || `HTTP Error ${response.status}`,
+      message: ((errorData as Record<string, unknown>)?.error?.message as string) || `HTTP Error ${response.status}`,
       status: response.status,
       statusCode: response.status,
       headers: headers,
@@ -372,6 +376,10 @@ export class OpenAIClient {
    * @private
    */
   private isAPIError(error: unknown): error is APIError {
-    return error && typeof error.type === 'string' && error.name === 'APIError';
+    return Boolean(
+      error &&
+        typeof (error as Record<string, unknown>).type === 'string' &&
+        (error as Record<string, unknown>).name === 'APIError',
+    );
   }
 }

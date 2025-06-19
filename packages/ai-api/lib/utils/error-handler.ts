@@ -91,8 +91,9 @@ export class APIErrorHandler {
    * @private
    */
   private handleHTTPError(error: unknown): APIError {
-    const statusCode = error.status || error.statusCode;
-    const message = error.message || `HTTP Error ${statusCode}`;
+    const errorObj = error as Record<string, unknown>;
+    const statusCode = errorObj.status || errorObj.statusCode;
+    const message = errorObj.message || `HTTP Error ${statusCode}`;
     let errorType: APIErrorType;
     let retryAfter: number | undefined;
 
@@ -131,7 +132,14 @@ export class APIErrorHandler {
       errorType = APIErrorType.QUOTA_EXCEEDED;
     }
 
-    return createAPIError(errorType, message, statusCode, retryAfter, error.data || error.response?.data, error);
+    return createAPIError(
+      errorType,
+      message,
+      statusCode,
+      retryAfter,
+      errorObj.data || errorObj.response?.data,
+      errorObj instanceof Error ? errorObj : undefined,
+    );
   }
 
   /**
@@ -148,21 +156,21 @@ export class APIErrorHandler {
     }
 
     const err = error as { name?: string; code?: string; message?: string };
-    return (
+    return Boolean(
       err.name === 'NetworkError' ||
-      err.name === 'TimeoutError' ||
-      err.name === 'AbortError' ||
-      err.code === 'ECONNREFUSED' ||
-      err.code === 'ENOTFOUND' ||
-      err.code === 'ETIMEDOUT' ||
-      (err.message &&
-        typeof err.message === 'string' &&
-        (err.message.toLowerCase().includes('network') ||
-          err.message.toLowerCase().includes('timeout') ||
-          err.message.toLowerCase().includes('connection') ||
-          err.message.toLowerCase().includes('failed') ||
-          err.message.toLowerCase().includes('request timeout') ||
-          err.message.includes('fetch')))
+        err.name === 'TimeoutError' ||
+        err.name === 'AbortError' ||
+        err.code === 'ECONNREFUSED' ||
+        err.code === 'ENOTFOUND' ||
+        err.code === 'ETIMEDOUT' ||
+        (err.message &&
+          typeof err.message === 'string' &&
+          (err.message.toLowerCase().includes('network') ||
+            err.message.toLowerCase().includes('timeout') ||
+            err.message.toLowerCase().includes('connection') ||
+            err.message.toLowerCase().includes('failed') ||
+            err.message.toLowerCase().includes('request timeout') ||
+            err.message.includes('fetch'))),
     );
   }
 
@@ -175,7 +183,8 @@ export class APIErrorHandler {
    * @private
    */
   private extractRetryAfter(error: unknown): number | undefined {
-    const headers = error.headers || error.response?.headers;
+    const errorObj = error as Record<string, unknown>;
+    const headers = errorObj.headers || errorObj.response?.headers;
     if (!headers) return undefined;
 
     const retryAfter = headers['retry-after'] || headers['Retry-After'];

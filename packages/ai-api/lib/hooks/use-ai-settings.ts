@@ -156,7 +156,7 @@ export const useAISettings = (): UseAISettingsReturn => {
       // デフォルト設定を取得
       const defaultSettings: AISettings = {
         apiKey: '',
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o-mini' as const,
         customPrompt: '',
         useCustomPrompt: false,
       };
@@ -180,7 +180,7 @@ export const useAISettings = (): UseAISettingsReturn => {
    * 設定が有効かどうか
    */
   const isValid = Boolean(
-    settings && hasApiKey && settings.model && ['gpt-4o', 'gpt-4o-mini'].includes(settings.model),
+    settings && hasApiKey && settings.model && (['gpt-4o', 'gpt-4o-mini'] as const).includes(settings.model),
   );
 
   /**
@@ -214,6 +214,8 @@ export const useAISettings = (): UseAISettingsReturn => {
         chrome.storage.onChanged.removeListener(handleStorageChange);
       };
     }
+
+    return undefined;
   }, []);
 
   return {
@@ -251,7 +253,7 @@ const validateSettings = (settings: AISettings): void => {
   }
 
   // モデルの検証
-  const validModels = ['gpt-4o', 'gpt-4o-mini'];
+  const validModels = ['gpt-4o', 'gpt-4o-mini'] as const;
   if (!validModels.includes(settings.model)) {
     throw new Error(`無効なモデルです。有効なモデル: ${validModels.join(', ')}`);
   }
