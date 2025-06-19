@@ -208,7 +208,9 @@ export const checkAISettings = async (): Promise<{
   errors: string[];
 }> => {
   try {
+    console.log('AI Settings: チェック開始');
     const settings = await aiSettingsStorage.get();
+    console.log('AI Settings: 取得された設定', settings);
     const errors: string[] = [];
 
     const hasApiKey = Boolean(settings.apiKey && settings.apiKey.trim().length > 0);
@@ -220,12 +222,15 @@ export const checkAISettings = async (): Promise<{
       errors.push('AIモデルが設定されていません');
     }
 
-    return {
+    const result = {
       isValid: errors.length === 0,
       hasApiKey,
       model: settings.model || 'gpt-4o-mini',
       errors,
     };
+
+    console.log('AI Settings: チェック結果', result);
+    return result;
   } catch (error) {
     console.error('Failed to check AI settings:', error);
     return {

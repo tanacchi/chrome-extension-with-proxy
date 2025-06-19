@@ -6,16 +6,10 @@ import type { AISettings, BaseStorageType } from './types.js';
  */
 const getDevConfig = (): Partial<AISettings> => {
   try {
-    // 開発時のみdev-config.jsonを読み込み
-    if (typeof process !== 'undefined' && process.env?.CLI_CEB_DEV === 'true') {
-      // 動的インポートは使用できないため、デフォルト値を返す
-      return {
-        apiKey: 'sk-test-development-api-key-placeholder',
-        model: 'gpt-4o-mini',
-        customPrompt: '',
-        useCustomPrompt: false,
-      };
-    }
+    // Content Script環境では process.env が使用できないため、
+    // 開発時のデフォルト設定はOptions画面やSidePanelの
+    // 「開発用設定をロード」ボタンで設定する
+    return {};
   } catch (error) {
     console.warn('Failed to load dev config:', error);
   }
@@ -35,14 +29,25 @@ export const createAISettingsStorage = (): BaseStorageType<AISettings> =>
     storageEnum: StorageEnum.Local,
     liveUpdate: true,
     serialization: {
-      serialize: value => JSON.stringify(value),
+      serialize: value => {
+        try {
+          return JSON.stringify(value);
+        } catch (error) {
+          console.error('AI Settings serialize error:', error);
+          return JSON.stringify(DEFAULT_AI_SETTINGS);
+        }
+      },
       deserialize: text => {
-        if (!text || text === 'undefined') {
+        if (!text || text === 'undefined' || text === 'null') {
+          console.log('AI Settings: デフォルト設定を使用します');
           return DEFAULT_AI_SETTINGS;
         }
         try {
-          return JSON.parse(text);
-        } catch {
+          const parsed = JSON.parse(text);
+          console.log('AI Settings: 正常に読み込まれました', parsed);
+          return parsed;
+        } catch (error) {
+          console.error('AI Settings deserialize error:', error);
           return DEFAULT_AI_SETTINGS;
         }
       },
