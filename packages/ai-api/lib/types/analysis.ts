@@ -1,16 +1,16 @@
 /**
  * @fileoverview AI分析関連の型定義
- * 
+ *
  * テーブルデータAI分析機能で使用される
  * 型定義を提供します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
 /**
  * 分析結果
- * 
+ *
  * @interface AnalysisResult
  */
 export interface AnalysisResult {
@@ -38,7 +38,7 @@ export interface AnalysisResult {
 
 /**
  * テーブル分析リクエスト
- * 
+ *
  * @interface TableAnalysisRequest
  */
 export interface TableAnalysisRequest {
@@ -59,7 +59,7 @@ export interface TableAnalysisRequest {
 
 /**
  * 分析状態
- * 
+ *
  * @enum AnalysisStatus
  */
 export enum AnalysisStatus {
@@ -72,12 +72,12 @@ export enum AnalysisStatus {
   /** エラー */
   ERROR = 'error',
   /** キャンセル */
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 /**
  * 分析履歴エントリ
- * 
+ *
  * @interface AnalysisHistoryEntry
  */
 export interface AnalysisHistoryEntry {

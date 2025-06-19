@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./lib",
+    "outDir": "./dist",
     "rootDir": "./lib",
     "declaration": true,
     "declarationMap": true,
@@ -9,9 +9,7 @@
     "composite": true,
     "incremental": true
   },
-  "include": [
-    "lib/**/*"
-  ],
+  "include": ["lib/**/*", "tests/**/*", "vitest.config.ts"],
   "references": [
     {
       "path": "../shared"

@@ -12,13 +12,7 @@ export default defineConfig({
         branches: 78,
         statements: 78,
       },
-      exclude: [
-        'dist/**',
-        '**/*.spec.ts',
-        '**/*.test.ts',
-        'vitest.config.ts',
-        'index.mts',
-      ],
+      exclude: ['dist/**', '**/*.spec.ts', '**/*.test.ts', 'vitest.config.ts', 'index.mts'],
     },
   },
 });

@@ -1,17 +1,17 @@
 /**
  * @fileoverview AI API統合のための型定義
- * 
+ *
  * OpenAI APIとの統合に必要な型定義を提供します。
  * レスポンス、リクエスト、エラーハンドリングなどの
  * 包括的な型安全性を確保します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
 /**
  * OpenAI APIのチャットメッセージ
- * 
+ *
  * @interface ChatMessage
  */
 export interface ChatMessage {
@@ -25,7 +25,7 @@ export interface ChatMessage {
 
 /**
  * OpenAI APIのチャット補完リクエスト
- * 
+ *
  * @interface ChatCompletionRequest
  */
 export interface ChatCompletionRequest {
@@ -51,7 +51,7 @@ export interface ChatCompletionRequest {
 
 /**
  * OpenAI APIのチャット補完レスポンス
- * 
+ *
  * @interface ChatCompletionResponse
  */
 export interface ChatCompletionResponse {
@@ -73,7 +73,7 @@ export interface ChatCompletionResponse {
 
 /**
  * チャット補完の選択肢
- * 
+ *
  * @interface ChatCompletionChoice
  */
 export interface ChatCompletionChoice {
@@ -89,7 +89,7 @@ export interface ChatCompletionChoice {
 
 /**
  * API使用量情報
- * 
+ *
  * @interface ChatCompletionUsage
  */
 export interface ChatCompletionUsage {
@@ -103,7 +103,7 @@ export interface ChatCompletionUsage {
 
 /**
  * ストリーミングレスポンスのチャンク
- * 
+ *
  * @interface ChatCompletionChunk
  */
 export interface ChatCompletionChunk {
@@ -123,7 +123,7 @@ export interface ChatCompletionChunk {
 
 /**
  * ストリーミングのデルタ情報
- * 
+ *
  * @interface ChatCompletionDelta
  */
 export interface ChatCompletionDelta {
@@ -142,7 +142,7 @@ export interface ChatCompletionDelta {
 
 /**
  * APIエラーの種別
- * 
+ *
  * @enum APIErrorType
  */
 export enum APIErrorType {
@@ -159,12 +159,12 @@ export enum APIErrorType {
   /** サーバーエラー */
   SERVER_ERROR = 'server_error',
   /** 不明なエラー */
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
  * APIエラーの詳細情報
- * 
+ *
  * @interface APIError
  * @extends Error
  */
@@ -183,7 +183,7 @@ export interface APIError extends Error {
 
 /**
  * リトライ設定
- * 
+ *
  * @interface RetryConfig
  */
 export interface RetryConfig {
@@ -201,7 +201,7 @@ export interface RetryConfig {
 
 /**
  * レート制限の状況
- * 
+ *
  * @interface RateLimitStatus
  */
 export interface RateLimitStatus {
@@ -217,7 +217,7 @@ export interface RateLimitStatus {
 
 /**
  * 分析結果
- * 
+ *
  * @interface AnalysisResult
  */
 export interface AnalysisResult {
@@ -241,7 +241,7 @@ export interface AnalysisResult {
 
 /**
  * プロンプト検証結果
- * 
+ *
  * @interface ValidationResult
  */
 export interface ValidationResult {
@@ -255,7 +255,7 @@ export interface ValidationResult {
 
 /**
  * キャッシュエントリ
- * 
+ *
  * @interface CacheEntry
  */
 export interface CacheEntry<T = unknown> {
@@ -273,7 +273,7 @@ export interface CacheEntry<T = unknown> {
 
 /**
  * AI設定（storageパッケージからの拡張）
- * 
+ *
  * @interface ExtendedAISettings
  */
 export interface ExtendedAISettings {
@@ -307,7 +307,7 @@ export interface ExtendedAISettings {
 
 /**
  * APIクライアントの設定
- * 
+ *
  * @interface ClientConfig
  */
 export interface ClientConfig {
@@ -325,7 +325,7 @@ export interface ClientConfig {
 
 /**
  * ヘルスチェック結果
- * 
+ *
  * @interface HealthCheckResult
  */
 export interface HealthCheckResult {

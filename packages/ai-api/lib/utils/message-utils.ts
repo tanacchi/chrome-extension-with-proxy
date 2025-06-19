@@ -1,20 +1,20 @@
 /**
  * @fileoverview Chrome メッセージング ユーティリティ
- * 
+ *
  * Chrome拡張機能のContent ScriptとBackground Script間の
  * メッセージング通信を簡素化するユーティリティです。
  * 型安全な通信とエラーハンドリングを提供します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
 /**
  * Chrome メッセージの基本構造
- * 
+ *
  * @interface ChromeMessage
  */
-export interface ChromeMessage<T = any> {
+export interface ChromeMessage<T = unknown> {
   /** メッセージタイプ */
   type: string;
   /** メッセージデータ */
@@ -27,10 +27,10 @@ export interface ChromeMessage<T = any> {
 
 /**
  * Chrome メッセージレスポンスの構造
- * 
+ *
  * @interface ChromeMessageResponse
  */
-export interface ChromeMessageResponse<T = any> {
+export interface ChromeMessageResponse<T = unknown> {
   /** 成功フラグ */
   success: boolean;
   /** レスポンスデータ */
@@ -45,7 +45,7 @@ export interface ChromeMessageResponse<T = any> {
 
 /**
  * メッセージ送信オプション
- * 
+ *
  * @interface MessageOptions
  */
 export interface MessageOptions {
@@ -59,10 +59,10 @@ export interface MessageOptions {
 
 /**
  * Chrome Runtime メッセージを送信する
- * 
+ *
  * Content ScriptからBackground Scriptにメッセージを送信します。
  * タイムアウト、リトライ、エラーハンドリングを含む包括的な通信機能です。
- * 
+ *
  * @example
  * ```typescript
  * // AI分析リクエストの送信
@@ -73,38 +73,34 @@ export interface MessageOptions {
  *     settings: aiSettings
  *   }
  * });
- * 
+ *
  * if (response.success) {
  *   console.log('Analysis result:', response.data);
  * } else {
  *   console.error('Analysis failed:', response.error);
  * }
  * ```
- * 
+ *
  * @param message - 送信するメッセージ
  * @param options - メッセージ送信オプション
  * @returns メッセージレスポンス
  * @throws {Error} 通信失敗時
- * 
+ *
  * @since 1.0.0
  */
-export const sendChromeMessage = async <TRequest = any, TResponse = any>(
+export const sendChromeMessage = async <TRequest = unknown, TResponse = unknown>(
   message: ChromeMessage<TRequest>,
-  options: MessageOptions = {}
+  options: MessageOptions = {},
 ): Promise<ChromeMessageResponse<TResponse>> => {
-  const {
-    timeout = 30000,
-    retries = 2,
-    enableLogging = false
-  } = options;
+  const { timeout = 30000, retries = 2, enableLogging = false } = options;
 
   // リクエストIDを生成
   const requestId = generateRequestId();
-  
+
   const messageWithMeta: ChromeMessage<TRequest> = {
     ...message,
     requestId,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   if (enableLogging) {
@@ -116,27 +112,23 @@ export const sendChromeMessage = async <TRequest = any, TResponse = any>(
     throw new Error('Chrome Runtime API is not available');
   }
 
-  return await executeWithRetry(
-    () => sendMessageWithTimeout(messageWithMeta, timeout),
-    retries,
-    enableLogging
-  );
+  return await executeWithRetry(() => sendMessageWithTimeout(messageWithMeta, timeout), retries, enableLogging);
 };
 
 /**
  * タイムアウト付きでメッセージを送信する
- * 
+ *
  * @param message - 送信するメッセージ
  * @param timeout - タイムアウト時間（ミリ秒）
  * @returns メッセージレスポンス
- * 
+ *
  * @private
  */
-const sendMessageWithTimeout = async <TRequest = any, TResponse = any>(
+const sendMessageWithTimeout = async <TRequest = unknown, TResponse = unknown>(
   message: ChromeMessage<TRequest>,
-  timeout: number
-): Promise<ChromeMessageResponse<TResponse>> => {
-  return new Promise((resolve, reject) => {
+  timeout: number,
+): Promise<ChromeMessageResponse<TResponse>> =>
+  new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       reject(new Error(`Message timeout after ${timeout}ms`));
     }, timeout);
@@ -159,37 +151,36 @@ const sendMessageWithTimeout = async <TRequest = any, TResponse = any>(
       resolve(response);
     });
   });
-};
 
 /**
  * リトライ機能付きで関数を実行する
- * 
+ *
  * @param operation - 実行する操作
  * @param maxRetries - 最大リトライ回数
  * @param enableLogging - ログ出力の有効化
  * @returns 操作の結果
- * 
+ *
  * @private
  */
 const executeWithRetry = async <T>(
   operation: () => Promise<T>,
   maxRetries: number,
-  enableLogging: boolean
+  enableLogging: boolean,
 ): Promise<T> => {
   let lastError: Error;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const result = await operation();
-      
+
       if (enableLogging && attempt > 0) {
         console.log(`[Chrome Message] Succeeded on attempt ${attempt + 1}`);
       }
-      
+
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       if (enableLogging) {
         console.warn(`[Chrome Message] Attempt ${attempt + 1} failed:`, lastError.message);
       }
@@ -207,10 +198,10 @@ const executeWithRetry = async <T>(
 
 /**
  * Background Script でメッセージリスナーを設定する
- * 
+ *
  * Background Script側でContent Scriptからのメッセージを
  * 受信するためのリスナーを設定します。
- * 
+ *
  * @example
  * ```typescript
  * // Background Script
@@ -221,16 +212,16 @@ const executeWithRetry = async <T>(
  *   return null;
  * });
  * ```
- * 
+ *
  * @param handler - メッセージハンドラー関数
- * 
+ *
  * @since 1.0.0
  */
-export const setupMessageListener = <TRequest = any, TResponse = any>(
+export const setupMessageListener = <TRequest = unknown, TResponse = unknown>(
   handler: (
     message: ChromeMessage<TRequest>,
-    sender: chrome.runtime.MessageSender
-  ) => Promise<ChromeMessageResponse<TResponse>> | ChromeMessageResponse<TResponse> | null
+    sender: chrome.runtime.MessageSender,
+  ) => Promise<ChromeMessageResponse<TResponse>> | ChromeMessageResponse<TResponse> | null,
 ): void => {
   if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.onMessage) {
     console.warn('Chrome Runtime API is not available for message listener');
@@ -240,7 +231,7 @@ export const setupMessageListener = <TRequest = any, TResponse = any>(
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     try {
       const result = handler(message, sender);
-      
+
       if (result === null) {
         // このハンドラーでは処理しない
         return false;
@@ -255,10 +246,10 @@ export const setupMessageListener = <TRequest = any, TResponse = any>(
             sendResponse({
               success: false,
               error: error.message || 'Unknown error',
-              requestId: message.requestId
+              requestId: message.requestId,
             });
           });
-        
+
         // 非同期レスポンスを示すためtrueを返す
         return true;
       } else {
@@ -271,7 +262,7 @@ export const setupMessageListener = <TRequest = any, TResponse = any>(
       sendResponse({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        requestId: message.requestId
+        requestId: message.requestId,
       });
       return false;
     }
@@ -280,7 +271,7 @@ export const setupMessageListener = <TRequest = any, TResponse = any>(
 
 /**
  * メッセージタイプの定数
- * 
+ *
  * @since 1.0.0
  */
 export const MESSAGE_TYPES = {
@@ -293,14 +284,14 @@ export const MESSAGE_TYPES = {
   /** ヘルスチェック */
   HEALTH_CHECK: 'HEALTH_CHECK',
   /** テーブルデータ取得 */
-  GET_TABLE_DATA: 'GET_TABLE_DATA'
+  GET_TABLE_DATA: 'GET_TABLE_DATA',
 } as const;
 
 /**
  * 一意のリクエストIDを生成する
- * 
+ *
  * @returns リクエストID
- * 
+ *
  * @private
  */
 const generateRequestId = (): string => {
@@ -311,10 +302,10 @@ const generateRequestId = (): string => {
 
 /**
  * メッセージサイズを計算する（デバッグ用）
- * 
+ *
  * @param message - サイズを計算するメッセージ
  * @returns バイト数
- * 
+ *
  * @since 1.0.0
  */
 export const calculateMessageSize = (message: ChromeMessage): number => {
@@ -324,12 +315,12 @@ export const calculateMessageSize = (message: ChromeMessage): number => {
 
 /**
  * メッセージをログ出力用にサニタイズする
- * 
+ *
  * APIキーなどの機密情報を除去してログ出力に安全な形式にします。
- * 
+ *
  * @param message - サニタイズするメッセージ
  * @returns サニタイズ済みメッセージ
- * 
+ *
  * @since 1.0.0
  */
 export const sanitizeMessageForLogging = (message: ChromeMessage): ChromeMessage => {
@@ -337,8 +328,8 @@ export const sanitizeMessageForLogging = (message: ChromeMessage): ChromeMessage
 
   // APIキーやトークンを除去
   const sensitiveKeys = ['apiKey', 'api_key', 'token', 'password', 'secret'];
-  
-  const sanitizeObject = (obj: any): void => {
+
+  const sanitizeObject = (obj: unknown): void => {
     if (typeof obj !== 'object' || obj === null) return;
 
     for (const key in obj) {

@@ -1,24 +1,24 @@
 /**
  * @fileoverview AI分析カスタムフック
- * 
+ *
  * @ai-sdk/reactのuseChatフックを内部で使用し、
  * テーブルデータのAI分析に特化したインターフェースを提供します。
  * Chrome拡張機能のContent ScriptでReactコンポーネントから使用されます。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
 
-import { useCallback, useMemo } from 'react';
-import { useChat } from '@ai-sdk/react';
 import { useAISettings } from './use-ai-settings';
 import { buildAnalysisPrompt } from '../services/prompt-service';
 import { sendChromeMessage } from '../utils/message-utils';
+import { useChat } from '@ai-sdk/react';
+import { useCallback, useMemo } from 'react';
 import type { AnalysisResult } from '../types/analysis';
 
 /**
  * AI分析フックのオプション
- * 
+ *
  * @interface UseAnalysisOptions
  */
 export interface UseAnalysisOptions {
@@ -32,7 +32,7 @@ export interface UseAnalysisOptions {
 
 /**
  * AI分析フックの戻り値
- * 
+ *
  * @interface UseAnalysisReturn
  */
 export interface UseAnalysisReturn {
@@ -54,11 +54,11 @@ export interface UseAnalysisReturn {
 
 /**
  * AI分析カスタムフック
- * 
+ *
  * @ai-sdk/reactのuseChatを内部で使用して、テーブルデータの
  * AI分析機能を提供します。Chrome拡張機能のBackground Scriptと
  * 連携してOpenAI APIを呼び出します。
- * 
+ *
  * @example
  * ```typescript
  * const AnalysisComponent: React.FC = () => {
@@ -70,12 +70,12 @@ export interface UseAnalysisReturn {
  *       console.error('Analysis failed:', error);
  *     }
  *   });
- * 
+ *
  *   const handleAnalyze = async () => {
  *     const tableData = ['データ1', 'データ2', 'データ3'];
  *     await analyzeTableData(tableData);
  *   };
- * 
+ *
  *   return (
  *     <div>
  *       <button onClick={handleAnalyze} disabled={isAnalyzing}>
@@ -87,10 +87,10 @@ export interface UseAnalysisReturn {
  *   );
  * };
  * ```
- * 
+ *
  * @param options - フックのオプション
  * @returns AI分析機能を提供するオブジェクト
- * 
+ *
  * @since 1.0.0
  */
 export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn => {
@@ -101,44 +101,40 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
    * Chrome拡張機能用のカスタムAPI関数
    * Background Scriptとの通信を行います
    */
-  const chromeExtensionAPI = useCallback(async (request: { messages: Array<{ role: string; content: string }> }) => {
-    try {
-      const response = await sendChromeMessage({
-        type: 'AI_ANALYSIS_REQUEST',
-        data: {
-          messages: request.messages,
-          settings: settings
+  const chromeExtensionAPI = useCallback(
+    async (request: { messages: Array<{ role: string; content: string }> }) => {
+      try {
+        const response = await sendChromeMessage({
+          type: 'AI_ANALYSIS_REQUEST',
+          data: {
+            messages: request.messages,
+            settings: settings,
+          },
+        });
+
+        if (!response.success) {
+          throw new Error(response.error || 'Analysis request failed');
         }
-      });
 
-      if (!response.success) {
-        throw new Error(response.error || 'Analysis request failed');
+        return response.data;
+      } catch (error) {
+        console.error('Chrome message error:', error);
+        throw error;
       }
-
-      return response.data;
-    } catch (error) {
-      console.error('Chrome message error:', error);
-      throw error;
-    }
-  }, [settings]);
+    },
+    [settings],
+  );
 
   /**
    * useChatフックの設定
    */
-  const {
-    messages,
-    append,
-    isLoading,
-    error,
-    stop,
-    setMessages
-  } = useChat({
+  const { messages, append, isLoading, error, stop, setMessages } = useChat({
     api: chromeExtensionAPI,
-    onError: (error) => {
+    onError: error => {
       console.error('AI Analysis Error:', error);
       onError?.(error);
     },
-    onFinish: (message) => {
+    onFinish: message => {
       if (message.role === 'assistant' && message.content) {
         const result: AnalysisResult = {
           id: `analysis-${Date.now()}`,
@@ -146,48 +142,50 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
           timestamp: new Date(),
           model: settings?.model || 'unknown',
           inputData: [], // 後で設定される
-          processingTime: 0 // 後で計算される
+          processingTime: 0, // 後で計算される
         };
         onAnalysisComplete?.(result);
       }
-    }
+    },
   });
 
   /**
    * テーブルデータを分析する関数
    */
-  const analyzeTableData = useCallback(async (tableData: string[]) => {
-    if (!settings) {
-      throw new Error('AI settings not loaded');
-    }
+  const analyzeTableData = useCallback(
+    async (tableData: string[]) => {
+      if (!settings) {
+        throw new Error('AI settings not loaded');
+      }
 
-    if (settingsLoading) {
-      throw new Error('AI settings are still loading');
-    }
+      if (settingsLoading) {
+        throw new Error('AI settings are still loading');
+      }
 
-    if (!tableData || tableData.length === 0) {
-      throw new Error('Table data is empty');
-    }
+      if (!tableData || tableData.length === 0) {
+        throw new Error('Table data is empty');
+      }
 
-    try {
-      onAnalysisStart?.();
+      try {
+        onAnalysisStart?.();
 
-      // プロンプトを構築
-      const prompt = buildAnalysisPrompt(tableData, settings.customPrompt);
+        // プロンプトを構築
+        const prompt = buildAnalysisPrompt(tableData, settings.customPrompt);
 
-      // AI分析を実行
-      await append({
-        role: 'user',
-        content: prompt
-      });
-
-    } catch (error) {
-      console.error('Analysis error:', error);
-      const analysisError = error instanceof Error ? error : new Error('Unknown analysis error');
-      onError?.(analysisError);
-      throw analysisError;
-    }
-  }, [settings, settingsLoading, append, onAnalysisStart, onError]);
+        // AI分析を実行
+        await append({
+          role: 'user',
+          content: prompt,
+        });
+      } catch (error) {
+        console.error('Analysis error:', error);
+        const analysisError = error instanceof Error ? error : new Error('Unknown analysis error');
+        onError?.(analysisError);
+        throw analysisError;
+      }
+    },
+    [settings, settingsLoading, append, onAnalysisStart, onError],
+  );
 
   /**
    * 分析をリセットする関数
@@ -225,31 +223,30 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
     latestResult,
     error,
     resetAnalysis,
-    stopAnalysis
+    stopAnalysis,
   };
 };
 
 /**
  * 分析結果のメッセージをフィルタリングするヘルパー関数
- * 
+ *
  * @param messages - メッセージの配列
  * @returns アシスタントのメッセージのみ
- * 
+ *
  * @since 1.0.0
  */
-export const getAnalysisResults = (messages: Array<{ role: string; content: string }>): string[] => {
-  return messages
+export const getAnalysisResults = (messages: Array<{ role: string; content: string }>): string[] =>
+  messages
     .filter(message => message.role === 'assistant')
     .map(message => message.content)
     .filter(Boolean);
-};
 
 /**
  * 分析実行時間を計算するヘルパー関数
- * 
+ *
  * @param messages - メッセージの配列
  * @returns 実行時間（ミリ秒）
- * 
+ *
  * @since 1.0.0
  */
 export const calculateAnalysisTime = (messages: Array<{ role: string; content: string; createdAt?: Date }>): number => {

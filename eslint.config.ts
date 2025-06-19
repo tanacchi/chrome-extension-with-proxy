@@ -25,7 +25,14 @@ export default config(
   },
   // Custom config
   {
-    ignores: ['**/build/**', '**/dist/**', '**/node_modules/**', 'chrome-extension/manifest.js', 'dev-servers/**'],
+    ignores: [
+      '**/build/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      'chrome-extension/manifest.js',
+      'dev-servers/**',
+      'packages/storage/lib/**/*.spec.ts', // Exclude storage test files from lint
+    ],
   },
   // Node.js scripts configuration
   {
@@ -128,6 +135,13 @@ export default config(
     files: ['**/packages/shared/**/*.ts'],
     rules: {
       'no-restricted-imports': 'off',
+    },
+  },
+  // Library files configuration
+  {
+    files: ['**/packages/ai-api/lib/**/*.ts', '**/pages/content/src/**/*.ts'],
+    rules: {
+      'import-x/exports-last': 'off', // Allow exports anywhere in library files
     },
   },
   // Test files configuration

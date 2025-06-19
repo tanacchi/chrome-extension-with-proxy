@@ -18,4 +18,4 @@ global.chrome = {
       },
     },
   },
-} as any;
+} as typeof global;

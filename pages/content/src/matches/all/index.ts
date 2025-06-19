@@ -89,7 +89,7 @@ const handleAnalyzeClick = async () => {
     let errorMessage = '分析中にエラーが発生しました。';
 
     if (error && typeof error === 'object' && 'type' in error) {
-      const analysisError = error as any;
+      const analysisError = error as { type: string; message?: string };
       switch (analysisError.type) {
         case AnalysisErrorType.NO_API_KEY:
           errorMessage = 'OpenAI APIキーが設定されていません。\n設定ページでAPIキーを設定してください。';

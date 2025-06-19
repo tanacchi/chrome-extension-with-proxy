@@ -1,10 +1,10 @@
 /**
  * @fileoverview プロンプト構築サービス
- * 
+ *
  * テーブルデータAI分析用のプロンプトを構築するサービスです。
  * デフォルトプロンプトとカスタムプロンプトの組み合わせ、
  * テーブルデータの整形、プロンプトバリデーションを提供します。
- * 
+ *
  * @author Chrome Extension Development Team
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ const FALLBACK_PROMPT = `各項目について、内容を簡潔に要約し、�
 
 /**
  * プロンプト構築オプション
- * 
+ *
  * @interface PromptBuildOptions
  */
 export interface PromptBuildOptions {
@@ -45,7 +45,7 @@ export interface PromptBuildOptions {
 
 /**
  * プロンプト構築結果
- * 
+ *
  * @interface PromptBuildResult
  */
 export interface PromptBuildResult {
@@ -63,36 +63,36 @@ export interface PromptBuildResult {
 
 /**
  * テーブルデータ用のAI分析プロンプトを構築する
- * 
+ *
  * SPECIFICATION.mdに従って、テーブルの2列目データを使用して
  * AI分析用のプロンプトを生成します。カスタムプロンプトが
  * 設定されている場合は、それを組み込みます。
- * 
+ *
  * @example
  * ```typescript
  * const tableData = ['データ1', 'データ2', 'データ3'];
  * const customPrompt = '各データの重要度を評価してください';
- * 
+ *
  * const result = buildAnalysisPrompt(tableData, customPrompt);
  * console.log(result.prompt);
  * // "以下の3つの項目について、以下の指示に沿って書けているかそれぞれ分析し100文字以内で回答してください。
  * //  項目1: データ1
- * //  項目2: データ2  
+ * //  項目2: データ2
  * //  項目3: データ3
  * //  指示: 各データの重要度を評価してください"
  * ```
- * 
+ *
  * @param tableData - テーブルから抽出されたデータ配列
  * @param customPrompt - ユーザー設定のカスタムプロンプト
  * @param options - プロンプト構築オプション
  * @returns 構築されたプロンプト
- * 
+ *
  * @since 1.0.0
  */
 export const buildAnalysisPrompt = (
-  tableData: string[], 
+  tableData: string[],
   customPrompt?: string,
-  options: PromptBuildOptions = {}
+  options: PromptBuildOptions = {},
 ): string => {
   const result = buildAnalysisPromptDetailed(tableData, customPrompt, options);
   return result.prompt;
@@ -100,32 +100,28 @@ export const buildAnalysisPrompt = (
 
 /**
  * 詳細な情報を含むプロンプト構築
- * 
+ *
  * デバッグやログ出力に使用される詳細情報を含むバージョンです。
- * 
+ *
  * @param tableData - テーブルから抽出されたデータ配列
  * @param customPrompt - ユーザー設定のカスタムプロンプト
  * @param options - プロンプト構築オプション
  * @returns 構築結果の詳細情報
- * 
+ *
  * @since 1.0.0
  */
 export const buildAnalysisPromptDetailed = (
-  tableData: string[], 
+  tableData: string[],
   customPrompt?: string,
-  options: PromptBuildOptions = {}
+  options: PromptBuildOptions = {},
 ): PromptBuildResult => {
-  const {
-    useCustomPrompt = true,
-    maxLength = 3000,
-    debug = false
-  } = options;
+  const { useCustomPrompt = true, maxLength = 3000, debug = false } = options;
 
   const warnings: string[] = [];
 
   // データの前処理
   const sanitizedData = sanitizeTableData(tableData);
-  
+
   if (sanitizedData.length === 0) {
     throw new Error('テーブルデータが空です');
   }
@@ -141,11 +137,11 @@ export const buildAnalysisPromptDetailed = (
 
   if (useCustomPrompt && customPrompt && customPrompt.trim()) {
     const trimmedCustomPrompt = customPrompt.trim();
-    
+
     if (trimmedCustomPrompt.length > 500) {
       warnings.push('カスタムプロンプトが長すぎます。切り詰められる可能性があります。');
     }
-    
+
     instructionPrompt = trimmedCustomPrompt;
     promptType = 'custom';
   } else if (sanitizedData.length >= 3) {
@@ -177,7 +173,7 @@ export const buildAnalysisPromptDetailed = (
       sanitizedDataCount: sanitizedData.length,
       promptType,
       characterCount: prompt.length,
-      warnings
+      warnings,
     });
   }
 
@@ -186,23 +182,24 @@ export const buildAnalysisPromptDetailed = (
     promptType,
     itemCount: sanitizedData.length,
     characterCount: prompt.length,
-    warnings
+    warnings,
   };
 };
 
 /**
  * デフォルト形式のプロンプトを構築
- * 
+ *
  * @param tableData - サニタイズ済みテーブルデータ
  * @param instruction - 指示文
  * @returns 構築されたプロンプト
- * 
+ *
  * @private
  */
 const buildDefaultPrompt = (tableData: string[], instruction: string): string => {
-  const items = tableData.slice(0, 3).map((data, index) => 
-    `項目${index + 1}: ${data}`
-  ).join('\n');
+  const items = tableData
+    .slice(0, 3)
+    .map((data, index) => `項目${index + 1}: ${data}`)
+    .join('\n');
 
   return `以下の3つの項目について、以下の指示に沿って書けているかそれぞれ分析し100文字以内で回答してください。
 
@@ -213,17 +210,15 @@ ${items}
 
 /**
  * 柔軟な形式のプロンプトを構築
- * 
+ *
  * @param tableData - サニタイズ済みテーブルデータ
  * @param instruction - 指示文
  * @returns 構築されたプロンプト
- * 
+ *
  * @private
  */
 const buildFlexiblePrompt = (tableData: string[], instruction: string): string => {
-  const items = tableData.map((data, index) => 
-    `${index + 1}. ${data}`
-  ).join('\n');
+  const items = tableData.map((data, index) => `${index + 1}. ${data}`).join('\n');
 
   return `以下のデータについて分析してください。
 
@@ -237,14 +232,14 @@ ${items}
 
 /**
  * テーブルデータをサニタイズする
- * 
+ *
  * @param tableData - 元のテーブルデータ
  * @returns サニタイズ済みデータ
- * 
+ *
  * @private
  */
-const sanitizeTableData = (tableData: string[]): string[] => {
-  return tableData
+const sanitizeTableData = (tableData: string[]): string[] =>
+  tableData
     .filter(data => data && typeof data === 'string')
     .map(data => data.trim())
     .filter(data => data.length > 0)
@@ -254,15 +249,14 @@ const sanitizeTableData = (tableData: string[]): string[] => {
       // 長すぎるデータを切り詰め
       return cleanData.length > 200 ? cleanData.substring(0, 200) + '...' : cleanData;
     });
-};
 
 /**
  * プロンプトを指定した文字数で切り詰める
- * 
+ *
  * @param prompt - 元のプロンプト
  * @param maxLength - 最大文字数
  * @returns 切り詰められたプロンプト
- * 
+ *
  * @private
  */
 const truncatePrompt = (prompt: string, maxLength: number): string => {
@@ -277,21 +271,19 @@ const truncatePrompt = (prompt: string, maxLength: number): string => {
 
 /**
  * デフォルトシステムプロンプトを取得する
- * 
+ *
  * @returns デフォルトプロンプト
- * 
+ *
  * @since 1.0.0
  */
-export const getDefaultPrompt = (): string => {
-  return DEFAULT_SYSTEM_PROMPT;
-};
+export const getDefaultPrompt = (): string => DEFAULT_SYSTEM_PROMPT;
 
 /**
  * プロンプトをバリデーションする
- * 
+ *
  * @param prompt - バリデーション対象のプロンプト
  * @returns バリデーション結果
- * 
+ *
  * @since 1.0.0
  */
 export const validatePrompt = (prompt: string): { isValid: boolean; errors: string[] } => {
@@ -320,7 +312,7 @@ export const validatePrompt = (prompt: string): { isValid: boolean; errors: stri
   const dangerousPatterns = [
     /ignore\s+(previous|above|all)\s+instructions?/i,
     /system\s*:\s*you\s+are/i,
-    /forget\s+(everything|all)/i
+    /forget\s+(everything|all)/i,
   ];
 
   dangerousPatterns.forEach(pattern => {
@@ -331,6 +323,6 @@ export const validatePrompt = (prompt: string): { isValid: boolean; errors: stri
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };

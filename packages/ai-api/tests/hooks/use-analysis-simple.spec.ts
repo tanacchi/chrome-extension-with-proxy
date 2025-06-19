@@ -12,7 +12,7 @@ const mockAnalysisHook = {
   latestResult: null,
   error: null,
   resetAnalysis: vi.fn(),
-  stopAnalysis: vi.fn()
+  stopAnalysis: vi.fn(),
 };
 
 describe('useAnalysis 簡易テスト', () => {
@@ -33,7 +33,7 @@ describe('useAnalysis 簡易テスト', () => {
 
   it('関数呼び出しが正常に動作すべき', async () => {
     const tableData = ['データ1', 'データ2', 'データ3'];
-    
+
     await mockAnalysisHook.analyzeTableData(tableData);
     expect(mockAnalysisHook.analyzeTableData).toHaveBeenCalledWith(tableData);
 

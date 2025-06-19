@@ -168,7 +168,7 @@ export class AIAPIHandler {
     } catch (error) {
       const processingTime = Date.now() - startTime;
 
-      console.error('AI Analysis Error:', error);
+      console.error('AI Analysis Error:', error, `(Processing time: ${processingTime}ms)`);
 
       // エラーレスポンス
       const errorResponse: ChromeMessageResponse<AIAnalysisResponse> = {
