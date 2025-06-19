@@ -29,7 +29,7 @@ describe('AI Analysis Feature', () => {
       const secondColumns = await browser.$$('.ai-target-table-table tbody tr td:nth-child(2)');
       expect(secondColumns).toHaveLength(3);
 
-      const fruitNames = await Promise.all(secondColumns.map(async col => await col.getText()));
+      const fruitNames = await Promise.all(await secondColumns.map(async col => await col.getText()));
 
       expect(fruitNames).toEqual(['りんご', 'バナナ', 'オレンジ']);
     });
@@ -111,7 +111,7 @@ describe('AI Analysis Feature', () => {
 
       // モデル選択
       const modelSelect = await browser.$('select[name="model"]');
-      await modelSelect.selectByValue('gpt-4o-mini');
+      await modelSelect.selectByVisibleText('gpt-4o-mini');
 
       // カスタムプロンプト設定
       const customPromptTextarea = await browser.$('textarea[name="customPrompt"]');

@@ -9,7 +9,7 @@ import {
   waitForAnalysisCompletion,
   configureExtensionSettings,
   cleanupTestData,
-} from '../helpers/ai-analysis-helpers';
+} from '../helpers/ai-analysis-helpers.js';
 
 describe('AI Analysis with Mock API Server', () => {
   const SAMPLE_HTML_URL = 'http://localhost:3000';
