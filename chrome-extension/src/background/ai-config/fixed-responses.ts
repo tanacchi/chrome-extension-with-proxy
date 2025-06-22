@@ -96,6 +96,49 @@ export const hasTableData = (userMessage: string): boolean => {
 };
 
 /**
+ * テーブルデータから動的な固定レスポンスを生成する
+ *
+ * @param tableData - テーブルデータ配列
+ * @returns 動的に生成された分析レスポンス
+ *
+ * @since 1.0.0
+ */
+export const generateDynamicTableResponse = (tableData: string[]): string => {
+  // 各セルの内容について動的にレスポンスを生成
+  const cellAnalyses = tableData.map((cellContent, index) => {
+    const analysisTexts = [
+      '良好な品質です',
+      '改善の余地があります',
+      '注意が必要です',
+      '優秀な状態です',
+      '標準的なレベルです',
+    ];
+
+    const randomAnalysis = analysisTexts[index % analysisTexts.length];
+    return `${cellContent}についてですが、${randomAnalysis}。データの特徴を分析した結果、適切な管理が行われていることを確認しました。`;
+  });
+
+  // 最初のセルは特別処理（2つ目のセルは後でオーバーライドされる）
+  if (cellAnalyses.length > 1) {
+    cellAnalyses[1] = '特に問題ありません';
+  }
+
+  // モーダル用のサマリーを作成
+  const summary = `AI分析結果（開発モード）
+
+このテーブルデータの分析結果：
+${tableData.length}個の項目を分析しました。各項目について個別の評価を実施し、全体的な品質状況を確認しました。データは適切に構造化されており、分析に適した形式となっています。
+
+これは開発モード用の固定レスポンスです。実際の分析には本番のAPIキーを設定してください。
+
+-----
+
+${cellAnalyses.join('\n\n-----\n\n')}`;
+
+  return summary;
+};
+
+/**
  * 適切な固定レスポンスを取得する
  *
  * @param messages - 入力メッセージ配列
@@ -107,6 +150,21 @@ export const getFixedResponse = (messages: Array<{ role: string; content: string
   const userMessage = messages.find(m => m.role === 'user')?.content || '';
 
   if (hasTableData(userMessage)) {
+    // テーブルデータがある場合は、メッセージからデータを抽出して動的レスポンスを生成
+    const tableDataMatch = userMessage.match(/データ:\s*([\s\S]*?)(?:\n\n|$)/);
+    if (tableDataMatch) {
+      const dataSection = tableDataMatch[1];
+      const tableData = dataSection
+        .split('\n')
+        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .filter(line => line.length > 0);
+
+      if (tableData.length > 0) {
+        return generateDynamicTableResponse(tableData);
+      }
+    }
+
+    // フォールバック：デフォルトのテーブル分析レスポンス
     return TABLE_ANALYSIS_RESPONSE;
   } else {
     return GENERAL_RESPONSE;

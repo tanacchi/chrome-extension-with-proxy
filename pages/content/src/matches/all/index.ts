@@ -17,7 +17,7 @@ const parseAnalysisResults = (analysisResult: string): { modalContent: string; c
     .map(section => section.trim())
     .filter(section => section);
 
-  if (sections.length < 4) {
+  if (sections.length < 2) {
     // セクションが足りない場合のフォールバック
     return {
       modalContent: analysisResult,
@@ -28,8 +28,8 @@ const parseAnalysisResults = (analysisResult: string): { modalContent: string; c
   // 1つ目のセクションはモーダル表示用
   const modalContent = sections[0];
 
-  // 2-4つ目のセクションはセル表示用（そのまま全文表示）
-  const cellContents = sections.slice(1, 4);
+  // 2つ目以降のセクションはセル表示用（LLMからの動的レスポンス）
+  const cellContents = sections.slice(1);
 
   return { modalContent, cellContents };
 };

@@ -332,11 +332,12 @@ export const sanitizeMessageForLogging = (message: ChromeMessage): ChromeMessage
   const sanitizeObject = (obj: unknown): void => {
     if (typeof obj !== 'object' || obj === null) return;
 
-    for (const key in obj) {
+    const objectRecord = obj as Record<string, unknown>;
+    for (const key in objectRecord) {
       if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
-        obj[key] = '[REDACTED]';
-      } else if (typeof obj[key] === 'object') {
-        sanitizeObject(obj[key]);
+        objectRecord[key] = '[REDACTED]';
+      } else if (typeof objectRecord[key] === 'object') {
+        sanitizeObject(objectRecord[key]);
       }
     }
   };

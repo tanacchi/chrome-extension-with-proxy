@@ -172,9 +172,9 @@ export const analyzeTableData = async (tableData: string[], options: AnalysisOpt
     onProgress?.('分析完了');
 
     return {
-      text: response.data.text,
-      usage: response.data.usage,
-      processingTime: response.data.processingTime,
+      text: (response.data as { text: string }).text,
+      usage: (response.data as { usage?: AnalysisResult['usage'] }).usage,
+      processingTime: (response.data as { processingTime: number }).processingTime,
     };
   } catch (error) {
     console.error('AI Analysis Error:', error);
