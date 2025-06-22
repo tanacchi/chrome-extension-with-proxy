@@ -13,39 +13,15 @@ export function createServer() {
   app.use(
     cors({
       origin: [
-        'http://localhost:3000', // sample-html-server
-        'http://localhost:3001', // mock-api-server (self)
-        'http://localhost:3002', // alternative mock-api port
-        'http://localhost:8080', // common dev server port
-        'http://localhost:8000', // alternative dev server port
-        'http://localhost:5173', // Vite dev server
-        'http://localhost:4173', // Vite preview server
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-        'http://127.0.0.1:3002',
-        'http://127.0.0.1:8080',
-        'http://127.0.0.1:8000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:4173',
-        // Chrome Extension origins
         /^chrome-extension:\/\//,
         /^moz-extension:\/\//,
-        // Any localhost port pattern
         /^http:\/\/localhost:\d+$/,
         /^http:\/\/127\.0\.0\.1:\d+$/,
       ],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'Accept',
-        'Origin',
-        'Access-Control-Request-Method',
-        'Access-Control-Request-Headers',
-      ],
       exposedHeaders: ['Content-Length', 'Content-Type', 'X-Response-Time'],
+      endpoints: ['*'],
       optionsSuccessStatus: 200,
     }),
   );
@@ -197,7 +173,7 @@ function calculateTokens(messages) {
 
 // Start server if this file is run directly
 /* eslint-env node */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === `file:\/\/${process.argv[1]}`) {
   const app = createServer();
   const PORT = process.env.PORT || 3002;
 

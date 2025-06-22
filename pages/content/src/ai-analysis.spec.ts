@@ -10,7 +10,6 @@
 
 import { analyzeTableData, checkAISettings, formatAnalysisResult, AnalysisErrorType } from './ai-analysis';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { AnalysisError } from './ai-analysis';
 
 // Chrome Message Utils のモック
 vi.mock('@extension/ai-api', () => ({

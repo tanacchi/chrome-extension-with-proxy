@@ -22,21 +22,18 @@ describe('Mock API Server', () => {
         messages: [
           {
             role: 'system',
-            content: 'Analyze the following table data and provide insights.'
+            content: 'Analyze the following table data and provide insights.',
           },
           {
             role: 'user',
-            content: 'Data: りんご, バナナ, オレンジ'
-          }
+            content: 'Data: りんご, バナナ, オレンジ',
+          },
         ],
         max_tokens: 150,
-        temperature: 0.7
+        temperature: 0.7,
       };
 
-      const response = await request(app)
-        .post('/v1/chat/completions')
-        .send(requestBody)
-        .expect(200);
+      const response = await request(app).post('/v1/chat/completions').send(requestBody).expect(200);
 
       // Check OpenAI response structure
       expect(response.body).toHaveProperty('id');
@@ -49,12 +46,12 @@ describe('Mock API Server', () => {
       // Check choices structure
       expect(response.body.choices).toBeInstanceOf(Array);
       expect(response.body.choices).toHaveLength(1);
-      
+
       const choice = response.body.choices[0];
       expect(choice).toHaveProperty('index', 0);
       expect(choice).toHaveProperty('message');
       expect(choice).toHaveProperty('finish_reason', 'stop');
-      
+
       // Check message structure
       expect(choice.message).toHaveProperty('role', 'assistant');
       expect(choice.message).toHaveProperty('content');
@@ -73,19 +70,16 @@ describe('Mock API Server', () => {
         messages: [
           {
             role: 'user',
-            content: longInput
-          }
-        ]
+            content: longInput,
+          },
+        ],
       };
 
-      const response = await request(app)
-        .post('/v1/chat/completions')
-        .send(requestBody)
-        .expect(200);
+      const response = await request(app).post('/v1/chat/completions').send(requestBody).expect(200);
 
       const responseContent = response.body.choices[0].message.content;
       const first30Chars = longInput.substring(0, 30);
-      
+
       expect(responseContent).toContain(first30Chars);
     });
 
@@ -94,10 +88,7 @@ describe('Mock API Server', () => {
         // Missing required fields
       };
 
-      const response = await request(app)
-        .post('/v1/chat/completions')
-        .send(invalidRequest)
-        .expect(400);
+      const response = await request(app).post('/v1/chat/completions').send(invalidRequest).expect(400);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error).toHaveProperty('message');
@@ -106,15 +97,38 @@ describe('Mock API Server', () => {
   });
 
   describe('CORS headers', () => {
-    it('should include CORS headers', async () => {
+    it('should include CORS headers for localhost', async () => {
       const response = await request(app)
         .post('/v1/chat/completions')
+        .set('Origin', 'http://localhost:3000')
         .send({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: 'test' }]
+          messages: [{ role: 'user', content: 'test' }],
         });
-      
-      expect(response.headers['access-control-allow-origin']).toBe('*');
+
+      expect(response.headers['access-control-allow-origin']).toBe('http://localhost:3000');
+    });
+
+    it('should include CORS headers for chrome extensions', async () => {
+      const response = await request(app)
+        .post('/v1/chat/completions')
+        .set('Origin', 'chrome-extension://abcdefghijklmnopqrstuvwxyz')
+        .send({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: 'test' }],
+        });
+
+      expect(response.headers['access-control-allow-origin']).toBe('chrome-extension://abcdefghijklmnopqrstuvwxyz');
+    });
+
+    it('should allow OPTIONS requests', async () => {
+      const response = await request(app)
+        .options('/v1/chat/completions')
+        .set('Origin', 'http://localhost:3000')
+        .expect(200);
+
+      expect(response.headers['access-control-allow-origin']).toBe('http://localhost:3000');
+      expect(response.headers['access-control-allow-methods']).toContain('POST');
     });
   });
 });

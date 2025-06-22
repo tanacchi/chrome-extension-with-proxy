@@ -38,7 +38,7 @@ describe('AI Settings Storage', () => {
     it('should have correct default values', () => {
       expect(DEFAULT_AI_SETTINGS).toEqual({
         apiKey: '',
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         customPrompt: '',
         useCustomPrompt: false,
       });

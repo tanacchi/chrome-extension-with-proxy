@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { aiSettingsStorage } from '@extension/storage';
 import { generateText } from 'ai';
 import type { ChromeMessage, ChromeMessageResponse } from '@extension/ai-api';
@@ -132,25 +132,26 @@ export class AIAPIHandler {
       // 開発時はmock-api、本番時はOpenAI APIを使用
       const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
 
-      let client: ReturnType<typeof openai>;
+      const openai = createOpenAI({
+        baseURL: 'https://api.openai-mock.com/v1',
+        apiKey: settings.apiKey,
+      });
+
+      const modelId = 'gpt-4-turbo';
+      let model: ReturnType<typeof openai>;
       if (isDevelopment) {
         // Mock API サーバーを使用
         console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
-        client = openai({
-          apiKey: 'mock-api-key',
-          baseURL: 'http://localhost:3001/v1',
-        });
+        model = openai(modelId);
       } else {
         // OpenAI API を使用
         console.log('AI Analysis: OpenAI API使用');
-        client = openai({
-          apiKey: settings.apiKey,
-        });
+        model = openai(modelId);
       }
 
       // AI分析の実行
       const result = await generateText({
-        model: client(settings.model),
+        model: model,
         messages: message.data.messages.map(msg => ({
           role: msg.role as 'system' | 'user' | 'assistant',
           content: msg.content,
