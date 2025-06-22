@@ -357,7 +357,9 @@ export class OpenAIClient {
     }
 
     const error = {
-      message: ((errorData as Record<string, unknown>)?.error?.message as string) || `HTTP Error ${response.status}`,
+      message:
+        (((errorData as Record<string, unknown>)?.error as Record<string, unknown>)?.message as string) ||
+        `HTTP Error ${response.status}`,
       status: response.status,
       statusCode: response.status,
       headers: headers,

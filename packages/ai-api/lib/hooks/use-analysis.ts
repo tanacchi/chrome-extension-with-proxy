@@ -129,7 +129,7 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
    * useChatフックの設定
    */
   const { messages, append, isLoading, error, stop, setMessages } = useChat({
-    api: chromeExtensionAPI as (request: { messages: Array<{ role: string; content: string }> }) => Promise<unknown>,
+    api: chromeExtensionAPI as (request: { messages: Array<{ role: string; content: string }> }) => Promise<Response>,
     onError: (error: Error) => {
       console.error('AI Analysis Error:', error);
       onError?.(error);

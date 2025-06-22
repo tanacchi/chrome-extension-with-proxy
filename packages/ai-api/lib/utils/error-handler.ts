@@ -92,8 +92,10 @@ export class APIErrorHandler {
    */
   private handleHTTPError(error: unknown): APIError {
     const errorObj = error as Record<string, unknown>;
-    const statusCode = errorObj.status || errorObj.statusCode;
-    const message = errorObj.message || `HTTP Error ${statusCode}`;
+    const statusCode = (errorObj.status || errorObj.statusCode) as number | undefined;
+    const message = (
+      typeof errorObj.message === 'string' ? errorObj.message : `HTTP Error ${statusCode || 'Unknown'}`
+    ) as string;
     let errorType: APIErrorType;
     let retryAfter: number | undefined;
 
@@ -118,9 +120,9 @@ export class APIErrorHandler {
         errorType = APIErrorType.SERVER_ERROR;
         break;
       default:
-        if (statusCode >= 400 && statusCode < 500) {
+        if (statusCode && statusCode >= 400 && statusCode < 500) {
           errorType = APIErrorType.INVALID_REQUEST;
-        } else if (statusCode >= 500) {
+        } else if (statusCode && statusCode >= 500) {
           errorType = APIErrorType.SERVER_ERROR;
         } else {
           errorType = APIErrorType.UNKNOWN;
@@ -137,7 +139,7 @@ export class APIErrorHandler {
       message,
       statusCode,
       retryAfter,
-      errorObj.data || errorObj.response?.data,
+      (errorObj as Record<string, unknown>).data || (errorObj as Record<string, unknown>).response?.data,
       errorObj instanceof Error ? errorObj : undefined,
     );
   }
@@ -184,13 +186,14 @@ export class APIErrorHandler {
    */
   private extractRetryAfter(error: unknown): number | undefined {
     const errorObj = error as Record<string, unknown>;
-    const headers = errorObj.headers || errorObj.response?.headers;
+    const headers = ((errorObj as Record<string, unknown>).headers ||
+      (errorObj as Record<string, unknown>).response?.headers) as Record<string, unknown> | undefined;
     if (!headers) return undefined;
 
     const retryAfter = headers['retry-after'] || headers['Retry-After'];
     if (!retryAfter) return undefined;
 
-    const seconds = parseInt(retryAfter, 10);
+    const seconds = parseInt(String(retryAfter), 10);
     return isNaN(seconds) ? undefined : seconds;
   }
 

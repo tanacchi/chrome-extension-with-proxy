@@ -13,7 +13,7 @@
 5. 🎨 UI Components (ユーザーインターフェース)
 6. 📄 Content Scripts (ウェブページ内での動作)
 7. 🔗 AI API Package (AI分析ロジック)
-8. 🧪 Mock API Server (開発用サーバー)
+8. 🧪 Sample HTML Server (テスト用サーバー)
 9. 🧪 E2E Tests (テスト)
 ```
 
@@ -21,7 +21,7 @@
 
 ## 📋 【STEP 1】開発設定
 
-**現在地**: プロジェクトルート  
+**現在地**: プロジェクトルート
 **目的**: 開発時の動作設定を理解する
 
 ### 読むべきファイル
@@ -47,7 +47,7 @@
 
 ## 🏗️ 【STEP 2】拡張機能設定
 
-**現在地**: プロジェクトルート → Chrome拡張機能の核心部分  
+**現在地**: プロジェクトルート → Chrome拡張機能の核心部分
 **目的**: Chrome拡張機能の全体構造と設定を理解する
 
 ### 読むべきファイル
@@ -110,7 +110,7 @@ Chrome Extensions Manifest V3の設定ファイル
 chrome-extension (本体)
     ↓ 使用
 packages/* (共有ライブラリ)
-    ↓ 使用  
+    ↓ 使用
 pages/* (UI画面)
 ```
 
@@ -118,7 +118,7 @@ pages/* (UI画面)
 
 ## 🧠 【STEP 3】Background Script (AI API通信の心臓部)
 
-**現在地**: Chrome拡張機能本体 → Background Script  
+**現在地**: Chrome拡張機能本体 → Background Script
 **目的**: AI分析の中核機能を理解する
 
 ### 読むべきファイル
@@ -182,7 +182,7 @@ const result = await generateText({
 
 ## 💾 【STEP 4】Storage Layer (設定管理システム)
 
-**現在地**: 共有パッケージ → Storage  
+**現在地**: 共有パッケージ → Storage
 **目的**: AI設定の永続化機能を理解する
 
 ### 読むべきファイル
@@ -237,7 +237,7 @@ export const aiSettingsStorage = createAISettingsStorage();
 
 ## 🎨 【STEP 5】UI Components (ユーザーインターフェース)
 
-**現在地**: UI画面群  
+**現在地**: UI画面群
 **目的**: ユーザーとの接点を理解する
 
 ### 5.1 ポップアップ (`./pages/popup/`)
@@ -270,14 +270,14 @@ const loadDevConfig = async () => {
   try {
     const response = await fetch('/dev-config.json');
     const config = await response.json();
-    
+
     await aiSettingsStorage.set({
       apiKey: config.apiKey,
       model: config.model,
       customPrompt: config.customPrompt || '',
       useCustomPrompt: config.useCustomPrompt || false,
     });
-    
+
     setMessage('開発用設定をロードしました');
   } catch (error) {
     setMessage('開発用設定のロードに失敗しました');
@@ -315,7 +315,7 @@ const tabs = [
 
 ## 📄 【STEP 6】Content Scripts (ウェブページ内での動作)
 
-**現在地**: ウェブページ内実行スクリプト  
+**現在地**: ウェブページ内実行スクリプト
 **目的**: テーブル検出とAI分析実行機能を理解する
 
 ### 6.1 基本Content Script (`./pages/content/`)
@@ -347,13 +347,13 @@ export const detectTables = (): HTMLTableElement[] => {
 export const extractTableData = (table: HTMLTableElement): string[] => {
   const rows = table.querySelectorAll('tr');
   const data: string[] = [];
-  
+
   rows.forEach(row => {
     const cells = row.querySelectorAll('td, th');
     const rowData = Array.from(cells).map(cell => cell.textContent?.trim() || '');
     data.push(rowData.join('\t'));
   });
-  
+
   return data;
 };
 ```
@@ -372,10 +372,10 @@ Content Script内でのAI分析実行
  * テーブルデータのAI分析を実行
  */
 export const analyzeTableData = async (
-  tableData: string[], 
+  tableData: string[],
   options: AnalysisOptions = {}
 ): Promise<AnalysisResult> => {
-  
+
   // 1. データ検証
   if (!tableData || tableData.length === 0) {
     throw createAnalysisError(AnalysisErrorType.INVALID_SETTINGS, '分析対象のデータが指定されていません');
@@ -431,7 +431,7 @@ React コンポーネントをウェブページに注入するためのスク�
 
 ## 🔗 【STEP 7】AI API Package (AI分析ロジック)
 
-**現在地**: 共有パッケージ → AI API  
+**現在地**: 共有パッケージ → AI API
 **目的**: AI分析システムの詳細を理解する
 
 ### 7.1 OpenAI クライアント (`./packages/ai-api/lib/client/`)
@@ -498,14 +498,14 @@ AI分析実行フック
  * テーブルデータ分析用のプロンプトを構築
  */
 export const buildAnalysisPrompt = (
-  tableData: string[], 
+  tableData: string[],
   customPrompt?: string
 ): string => {
-  const basePrompt = customPrompt || 
+  const basePrompt = customPrompt ||
     "以下のテーブルデータを分析して、パターンや傾向を教えてください：";
-  
+
   const dataSection = tableData.join('\n');
-  
+
   return `${basePrompt}\n\n${dataSection}\n\n分析をお願いします。`;
 };
 ```
@@ -568,73 +568,12 @@ export interface ChromeMessageResponse<T = unknown> {
 
 ---
 
-## 🧪 【STEP 8】Mock API Server (開発用サーバー)
+## 🧪 【STEP 8】Sample HTML Server (テスト用サーバー)
 
-**現在地**: 開発用サーバー  
-**目的**: 開発時のAI API代替システムを理解する
+**現在地**: 開発用サーバー
+**目的**: E2Eテスト用のHTMLページを提供する
 
 ### 読むべきファイル
-
-#### `./dev-servers/mock-api/server.js`
-Mock APIサーバーの実装
-
-**主要機能**:
-- **OpenAI API互換エンドポイント**
-- **CORS設定** (Chrome拡張機能対応)
-- **Swagger UI** (`/docs`)
-- **固定レスポンス** (開発用)
-
-```javascript
-// OpenAI Chat Completions API 互換エンドポイント
-app.post('/v1/chat/completions', (req, res) => {
-  const { messages, model = 'gpt-4o-mini', temperature = 0.7 } = req.body;
-  
-  // モック分析結果を生成
-  const analysisResult = generateMockAnalysis(messages);
-  
-  res.json({
-    id: `chatcmpl-mock-${Date.now()}`,
-    object: 'chat.completion',
-    created: Math.floor(Date.now() / 1000),
-    model: model,
-    choices: [{
-      index: 0,
-      message: {
-        role: 'assistant',
-        content: analysisResult
-      },
-      finish_reason: 'stop'
-    }],
-    usage: {
-      prompt_tokens: 50,
-      completion_tokens: 100,
-      total_tokens: 150
-    }
-  });
-});
-```
-
-#### `./dev-servers/mock-api/openapi.yaml`
-OpenAPI 3.0.3 仕様書
-
-**主要定義**:
-- **Chat Completions API**
-- **リクエスト/レスポンス スキーマ**
-- **エラーレスポンス**
-- **認証方法**
-
-#### `./dev-servers/mock-api/swagger-ui.html`
-Swagger UI インターフェース
-
-**アクセス**: `http://localhost:3001/docs`
-
-#### `./dev-servers/mock-api/postman-collection.json`
-Postman テストコレクション
-
-**テスト項目**:
-- **正常系API呼び出し**
-- **エラーケース**
-- **レスポンス検証**
 
 #### `./dev-servers/sample-html/server.js`
 テスト用HTMLサーバー
@@ -643,11 +582,13 @@ Postman テストコレクション
 - **サンプルテーブル** (E2Eテスト用)
 - **テストページ**
 
+**アクセス**: `http://localhost:3000`
+
 ---
 
 ## 🧪 【STEP 9】E2E Tests (テスト)
 
-**現在地**: テスト → E2Eテスト  
+**現在地**: テスト → E2Eテスト
 **目的**: 自動テストシステムを理解する
 
 ### 読むべきファイル
@@ -671,13 +612,13 @@ AI分析機能のテスト
 describe('AI分析機能', () => {
   it('設定画面でAPIキーを設定できる', async () => {
     await browser.url('chrome-extension://[ID]/options/index.html');
-    
+
     const apiKeyInput = await $('[data-testid="api-key-input"]');
     await apiKeyInput.setValue('test-api-key');
-    
+
     const saveButton = await $('[data-testid="save-button"]');
     await saveButton.click();
-    
+
     // 保存確認
     const message = await $('[data-testid="save-message"]');
     await expect(message).toHaveText('設定を保存しました');
@@ -686,10 +627,10 @@ describe('AI分析機能', () => {
   it('Mock APIサーバーとの通信ができる', async () => {
     // Mock API分析のテスト
     await browser.url('http://localhost:3002/table-sample.html');
-    
+
     const analyzeButton = await $('[data-testid="analyze-button"]');
     await analyzeButton.click();
-    
+
     // 分析結果の確認
     const result = await $('[data-testid="analysis-result"]');
     await expect(result).toBeDisplayed();
@@ -713,7 +654,7 @@ AI分析テスト用のヘルパー関数
 export const setupMockApiMode = async () => {
   // 開発用設定をロード
   await loadDevConfig();
-  
+
   // Mock APIサーバーの起動確認
   await waitForMockApiServer();
 };
@@ -721,10 +662,10 @@ export const setupMockApiMode = async () => {
 export const performTableAnalysis = async (tableSelector: string) => {
   const table = await $(tableSelector);
   await table.waitForDisplayed();
-  
+
   const analyzeButton = await $('[data-testid="analyze-button"]');
   await analyzeButton.click();
-  
+
   // 分析完了まで待機
   await browser.waitUntil(async () => {
     const result = await $('[data-testid="analysis-result"]');
@@ -828,4 +769,504 @@ E2Eテスト用サーバー起動スクリプト
 
 ---
 
-**🎉 ツアー完了！これで全コードの理解ができました。**
+## 🔄 【STEP 10】処理の流れ詳細解説
+
+**現在地**: 全体システム
+**目的**: ユーザー操作に対する具体的な処理フローを理解する
+
+このセクションでは、Chrome拡張機能でのあらゆるユーザー操作に対する詳細な処理の流れを、具体的なファイルパスと行番号を含めて解説します。
+
+### 10.1 設定変更の流れ
+
+#### 🎛️ オプション画面での設定変更
+
+**エントリーポイント**: `pages/options/src/AISettingsOptions.tsx`
+
+```typescript
+// 1. 初期化 (L7-16)
+export const AISettingsOptions = () => {
+  const aiSettingsStorage = createAISettingsStorage();
+  const [settings] = useStorage(aiSettingsStorage);
+```
+
+**処理の流れ**:
+
+1. **ストレージ初期化**: `packages/storage/lib/ai-settings-storage.ts:27-29`
+   ```typescript
+   export const createAISettingsStorage = () => createStorage(
+     `${storagePrefix}-ai-settings`, DEFAULT_AI_SETTINGS, { liveUpdate: true }
+   );
+   ```
+
+2. **リアルタイム監視**: `packages/shared/lib/hooks/use-storage.tsx:44`
+   ```typescript
+   return useSyncExternalStore(storage.subscribe, storage.getSnapshot);
+   ``P
+
+3. **入力値変更**: `pages/options/src/AISettingsOptions.tsx:18-27`
+   ```typescript
+   const handleInputChange = (field: keyof AISettings, value: string | boolean) => {
+     setFormData(prev => ({ ...prev, [field]: value }));
+   };
+   ```
+
+4. **保存処理**: `pages/options/src/AISettingsOptions.tsx:29-43`
+   ```typescript
+   const handleSave = async () => {
+     await aiSettingsStorage.set(formData);
+     setMessage('設定を保存しました');
+   };
+   ```
+
+5. **Chrome Storage書き込み**: `packages/storage/lib/base/base.ts:102-110`
+   ```typescript
+   async set(value: T): Promise<void> {
+     const serialized = this.serialize(value);
+     await chrome.storage.local.set({ [this.key]: serialized });
+     this._emitChange();
+   }
+   ```
+
+6. **全画面への変更通知**: `packages/storage/lib/base/base.ts:127-138`
+   ```typescript
+   chrome.storage.onChanged.addListener((changes, areaName) => {
+     if (areaName === this.area && changes[this.key]) {
+       this._emitChange();
+     }
+   });
+   ```
+
+#### 🔧 開発用設定のロード
+
+**処理開始**: `pages/options/src/AISettingsOptions.tsx:50-62`
+
+```typescript
+const handleLoadDevConfig = async () => {
+  setFormData({
+    apiKey: 'sk-test-development-api-key-placeholder',
+    model: 'gpt-4o-mini',
+    customPrompt: '',
+    useCustomPrompt: false,
+  });
+};
+```
+
+**設定ファイル**: `dev-config.json:1-7`
+```json
+{
+  "apiKey": "sk-test-development-api-key-placeholder",
+  "model": "gpt-4o-mini",
+  "customPrompt": "以下のテーブルデータを分析して、パターンや傾向を教えてください：",
+  "useCustomPrompt": false
+}
+```
+
+### 10.2 AI分析実行の流れ
+
+#### 🧠 Content ScriptでのAI分析実行
+
+**エントリーポイント**: `pages/content/src/ai-analysis.ts:85-190`
+
+```typescript
+export const analyzeTableData = async (
+  tableData: string[],
+  options: AnalysisOptions = {}
+): Promise<AnalysisResult>
+```
+
+**詳細な処理フロー**:
+
+1. **データ検証**: `pages/content/src/ai-analysis.ts:117-121`
+   ```typescript
+   if (!tableData || tableData.length === 0) {
+     throw createAnalysisError(AnalysisErrorType.INVALID_DATA,
+       '分析対象のデータが指定されていません');
+   }
+   ```
+
+2. **AI設定取得**: `pages/content/src/ai-analysis.ts:123-132`
+   ```typescript
+   const settings = await aiSettingsStorage.get();
+   if (!settings.apiKey || settings.apiKey.trim().length === 0) {
+     throw createAnalysisError(AnalysisErrorType.NO_API_KEY,
+       'OpenAI APIキーが設定されていません');
+   }
+   ```
+
+3. **プロンプト構築**: `pages/content/src/ai-analysis.ts:134-137`
+   ```typescript
+   const prompt = buildAnalysisPrompt(tableData, {
+     customPrompt: settings.useCustomPrompt ? settings.customPrompt : undefined,
+   });
+   ```
+
+4. **Background Scriptへのメッセージ送信**: `pages/content/src/ai-analysis.ts:147-160`
+   ```typescript
+   const response = await sendChromeMessage({
+     type: 'AI_ANALYSIS_REQUEST',
+     data: {
+       messages: [{ role: 'user', content: prompt }],
+       settings: {
+         apiKey: settings.apiKey,
+         model: settings.model,
+         temperature: 0.7,
+         maxTokens: 1000,
+       },
+     },
+   });
+   ```
+
+#### 🔌 Background ScriptでのAPI通信
+
+**メッセージ受信**: `chrome-extension/src/background/ai-api-handler.ts:83-96`
+
+```typescript
+chrome.runtime.onMessage.addListener(
+  (message: ChromeMessage<unknown>, sender, sendResponse) => {
+    if (message.type === 'AI_ANALYSIS_REQUEST') {
+      handleAIAnalysisRequest(message as ChromeMessage<AIAnalysisRequestData>)
+        .then(sendResponse)
+        .catch(error => sendResponse(createErrorResponse(error, message.requestId)));
+      return true; // 非同期レスポンスを示す
+    }
+  }
+);
+```
+
+**AI分析実行**: `chrome-extension/src/background/ai-api-handler.ts:111-198`
+
+```typescript
+async function handleAIAnalysisRequest(
+  message: ChromeMessage<AIAnalysisRequestData>
+): Promise<ChromeMessageResponse<AIAnalysisResponseData>>
+```
+
+1. **設定マージ**: `chrome-extension/src/background/ai-api-handler.ts:124-125`
+   ```typescript
+   const storedSettings = await aiSettingsStorage.get();
+   const settings = { ...storedSettings, ...message.data.settings };
+   ```
+
+2. **環境判定とAPI切り替え**: `chrome-extension/src/background/ai-api-handler.ts:132-150`
+   ```typescript
+   const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
+
+   let client: ReturnType<typeof openai>;
+   if (isDevelopment) {
+     console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
+     client = openai({
+       apiKey: 'mock-api-key',
+       baseURL: 'http://localhost:3001/v1',
+     });
+   } else {
+     console.log('AI Analysis: OpenAI API使用');
+     client = openai({ apiKey: settings.apiKey });
+   }
+   ```
+
+3. **AI実行**: `chrome-extension/src/background/ai-api-handler.ts:152-161`
+   ```typescript
+   const result = await generateText({
+     model: client(settings.model),
+     messages: message.data.messages.map(msg => ({
+       role: msg.role as 'system' | 'user' | 'assistant',
+       content: msg.content,
+     })),
+     temperature: settings.temperature || 0.7,
+     maxTokens: settings.maxTokens || 1000,
+   });
+   ```
+
+4. **レスポンス送信**: `chrome-extension/src/background/ai-api-handler.ts:166-182`
+   ```typescript
+   return {
+     success: true,
+     data: {
+       text: result.text,
+       usage: result.usage,
+       processingTime: endTime - startTime,
+     },
+     requestId: message.requestId,
+   };
+   ```
+
+#### 📡 Chrome拡張機能間通信
+
+**メッセージ送信**: `packages/ai-api/lib/utils/message-utils.ts:91-116`
+
+```typescript
+export const sendChromeMessage = async <T>(
+  message: Omit<ChromeMessage<T>, 'requestId'>
+): Promise<ChromeMessageResponse<unknown>>
+```
+
+1. **リクエストID生成**: `packages/ai-api/lib/utils/message-utils.ts:97-104`
+   ```typescript
+   const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+   const fullMessage: ChromeMessage<T> = { ...message, requestId };
+   ```
+
+2. **タイムアウト付き送信**: `packages/ai-api/lib/utils/message-utils.ts:127-153`
+   ```typescript
+   const sendMessageWithTimeout = (message: ChromeMessage<T>, timeout: number) => {
+     return new Promise<ChromeMessageResponse<unknown>>((resolve, reject) => {
+       const timer = setTimeout(() => {
+         reject(new Error(`Message timeout: ${timeout}ms`));
+       }, timeout);
+
+       chrome.runtime.sendMessage(message, (response) => {
+         clearTimeout(timer);
+         resolve(response);
+       });
+     });
+   };
+   ```
+
+3. **リトライ機能**: `packages/ai-api/lib/utils/message-utils.ts:165-197`
+   ```typescript
+   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+     try {
+       return await sendMessageWithTimeout(fullMessage, timeout);
+     } catch (error) {
+       if (attempt === maxRetries) throw error;
+       const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+       await new Promise(resolve => setTimeout(resolve, delay));
+     }
+   }
+   ```
+
+### 10.3 エラーハンドリングの流れ
+
+#### ⚠️ API エラー分類・処理
+
+**エラーハンドラー**: `packages/ai-api/lib/utils/error-handler.ts:39-326`
+
+```typescript
+export class APIErrorHandler {
+  public handleError(error: unknown): APIError
+```
+
+1. **エラー分類**: `packages/ai-api/lib/utils/error-handler.ts:56-83`
+   ```typescript
+   // HTTPエラーの場合
+   if (error && typeof error === 'object' && ('status' in error || 'statusCode' in error)) {
+     return this.handleHTTPError(error);
+   }
+
+   // ネットワークエラーの場合
+   if (this.isNetworkError(error)) {
+     return createAPIError(APIErrorType.NETWORK, /* ... */);
+   }
+   ```
+
+2. **HTTPステータス別処理**: `packages/ai-api/lib/utils/error-handler.ts:101-128`
+   ```typescript
+   switch (statusCode) {
+     case 401:
+     case 403:
+       errorType = APIErrorType.AUTHENTICATION;
+       break;
+     case 429:
+       errorType = APIErrorType.RATE_LIMIT;
+       retryAfter = this.extractRetryAfter(error);
+       break;
+     case 400:
+     case 422:
+       errorType = APIErrorType.INVALID_REQUEST;
+       break;
+     // ...
+   }
+   ```
+
+3. **リトライ判定**: `packages/ai-api/lib/utils/error-handler.ts:207-215`
+   ```typescript
+   public shouldRetry(error: APIError, currentRetry: number, maxRetries: number): boolean {
+     if (currentRetry >= maxRetries) return false;
+     return isRetryableError(error);
+   }
+   ```
+
+4. **指数バックオフ計算**: `packages/ai-api/lib/utils/error-handler.ts:229-250`
+   ```typescript
+   public calculateBackoffDelay(
+     retryCount: number,
+     baseDelay: number = 1000,
+     maxDelay: number = 30000,
+     backoffMultiplier: number = 2,
+     enableJitter: boolean = true,
+   ): number {
+     const exponentialDelay = baseDelay * Math.pow(backoffMultiplier, retryCount);
+     const boundedDelay = Math.min(exponentialDelay, maxDelay);
+
+     if (enableJitter) {
+       const jitter = boundedDelay * 0.25 * Math.random();
+       return Math.floor(boundedDelay + jitter);
+     }
+     return boundedDelay;
+   }
+   ```
+
+5. **機密情報の除去**: `packages/ai-api/lib/utils/error-handler.ts:262-325`
+   ```typescript
+   public sanitizeErrorForLogging(error: APIError): APIError {
+     const sanitized = { ...error };
+     sanitized.message = this.sanitizeString(error.message);
+     // APIキー、トークンなどをマスク
+   }
+   ```
+
+#### 🚨 Content Script エラー処理
+
+**エラー型定義**: `pages/content/src/ai-analysis.ts:38-63`
+
+```typescript
+export enum AnalysisErrorType {
+  NO_API_KEY = 'NO_API_KEY',
+  INVALID_SETTINGS = 'INVALID_SETTINGS',
+  INVALID_DATA = 'INVALID_DATA',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  API_ERROR = 'API_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+}
+```
+
+**エラー作成**: `pages/content/src/ai-analysis.ts:255-260`
+```typescript
+export const createAnalysisError = (
+  type: AnalysisErrorType,
+  message: string,
+  originalError?: Error,
+): AnalysisError => {
+  const error = new Error(message) as AnalysisError;
+  error.name = 'AnalysisError';
+  error.type = type;
+  error.originalError = originalError;
+  return error;
+};
+```
+
+### 10.4 開発/本番モード切り替えの流れ
+
+#### 🔄 環境判定とAPI切り替え
+
+**判定ロジック**: `chrome-extension/src/background/ai-api-handler.ts:133`
+
+```typescript
+const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
+```
+
+**API設定**: `chrome-extension/src/background/ai-api-handler.ts:135-150`
+
+```typescript
+let client: ReturnType<typeof openai>;
+if (isDevelopment) {
+  // Mock API サーバーを使用
+  console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
+  client = openai({
+    apiKey: 'mock-api-key',
+    baseURL: 'http://localhost:3001/v1',
+  });
+} else {
+  // OpenAI API を使用
+  console.log('AI Analysis: OpenAI API使用');
+  client = openai({
+    apiKey: settings.apiKey,
+  });
+}
+```
+
+#### 🧪 Mock API サーバー
+
+**CORS設定**: `dev-servers/mock-api/server.js:14-27`
+
+```javascript
+app.use(cors({
+  origin: [
+    'chrome-extension://*',
+    'moz-extension://*',
+    'http://localhost:*',
+    'https://localhost:*'
+  ],
+  credentials: true
+}));
+```
+
+**Chat Completions API**: `dev-servers/mock-api/server.js:42-90`
+
+```javascript
+app.post('/v1/chat/completions', (req, res) => {
+  const { messages, model = 'gpt-4o-mini', temperature = 0.7 } = req.body;
+
+  // モック分析結果を生成
+  const analysisResult = generateMockAnalysis(messages);
+
+  res.json({
+    id: `chatcmpl-mock-${Date.now()}`,
+    object: 'chat.completion',
+    created: Math.floor(Date.now() / 1000),
+    model: model,
+    choices: [{
+      index: 0,
+      message: {
+        role: 'assistant',
+        content: analysisResult
+      },
+      finish_reason: 'stop'
+    }],
+    usage: {
+      prompt_tokens: estimateTokens(JSON.stringify(messages)),
+      completion_tokens: estimateTokens(analysisResult),
+      total_tokens: estimateTokens(JSON.stringify(messages)) + estimateTokens(analysisResult)
+    }
+  });
+});
+```
+
+### 10.5 主要な処理チェーン
+
+#### 🔗 設定変更チェーン
+```
+UI入力 → handleInputChange → formData更新 → handleSave →
+aiSettingsStorage.set() → chrome.storage.local.set() →
+chrome.storage.onChanged → 全画面リアルタイム更新
+```
+
+#### 🔗 AI分析チェーン
+```
+Content Script → データ検証 → 設定取得 → プロンプト構築 →
+sendChromeMessage → Background Script → API切り替え →
+generateText → レスポンス作成 → Content Script → 結果表示
+```
+
+#### 🔗 エラー処理チェーン
+```
+エラー発生 → handleError → エラー分類 → shouldRetry →
+calculateBackoffDelay → リトライ実行 → sanitizeErrorForLogging →
+ユーザー通知
+```
+
+#### 🔗 環境切り替えチェーン
+```
+設定変更 → APIキー判定 → isDevelopment → Mock/OpenAI API選択 →
+適切なbaseURL設定 → API実行
+```
+
+### 10.6 デバッグのポイント
+
+#### 🔍 ログの確認場所
+
+1. **Background Script**: Chrome DevTools → Extensions → 詳細 → background page をインスペクト
+2. **Content Script**: ページ上で右クリック → 検証 → Console
+3. **Popup/Options**: 右クリック → 検証 → Console
+4. **Mock API**: `dev-servers/mock-api/` でサーバーログ確認
+
+#### 🔍 主要なログメッセージ
+
+- `AI Analysis: Mock APIサーバー使用`: 開発モード動作中
+- `AI Analysis: OpenAI API使用`: 本番モード動作中
+- `AI分析が完了しました`: 分析成功
+- `Chrome拡張機能間通信エラー`: メッセージング失敗
+
+---
+
+**🎉 ツアー完了！これで全コードの理解と処理フローの把握ができました。**

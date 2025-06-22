@@ -24,7 +24,7 @@ global.chrome = {
       onChanged: mockStorageOnChanged,
     },
   },
-} as MockChrome;
+} as unknown as typeof chrome;
 
 // Import after mocking
 const { createAISettingsStorage, DEFAULT_AI_SETTINGS } = await import('./ai-settings-storage.js');
@@ -64,7 +64,7 @@ describe('AI Settings Storage', () => {
     it('should get stored settings when data exists', async () => {
       const storedSettings: AISettings = {
         apiKey: 'test-key',
-        model: 'gpt-4',
+        model: 'gpt-4o', // 修正
         customPrompt: 'カスタムプロンプト',
         useCustomPrompt: true,
       };
@@ -80,7 +80,7 @@ describe('AI Settings Storage', () => {
     it('should set settings to storage', async () => {
       const newSettings: AISettings = {
         apiKey: 'new-key',
-        model: 'gpt-4-turbo',
+        model: 'gpt-4o-mini', // 修正
         customPrompt: '新しいプロンプト',
         useCustomPrompt: true,
       };
@@ -98,7 +98,7 @@ describe('AI Settings Storage', () => {
     it('should handle function update in set method', async () => {
       const initialSettings: AISettings = {
         apiKey: 'initial-key',
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o', // 修正
         useCustomPrompt: false,
       };
 

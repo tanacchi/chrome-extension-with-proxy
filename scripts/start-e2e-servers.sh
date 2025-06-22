@@ -36,26 +36,5 @@ else
     done
 fi
 
-# mock-api-server (port 3001) の起動
-if check_port 3001; then
-    echo "Mock API server already running on port 3001"
-else
-    echo "Starting mock API server on port 3001..."
-    (cd dev-servers/mock-api && PORT=3001 pnpm start) &
-    MOCK_API_PID=$!
-    echo "Mock API server PID: $MOCK_API_PID"
-    
-    # サーバーの起動を待機
-    for i in {1..30}; do
-        if check_port 3001; then
-            echo "Mock API server is ready"
-            break
-        fi
-        echo "Waiting for mock API server to start... ($i/30)"
-        sleep 1
-    done
-fi
-
 echo "E2E test servers are ready!"
 echo "Sample HTML: http://localhost:3000"
-echo "Mock API: http://localhost:3001"

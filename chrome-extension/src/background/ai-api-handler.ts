@@ -132,33 +132,24 @@ export class AIAPIHandler {
       // 開発時はmock-api、本番時はOpenAI APIを使用
       const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
 
-      const openai = createOpenAI({
-        baseURL: 'https://api.openai-mock.com/v1',
-        apiKey: settings.apiKey,
-      });
+      let result: {
+        text: string;
+        usage?: {
+          promptTokens: number;
+          completionTokens: number;
+          totalTokens: number;
+        };
+      };
 
-      const modelId = 'gpt-4-turbo';
-      let model: ReturnType<typeof openai>;
       if (isDevelopment) {
         // Mock API サーバーを使用
         console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
-        model = openai(modelId);
+        result = await this.callMockAPI(message.data);
       } else {
         // OpenAI API を使用
         console.log('AI Analysis: OpenAI API使用');
-        model = openai(modelId);
+        result = await this.callOpenAIAPI(message.data, settings);
       }
-
-      // AI分析の実行
-      const result = await generateText({
-        model: model,
-        messages: message.data.messages.map(msg => ({
-          role: msg.role as 'system' | 'user' | 'assistant',
-          content: msg.content,
-        })),
-        temperature: settings.temperature || 0.7,
-        maxTokens: settings.maxTokens || 1000,
-      });
 
       const processingTime = Date.now() - startTime;
 
@@ -228,6 +219,147 @@ export class AIAPIHandler {
         maxTokens: requestSettings?.maxTokens ?? 1000,
       };
     }
+  }
+
+  /**
+   * 開発モード用の固定レスポンスを生成します
+   *
+   * @param requestData - リクエストデータ
+   * @param settings - AI設定
+   * @returns 開発用の固定レスポンス
+   *
+   * @private
+   */
+  private async callMockAPI(requestData: AIAnalysisRequest): Promise<{
+    text: string;
+    usage?: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+  }> {
+    // 開発モード用の固定レスポンス
+    const mockAnalysisResult = this.generateMockAnalysisResult(requestData.messages);
+
+    // トークン数の簡易計算（文字数ベース）
+    const inputText = requestData.messages.map(m => m.content).join(' ');
+    const promptTokens = Math.ceil(inputText.length / 4); // 大体4文字で1トークン
+    const completionTokens = Math.ceil(mockAnalysisResult.length / 4);
+
+    // 実際のAPI呼び出しを模倣するため少し待機
+    await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+
+    return {
+      text: mockAnalysisResult,
+      usage: {
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+      },
+    };
+  }
+
+  /**
+   * 開発用のモック分析結果を生成します
+   *
+   * @param messages - 入力メッセージ
+   * @returns モック分析結果
+   *
+   * @private
+   */
+  private generateMockAnalysisResult(messages: Array<{ role: string; content: string }>): string {
+    // ユーザーメッセージからテーブルデータの特徴を抽出
+    const userMessage = messages.find(m => m.role === 'user')?.content || '';
+
+    // テーブルデータかどうかを判定
+    const hasTableData =
+      userMessage.includes('\t') ||
+      userMessage.includes('|') ||
+      userMessage.toLowerCase().includes('table') ||
+      userMessage.toLowerCase().includes('テーブル');
+
+    if (hasTableData) {
+      return `📊 **AI分析結果（開発モード）**
+
+このテーブルデータの分析結果：
+
+🔍 **データの特徴**
+- データ形式: 構造化されたテーブルデータを検出
+- 項目数: 複数のカラムと行で構成
+- データの種類: 数値データと文字列データが混在
+
+📈 **傾向とパターン**
+- データには一定のパターンが見られます
+- 各項目間に相関関係の可能性があります
+- データの分布は比較的均等です
+
+💡 **推奨事項**
+- より詳細な分析には追加のデータが有効です
+- データの可視化を検討することをお勧めします
+- 定期的なデータ更新で傾向を追跡できます
+
+⚠️ *これは開発モード用の固定レスポンスです。実際の分析には本番のAPIキーを設定してください。*`;
+    } else {
+      return `🤖 **AI応答（開発モード）**
+
+ご質問にお答えします：
+
+📝 **回答内容**
+入力いただいた内容について、以下の観点から回答いたします：
+
+• 基本的な情報整理
+• 関連する要素の特定
+• 推奨される次のステップ
+
+🎯 **要点**
+- 内容を理解し、適切な対応を検討しました
+- さらなる詳細が必要な場合はお知らせください
+- 継続的なサポートが可能です
+
+⚠️ *これは開発モード用の固定レスポンスです。実際のAI分析には本番のAPIキーを設定してください。*`;
+    }
+  }
+
+  /**
+   * OpenAI API を呼び出します
+   *
+   * @param requestData - リクエストデータ
+   * @param settings - AI設定
+   * @returns OpenAI API のレスポンス
+   *
+   * @private
+   */
+  private async callOpenAIAPI(
+    requestData: AIAnalysisRequest,
+    settings: {
+      apiKey: string;
+      model: string;
+      temperature: number;
+      maxTokens: number;
+    },
+  ): Promise<{
+    text: string;
+    usage?: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+  }> {
+    const openai = createOpenAI({
+      apiKey: settings.apiKey, // 実際のOpenAI APIキー
+    });
+
+    const model = openai(settings.model);
+
+    return await generateText({
+      model: model,
+      messages: requestData.messages.map(msg => ({
+        role: msg.role as 'system' | 'user' | 'assistant',
+        content: msg.content,
+      })),
+      temperature: settings.temperature,
+      maxTokens: settings.maxTokens,
+    });
   }
 
   /**
