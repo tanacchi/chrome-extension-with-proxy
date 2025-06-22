@@ -139,7 +139,8 @@ export class APIErrorHandler {
       message,
       statusCode,
       retryAfter,
-      (errorObj as Record<string, unknown>).data || (errorObj as Record<string, unknown>).response?.data,
+      (errorObj as Record<string, unknown>).data ||
+        ((errorObj as Record<string, unknown>).response as Record<string, unknown> | undefined)?.data,
       errorObj instanceof Error ? errorObj : undefined,
     );
   }
@@ -186,8 +187,9 @@ export class APIErrorHandler {
    */
   private extractRetryAfter(error: unknown): number | undefined {
     const errorObj = error as Record<string, unknown>;
-    const headers = ((errorObj as Record<string, unknown>).headers ||
-      (errorObj as Record<string, unknown>).response?.headers) as Record<string, unknown> | undefined;
+    const headers = (errorObj.headers || (errorObj.response as Record<string, unknown> | undefined)?.headers) as
+      | Record<string, unknown>
+      | undefined;
     if (!headers) return undefined;
 
     const retryAfter = headers['retry-after'] || headers['Retry-After'];

@@ -206,7 +206,7 @@ export const showBalloon = (content: string, targetElement: HTMLElement): void =
   balloon.style.fontSize = '14px';
   balloon.style.lineHeight = '1.4';
   balloon.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-  balloon.style.wordWrap = 'break-word'; // 長いテキストの折り返し
+  balloon.style.overflowWrap = 'break-word'; // 長いテキストの折り返し
 
   // 対象要素の右側に吹き出しを配置
   const targetRect = targetElement.getBoundingClientRect();
@@ -321,4 +321,104 @@ export const hideLoading = (): void => {
     // 要素が存在する場合はDOMから削除
     loading.remove();
   }
+};
+
+/**
+ * テーブルの2列目に解析結果を赤文字で注入する
+ *
+ * このメソッドは、AI分析結果をテーブルの各行の2列目に赤文字で表示します。
+ * 既存の解析結果がある場合は置き換えます。
+ *
+ * @example
+ * ```typescript
+ * const analysisResults = [
+ *   '高品質な商品です',
+ *   '価格が競争力があります',
+ *   '在庫に注意が必要です'
+ * ];
+ * injectAnalysisResultsToTable(analysisResults);
+ * ```
+ *
+ * @param {string[]} results - 各行に表示する解析結果の配列
+ * @returns {boolean} 注入が成功したかどうか
+ *
+ * @since 1.0.0
+ */
+export const injectAnalysisResultsToTable = (results: string[]): boolean => {
+  const table = detectTargetTable();
+  if (!table) {
+    console.warn('テーブルが見つからないため、解析結果を注入できませんでした');
+    return false;
+  }
+
+  // 既存の解析結果を削除
+  clearAnalysisResultsFromTable();
+
+  // tbodyがある場合は優先的に使用、ない場合は直接テーブルの行を取得
+  const tbody = table.querySelector('tbody');
+  const rows = tbody ? tbody.querySelectorAll('tr') : table.querySelectorAll('tr');
+
+  if (rows.length === 0) {
+    console.warn('テーブルに行が見つかりませんでした');
+    return false;
+  }
+
+  let injectedCount = 0;
+
+  // 各行に解析結果を注入
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll('td, th');
+
+    // 2列目が存在するかチェック
+    if (cells.length > 1) {
+      const secondCell = cells[1];
+
+      // 解析結果がある場合のみ注入
+      if (index < results.length && results[index].trim()) {
+        // 解析結果を表示するdiv要素を作成（ブロック要素で下に配置）
+        const analysisDiv = document.createElement('div');
+        analysisDiv.className = 'ai-analysis-result';
+
+        // 「特に問題ありません」の場合は緑色表示
+        const isNoProblem = results[index].trim() === '特に問題ありません';
+        const textColor = isNoProblem ? '#28a745' : '#dc3545';
+        const backgroundColor = isNoProblem ? '#f5fff5' : '#fff5f5';
+        const borderColor = isNoProblem ? '#c3e6cb' : '#fecaca';
+
+        analysisDiv.style.cssText = `
+          color: ${textColor};
+          font-weight: bold;
+          margin-top: 4px;
+          padding: 2px 6px;
+          background-color: ${backgroundColor};
+          border-radius: 3px;
+          font-size: 11px;
+          border: 1px solid ${borderColor};
+          display: block;
+          width: fit-content;
+        `;
+        analysisDiv.textContent = results[index];
+
+        // 2列目に解析結果を追加（既存テキストの下に配置）
+        secondCell.appendChild(analysisDiv);
+        injectedCount++;
+      }
+    }
+  });
+
+  console.log(`テーブルに${injectedCount}件の解析結果を注入しました`);
+  return injectedCount > 0;
+};
+
+/**
+ * テーブルから既存の解析結果を削除する
+ *
+ * このメソッドは、テーブル内に表示されている解析結果を全て削除します。
+ * 新しい解析結果を表示する前のクリーンアップに使用されます。
+ *
+ * @since 1.0.0
+ */
+export const clearAnalysisResultsFromTable = (): void => {
+  const existingResults = document.querySelectorAll('.ai-analysis-result');
+  existingResults.forEach(result => result.remove());
 };

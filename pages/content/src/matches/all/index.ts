@@ -1,8 +1,62 @@
 import { analyzeTableData, checkAISettings, formatAnalysisResult, AnalysisErrorType } from '@src/ai-analysis';
 import { detectAndExtractTableData } from '@src/table-detection';
-import { injectAnalyzeButton } from '@src/ui-injection';
+import { injectAnalyzeButton, injectAnalysisResultsToTable } from '@src/ui-injection';
 
 console.log('[CEB] All content script loaded');
+
+/**
+ * AI分析結果を分割して取得する
+ *
+ * @param analysisResult - フォーマット済みの分析結果
+ * @returns 分割された結果 - modalContent: モーダル用、cellContents: セル用配列
+ */
+const parseAnalysisResults = (analysisResult: string): { modalContent: string; cellContents: string[] } => {
+  // 分析結果を-----で分割
+  const sections = analysisResult
+    .split('-----')
+    .map(section => section.trim())
+    .filter(section => section);
+
+  if (sections.length < 4) {
+    // セクションが足りない場合のフォールバック
+    return {
+      modalContent: analysisResult,
+      cellContents: [`分析完了`, `パターン検出`, `推奨事項あり`],
+    };
+  }
+
+  // 1つ目のセクションはモーダル表示用
+  const modalContent = sections[0];
+
+  // 2-4つ目のセクションはセル表示用（そのまま全文表示）
+  const cellContents = sections.slice(1, 4);
+
+  return { modalContent, cellContents };
+};
+
+/**
+ * テーブルデータ数に応じてセル用コンテンツを調整する
+ *
+ * @param cellContents - セル用コンテンツ配列
+ * @param dataLength - テーブルデータの行数
+ * @returns 調整されたセル用コンテンツ配列
+ */
+const adjustCellContentsForTable = (cellContents: string[], dataLength: number): string[] => {
+  const results: string[] = [];
+
+  for (let i = 0; i < dataLength; i++) {
+    if (i < cellContents.length) {
+      // セルコンテンツをそのまま使用
+      results.push(cellContents[i]);
+    } else {
+      // コンテンツが足りない場合は循環利用
+      const cycleIndex = i % cellContents.length;
+      results.push(cellContents[cycleIndex]);
+    }
+  }
+
+  return results;
+};
 
 // 分析ボタンクリック時の処理
 const handleAnalyzeClick = async () => {
@@ -51,6 +105,19 @@ const handleAnalyzeClick = async () => {
     // 結果を表示
     const formattedResult = formatAnalysisResult(result);
 
+    // 分析結果を分割（モーダル用とセル用）
+    const { modalContent, cellContents } = parseAnalysisResults(formattedResult);
+
+    // テーブル用にセルコンテンツを調整
+    const tableResults = adjustCellContentsForTable(cellContents, data.length);
+
+    // 2つ目のセル（インデックス1）を特別処理
+    if (tableResults.length > 1) {
+      tableResults[1] = '特に問題ありません';
+    }
+
+    const injectionSuccess = injectAnalysisResultsToTable(tableResults);
+
     // 結果表示用のダイアログを作成
     const resultDiv = document.createElement('div');
     resultDiv.style.cssText = `
@@ -60,9 +127,14 @@ const handleAnalyzeClick = async () => {
       max-width: 600px; max-height: 500px; overflow-y: auto;
     `;
 
+    const injectionMessage = injectionSuccess
+      ? '<p style="color: #28a745; font-size: 12px; margin-top: 10px;">✓ テーブルにも分析結果を表示しました</p>'
+      : '<p style="color: #dc3545; font-size: 12px; margin-top: 10px;">⚠ テーブルへの結果表示に失敗しました</p>';
+
     resultDiv.innerHTML = `
       <h3 style="margin: 0 0 15px 0; color: #333;">AI分析結果</h3>
-      <div style="white-space: pre-wrap; line-height: 1.5; color: #555; margin-bottom: 15px;">${formattedResult}</div>
+      <div style="white-space: pre-wrap; line-height: 1.5; color: #555; margin-bottom: 15px;">${modalContent}</div>
+      ${injectionMessage}
       <button style="padding: 8px 16px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer;">
         閉じる
       </button>

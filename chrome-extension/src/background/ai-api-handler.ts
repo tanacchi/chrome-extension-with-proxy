@@ -10,6 +10,8 @@
  * @since 1.0.0
  */
 
+import { getFixedResponse } from './ai-config/fixed-responses';
+import { getSystemPrompt, detectPromptType } from './ai-config/system-prompts';
 import { createOpenAI } from '@ai-sdk/openai';
 import { aiSettingsStorage } from '@extension/storage';
 import { generateText } from 'ai';
@@ -225,7 +227,6 @@ export class AIAPIHandler {
    * 開発モード用の固定レスポンスを生成します
    *
    * @param requestData - リクエストデータ
-   * @param settings - AI設定
    * @returns 開発用の固定レスポンス
    *
    * @private
@@ -238,8 +239,8 @@ export class AIAPIHandler {
       totalTokens: number;
     };
   }> {
-    // 開発モード用の固定レスポンス
-    const mockAnalysisResult = this.generateMockAnalysisResult(requestData.messages);
+    // 設定ファイルから固定レスポンスを取得
+    const mockAnalysisResult = getFixedResponse(requestData.messages);
 
     // トークン数の簡易計算（文字数ベース）
     const inputText = requestData.messages.map(m => m.content).join(' ');
@@ -257,67 +258,6 @@ export class AIAPIHandler {
         totalTokens: promptTokens + completionTokens,
       },
     };
-  }
-
-  /**
-   * 開発用のモック分析結果を生成します
-   *
-   * @param messages - 入力メッセージ
-   * @returns モック分析結果
-   *
-   * @private
-   */
-  private generateMockAnalysisResult(messages: Array<{ role: string; content: string }>): string {
-    // ユーザーメッセージからテーブルデータの特徴を抽出
-    const userMessage = messages.find(m => m.role === 'user')?.content || '';
-
-    // テーブルデータかどうかを判定
-    const hasTableData =
-      userMessage.includes('\t') ||
-      userMessage.includes('|') ||
-      userMessage.toLowerCase().includes('table') ||
-      userMessage.toLowerCase().includes('テーブル');
-
-    if (hasTableData) {
-      return `📊 **AI分析結果（開発モード）**
-
-このテーブルデータの分析結果：
-
-🔍 **データの特徴**
-- データ形式: 構造化されたテーブルデータを検出
-- 項目数: 複数のカラムと行で構成
-- データの種類: 数値データと文字列データが混在
-
-📈 **傾向とパターン**
-- データには一定のパターンが見られます
-- 各項目間に相関関係の可能性があります
-- データの分布は比較的均等です
-
-💡 **推奨事項**
-- より詳細な分析には追加のデータが有効です
-- データの可視化を検討することをお勧めします
-- 定期的なデータ更新で傾向を追跡できます
-
-⚠️ *これは開発モード用の固定レスポンスです。実際の分析には本番のAPIキーを設定してください。*`;
-    } else {
-      return `🤖 **AI応答（開発モード）**
-
-ご質問にお答えします：
-
-📝 **回答内容**
-入力いただいた内容について、以下の観点から回答いたします：
-
-• 基本的な情報整理
-• 関連する要素の特定
-• 推奨される次のステップ
-
-🎯 **要点**
-- 内容を理解し、適切な対応を検討しました
-- さらなる詳細が必要な場合はお知らせください
-- 継続的なサポートが可能です
-
-⚠️ *これは開発モード用の固定レスポンスです。実際のAI分析には本番のAPIキーを設定してください。*`;
-    }
   }
 
   /**
@@ -351,12 +291,22 @@ export class AIAPIHandler {
 
     const model = openai(settings.model);
 
-    return await generateText({
-      model: model,
-      messages: requestData.messages.map(msg => ({
+    // 適切なシステムプロンプトを自動選択
+    const promptType = detectPromptType(requestData.messages);
+    const systemPrompt = getSystemPrompt(promptType, true);
+
+    // システムプロンプトを先頭に追加
+    const messagesWithSystem = [
+      { role: 'system' as const, content: systemPrompt },
+      ...requestData.messages.map(msg => ({
         role: msg.role as 'system' | 'user' | 'assistant',
         content: msg.content,
       })),
+    ];
+
+    return await generateText({
+      model: model,
+      messages: messagesWithSystem,
       temperature: settings.temperature,
       maxTokens: settings.maxTokens,
     });
