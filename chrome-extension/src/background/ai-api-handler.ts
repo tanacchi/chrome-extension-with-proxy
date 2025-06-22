@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 
-import { getFixedResponse } from './ai-config/fixed-responses';
+import { getFixedResponse } from './ai-config/response-generator';
 import { getSystemPrompt, detectPromptType } from './ai-config/system-prompts';
 import { createOpenAI } from '@ai-sdk/openai';
 import { aiSettingsStorage } from '@extension/storage';
@@ -112,7 +112,7 @@ export class AIAPIHandler {
    */
   private async handleAIAnalysisRequest(
     message: ChromeMessage<AIAnalysisRequest>,
-    sender: chrome.runtime.MessageSender,
+    _sender: chrome.runtime.MessageSender,
     sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void,
   ): Promise<void> {
     const startTime = Date.now();

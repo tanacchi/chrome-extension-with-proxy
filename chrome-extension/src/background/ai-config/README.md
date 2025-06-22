@@ -6,7 +6,7 @@ Chrome拡張機能のAI分析機能で使用する設定とプロンプトを管
 
 このディレクトリには、AI API ハンドラーで使用される以下の設定ファイルが含まれています：
 
-- **fixed-responses.ts**: 開発モード用の固定レスポンス
+- **response-generator.ts**: 開発モード用の動的レスポンス生成機能
 - **system-prompts.ts**: OpenAI APIに送信するシステムプロンプト
 
 ## ファイル構成
@@ -14,38 +14,43 @@ Chrome拡張機能のAI分析機能で使用する設定とプロンプトを管
 ```
 ai-config/
 ├── README.md              # このファイル
-├── fixed-responses.ts     # 開発モード用の固定レスポンス設定
+├── response-generator.ts  # 開発モード用の動的レスポンス生成機能
 └── system-prompts.ts      # AI分析用システムプロンプト設定
 ```
 
-## fixed-responses.ts
+## response-generator.ts
 
-開発モード時に使用される固定のAI分析結果レスポンスを管理します。
+開発モード時に使用される動的AI分析結果レスポンスを生成します。
 
 ### 主な機能
 
-- **テーブルデータ分析用レスポンス**: 構造化されたテーブルデータの分析結果
-- **一般的な質問応答用レスポンス**: 汎用的なAI応答
+- **動的テーブルデータ分析**: 実際のセル内容に基づく個別分析結果生成
+- **セル固有レスポンス**: 各セルの内容を参照した具体的分析
+- **フォールバック機能**: 固定レスポンスによる安定動作保証
 - **データ判定機能**: 入力メッセージからテーブルデータの存在を自動判定
 
 ### 使用例
 
 ```typescript
-import { getFixedResponse } from './fixed-responses';
+import { getFixedResponse, generateDynamicTableResponse } from './response-generator';
 
+// 動的レスポンス生成
+const tableData = ['データA', 'データB', 'データC'];
+const dynamicResponse = generateDynamicTableResponse(tableData);
+
+// メッセージベースのレスポンス取得
 const messages = [
-  { role: 'user', content: 'このテーブルを分析してください' }
+  { role: 'user', content: 'このテーブルを分析してください\nデータ:\n1. 売上実績\n2. 顧客満足度' }
 ];
-
 const response = getFixedResponse(messages);
-console.log(response); // テーブル分析用の固定レスポンスが返される
 ```
 
-### 設定可能な内容
+### 動的生成の特徴
 
-- レスポンステキストの内容
-- テーブルデータ判定条件
-- 分析結果のフォーマット
+- 実際のテーブルセル内容を解析
+- セルごとに個別の評価を生成
+- 「〜についてですが、」形式での具体的言及
+- 2番目のセルは自動的に「特に問題ありません」
 
 ## system-prompts.ts
 
@@ -94,22 +99,28 @@ const tablePrompt = getSystemPrompt(SystemPromptType.TABLE_ANALYSIS);
 
 ## 設定のカスタマイズ
 
-### 固定レスポンスの変更
+### レスポンス生成の設定変更
 
-`fixed-responses.ts`で以下の定数を変更できます：
+`response-generator.ts`で以下の設定を変更できます：
 
 ```typescript
-// テーブル分析用レスポンス
-export const TABLE_ANALYSIS_RESPONSE = `カスタムレスポンス内容`;
-
-// 一般応答用レスポンス
-export const GENERAL_RESPONSE = `カスタムレスポンス内容`;
+// 動的分析パターン
+const analysisTexts = [
+  '良好な品質です',
+  '改善の余地があります',
+  '注意が必要です',
+  '優秀な状態です',
+  '標準的なレベルです'
+];
 
 // テーブルデータ判定条件
 export const TABLE_DATA_INDICATORS = [
   'custom_keyword',
   '特定文字列'
 ];
+
+// 固定レスポンステンプレート
+export const TABLE_ANALYSIS_RESPONSE = `カスタムレスポンス内容`;
 ```
 
 ### システムプロンプトの変更
