@@ -25,7 +25,8 @@
   "dependencies": {
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
-    "@extension/env": "workspace:*"
+    "@extension/env": "workspace:*",
+    "@extension/ai-api": "workspace:*"
   },
   "devDependencies": {
     "@extension/hmr": "workspace:*",

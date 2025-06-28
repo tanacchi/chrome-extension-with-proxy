@@ -145,6 +145,15 @@ pnpm i <package> -F <module-name>
 - TypeScript Project Service使用
 - Chrome API用の`chrome`グローバル変数を定義
 
+#### テスト記述規約
+- **テスト記述言語**: すべてのテスト（E2E・単体テスト）のdescribe()・it()は**日本語で記述**する
+- **テストファイル形式**: `*.spec.ts`または`*.test.ts`を使用
+- **テストルール緩和**: テストファイルでは以下のESLintルールを緩和
+  - 関数宣言の使用を許可（`func-style: off`）
+  - `@ts-ignore`コメントの使用を許可
+  - `any`型の使用を許可
+  - 未使用変数を許可（テストの可読性向上のため）
+
 ### 拡張機能開発
 
 #### Manifest設定
