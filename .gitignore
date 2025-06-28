@@ -3,6 +3,7 @@
 
 # testing
 **/coverage
+**/reports
 
 # build
 **/dist

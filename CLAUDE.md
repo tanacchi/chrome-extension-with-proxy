@@ -98,15 +98,23 @@ pnpm build:firefox # Firefox向けプロダクションビルド
 
 #### 品質チェック
 ```bash
-pnpm lint          # ESLint実行
-pnpm lint:fix      # ESLint自動修正
+pnpm lint          # Biome lint実行
+pnpm lint:fix      # Biome lint自動修正
 pnpm type-check    # TypeScript型チェック
-pnpm format        # Prettier実行
+pnpm format        # Biome format実行
 ```
 
 #### テスト・パッケージング
 ```bash
-pnpm e2e           # E2Eテスト実行
+# E2Eテスト（デフォルト：ヘッドレス）
+pnpm e2e           # Chrome E2Eテスト（ヘッドレス）
+pnpm e2e:firefox   # Firefox E2Eテスト（ヘッドレス）
+
+# E2Eテスト（ブラウザ表示）
+pnpm e2e:headed           # Chrome E2Eテスト（ブラウザ表示）
+pnpm e2e:firefox:headed   # Firefox E2Eテスト（ブラウザ表示）
+
+# パッケージング
 pnpm zip           # 拡張機能のZIPパッケージ作成
 ```
 
@@ -259,12 +267,35 @@ pnpm i <package> -F <module-name>
 - WebdriverIOを使用
 - Chrome/Firefox両方でテスト実行
 - `tests/e2e/`配下でテスト管理
+- **デフォルト：ヘッドレスモード**（CI/CD最適化）
 
 ### テストコマンド
 ```bash
-pnpm e2e           # Chrome E2Eテスト
-pnpm e2e:firefox   # Firefox E2Eテスト
+# ヘッドレスモード（デフォルト）
+pnpm e2e           # Chrome E2Eテスト（ヘッドレス）
+pnpm e2e:firefox   # Firefox E2Eテスト（ヘッドレス）
+
+# ブラウザ表示モード
+pnpm e2e:headed           # Chrome E2Eテスト（ブラウザ表示）
+pnpm e2e:firefox:headed   # Firefox E2Eテスト（ブラウザ表示）
 ```
+
+### CI/CD環境での実行
+GitHub Actionsで自動的にE2Eテストが実行されます：
+
+```yaml
+# プルリクエスト時に自動実行
+- 基本E2Eテスト: Chrome/Firefox両方で実行
+- モジュラーテスト: 各機能単位で細分化実行
+- サーバー自動起動: テスト用HTMLサーバーを一時的に起動
+- ヘッドレス実行: Ubuntu環境で高速実行
+```
+
+**CI実行の特徴：**
+- **自動サーバー起動**: `scripts/start-e2e-servers.sh`による一時サーバー
+- **並列実行**: 最大10インスタンスで高速化
+- **ヘッドレス最適化**: デフォルト設定で自動適用
+- **エラーハンドリング**: サーバー起動失敗時の適切な処理
 
 ## デプロイ・配布
 
@@ -277,7 +308,7 @@ pnpm zip:firefox   # Firefox用ZIPパッケージ作成
 ### 配布準備
 1. バージョン更新：`pnpm update-version <version>`
 2. 本番ビルド：`pnpm build`
-3. E2Eテスト：`pnpm e2e`
+3. E2Eテスト：`pnpm e2e`（ヘッドレス）
 4. ZIPパッケージ作成：`pnpm zip`
 
 ## トラブルシューティング
