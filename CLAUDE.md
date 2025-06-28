@@ -278,7 +278,30 @@ pnpm e2e:firefox   # Firefox E2Eテスト（ヘッドレス）
 # ブラウザ表示モード
 pnpm e2e:headed           # Chrome E2Eテスト（ブラウザ表示）
 pnpm e2e:firefox:headed   # Firefox E2Eテスト（ブラウザ表示）
+
+# HTMLレポート生成
+pnpm e2e:report           # E2Eテスト実行 + HTMLレポート生成
+pnpm e2e:report:open      # 生成済みレポートをブラウザで開く
+pnpm e2e:report:serve     # レポートサーバーを起動して表示
 ```
+
+### テストレポート機能
+E2Eテストの詳細なHTMLレポートを生成できます：
+
+**出力先：**
+```
+tests/e2e/reports/
+├── allure-report/       # 美しいHTMLレポート
+├── allure-results/      # Allure生データ
+└── junit/              # JUnit形式（CI連携用）
+```
+
+**機能：**
+- **実行時間の可視化**: テスト毎の実行時間グラフ
+- **スクリーンショット**: 失敗時の画面キャプチャ
+- **詳細ログ**: 各ステップの実行詳細
+- **トレンド分析**: 過去の実行結果との比較
+- **分類表示**: ブラウザ別・テスト種別の整理
 
 ### CI/CD環境での実行
 GitHub Actionsで自動的にE2Eテストが実行されます：

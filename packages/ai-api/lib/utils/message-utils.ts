@@ -171,7 +171,7 @@ const executeWithRetry = async <T>(
   maxRetries: number,
   enableLogging: boolean,
 ): Promise<T> => {
-  let lastError: Error
+  let lastError: Error | undefined
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
