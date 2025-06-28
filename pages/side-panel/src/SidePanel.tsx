@@ -1,47 +1,50 @@
-import '@src/SidePanel.css';
-import { t } from '@extension/i18n';
-import { PROJECT_URL_OBJECT, useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, createAISettingsStorage } from '@extension/storage';
-import { cn, ErrorDisplay, LoadingSpinner, ToggleButton } from '@extension/ui';
-import { useState } from 'react';
-import type { AISettings } from '@extension/storage';
+import '@src/SidePanel.css'
+import { t } from '@extension/i18n'
+import { PROJECT_URL_OBJECT, useStorage, withErrorBoundary, withSuspense } from '@extension/shared'
+import { exampleThemeStorage, createAISettingsStorage } from '@extension/storage'
+import { cn, ErrorDisplay, LoadingSpinner, ToggleButton } from '@extension/ui'
+import { useState } from 'react'
+import type { AISettings } from '@extension/storage'
 
-const aiSettingsStorage = createAISettingsStorage();
+const aiSettingsStorage = createAISettingsStorage()
 
 const SidePanel = () => {
-  const { isLight } = useStorage(exampleThemeStorage);
-  const storage = useStorage(aiSettingsStorage);
-  const [activeTab, setActiveTab] = useState<'home' | 'settings'>('home');
-  const [formData, setFormData] = useState<AISettings>(storage);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
+  const { isLight } = useStorage(exampleThemeStorage)
+  const storage = useStorage(aiSettingsStorage)
+  const [activeTab, setActiveTab] = useState<'home' | 'settings'>('home')
+  const [formData, setFormData] = useState<AISettings>(storage)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState('')
 
-  const logo = isLight ? 'side-panel/logo_vertical.svg' : 'side-panel/logo_vertical_dark.svg';
+  const logo = isLight ? 'side-panel/logo_vertical.svg' : 'side-panel/logo_vertical_dark.svg'
 
-  const goGithubSite = () => chrome.tabs.create(PROJECT_URL_OBJECT);
-  const openOptionsPage = () => chrome.runtime.openOptionsPage();
+  const goGithubSite = () => chrome.tabs.create(PROJECT_URL_OBJECT)
+  const openOptionsPage = () => chrome.runtime.openOptionsPage()
 
   const handleInputChange =
     (field: keyof AISettings) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      const value = event.target.type === 'checkbox' ? (event.target as HTMLInputElement).checked : event.target.value;
-      setFormData(prev => ({ ...prev, [field]: value }));
-    };
+      const value =
+        event.target.type === 'checkbox'
+          ? (event.target as HTMLInputElement).checked
+          : event.target.value
+      setFormData(prev => ({ ...prev, [field]: value }))
+    }
 
   const handleSave = async () => {
-    setIsSaving(true);
-    setSaveMessage('');
+    setIsSaving(true)
+    setSaveMessage('')
     try {
-      await aiSettingsStorage.set(formData);
-      setSaveMessage('保存完了');
-      setTimeout(() => setSaveMessage(''), 3000);
+      await aiSettingsStorage.set(formData)
+      setSaveMessage('保存完了')
+      setTimeout(() => setSaveMessage(''), 3000)
     } catch (error) {
-      setSaveMessage('保存エラー');
-      console.error('Failed to save AI settings:', error);
+      setSaveMessage('保存エラー')
+      console.error('Failed to save AI settings:', error)
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleLoadDevConfig = () => {
     const devConfig: AISettings = {
@@ -49,11 +52,11 @@ const SidePanel = () => {
       model: 'gpt-4o-mini',
       customPrompt: '以下のテーブルデータを分析して、パターンや傾向を教えてください：',
       useCustomPrompt: false,
-    };
-    setFormData(devConfig);
-    setSaveMessage('開発用設定をロードしました');
-    setTimeout(() => setSaveMessage(''), 3000);
-  };
+    }
+    setFormData(devConfig)
+    setSaveMessage('開発用設定をロードしました')
+    setTimeout(() => setSaveMessage(''), 3000)
+  }
 
   const renderSettings = () => (
     <div className="space-y-4 p-4">
@@ -81,7 +84,8 @@ const SidePanel = () => {
           id="side-model"
           value={formData.model}
           onChange={handleInputChange('model')}
-          className="w-full rounded border px-2 py-1 text-sm">
+          className="w-full rounded border px-2 py-1 text-sm"
+        >
           <option value="gpt-4o-mini">GPT-4o Mini</option>
           <option value="gpt-4o">GPT-4o</option>
         </select>
@@ -116,35 +120,43 @@ const SidePanel = () => {
         </div>
       )}
 
-      {saveMessage && <div className="rounded bg-green-100 p-2 text-sm text-green-800">{saveMessage}</div>}
+      {saveMessage && (
+        <div className="rounded bg-green-100 p-2 text-sm text-green-800">{saveMessage}</div>
+      )}
 
       <div className="flex gap-2">
         <button
+          type="button"
           onClick={handleSave}
           disabled={isSaving || !formData.apiKey.trim()}
-          className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50">
+          className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+        >
           {isSaving ? '保存中...' : '保存'}
         </button>
 
         <button
+          type="button"
           onClick={handleLoadDevConfig}
           disabled={isSaving}
-          className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 disabled:opacity-50">
+          className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 disabled:opacity-50"
+        >
           開発用設定
         </button>
 
         <button
+          type="button"
           onClick={openOptionsPage}
-          className="rounded bg-gray-600 px-3 py-1 text-sm text-white hover:bg-gray-700">
+          className="rounded bg-gray-600 px-3 py-1 text-sm text-white hover:bg-gray-700"
+        >
           詳細設定
         </button>
       </div>
     </div>
-  );
+  )
 
   const renderHome = () => (
     <div className="space-y-4 p-4">
-      <button onClick={goGithubSite} className="block">
+      <button type="button" onClick={goGithubSite} className="block">
         <img src={chrome.runtime.getURL(logo)} className="App-logo mx-auto" alt="logo" />
       </button>
 
@@ -155,12 +167,18 @@ const SidePanel = () => {
 
       <div className="space-y-2">
         <button
+          type="button"
           onClick={() => setActiveTab('settings')}
-          className="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700">
+          className="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700"
+        >
           AI設定
         </button>
 
-        <button onClick={openOptionsPage} className="w-full rounded bg-gray-600 p-2 text-white hover:bg-gray-700">
+        <button
+          type="button"
+          onClick={openOptionsPage}
+          className="w-full rounded bg-gray-600 p-2 text-white hover:bg-gray-700"
+        >
           設定ページを開く
         </button>
 
@@ -169,31 +187,40 @@ const SidePanel = () => {
         </ToggleButton>
       </div>
     </div>
-  );
+  )
 
   return (
     <div className={cn('App min-h-screen', isLight ? 'bg-slate-50' : 'bg-gray-800')}>
-      <div className={cn('text-gray-900 dark:text-gray-100', isLight ? 'text-gray-900' : 'text-gray-100')}>
+      <div
+        className={cn(
+          'text-gray-900 dark:text-gray-100',
+          isLight ? 'text-gray-900' : 'text-gray-100',
+        )}
+      >
         {/* Tab Navigation */}
         <div className="flex border-b">
           <button
+            type="button"
             onClick={() => setActiveTab('home')}
             className={cn(
               'flex-1 p-3 text-sm font-medium',
               activeTab === 'home'
                 ? 'border-b-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                 : 'hover:bg-gray-100 dark:hover:bg-gray-700',
-            )}>
+            )}
+          >
             ホーム
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('settings')}
             className={cn(
               'flex-1 p-3 text-sm font-medium',
               activeTab === 'settings'
                 ? 'border-b-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                 : 'hover:bg-gray-100 dark:hover:bg-gray-700',
-            )}>
+            )}
+          >
             AI設定
           </button>
         </div>
@@ -202,7 +229,7 @@ const SidePanel = () => {
         {activeTab === 'home' ? renderHome() : renderSettings()}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default withErrorBoundary(withSuspense(SidePanel, <LoadingSpinner />), ErrorDisplay);
+export default withErrorBoundary(withSuspense(SidePanel, <LoadingSpinner />), ErrorDisplay)

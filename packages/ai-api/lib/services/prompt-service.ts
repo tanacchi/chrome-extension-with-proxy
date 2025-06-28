@@ -19,13 +19,13 @@ const DEFAULT_SYSTEM_PROMPT = `以下の3つの項目について、以下の指
 項目2: {項目2のデータ}
 項目3: {項目3のデータ}
 
-指示: {ユーザー設定のカスタムプロンプト}`;
+指示: {ユーザー設定のカスタムプロンプト}`
 
 /**
  * フォールバック用の基本プロンプト
  * カスタムプロンプトが設定されていない場合に使用
  */
-const FALLBACK_PROMPT = `各項目について、内容を簡潔に要約し、特徴や注意点があれば指摘してください。`;
+const FALLBACK_PROMPT = '各項目について、内容を簡潔に要約し、特徴や注意点があれば指摘してください。'
 
 /**
  * プロンプト構築オプション
@@ -34,13 +34,13 @@ const FALLBACK_PROMPT = `各項目について、内容を簡潔に要約し、�
  */
 export interface PromptBuildOptions {
   /** カスタムプロンプト */
-  customPrompt?: string;
+  customPrompt?: string
   /** カスタムプロンプトを使用するかどうか */
-  useCustomPrompt?: boolean;
+  useCustomPrompt?: boolean
   /** 最大文字数制限 */
-  maxLength?: number;
+  maxLength?: number
   /** デバッグモード */
-  debug?: boolean;
+  debug?: boolean
 }
 
 /**
@@ -50,15 +50,15 @@ export interface PromptBuildOptions {
  */
 export interface PromptBuildResult {
   /** 構築されたプロンプト */
-  prompt: string;
+  prompt: string
   /** 使用されたプロンプトタイプ */
-  promptType: 'default' | 'custom' | 'fallback';
+  promptType: 'default' | 'custom' | 'fallback'
   /** テーブルデータ項目数 */
-  itemCount: number;
+  itemCount: number
   /** プロンプト文字数 */
-  characterCount: number;
+  characterCount: number
   /** 警告メッセージ（もしあれば） */
-  warnings: string[];
+  warnings: string[]
 }
 
 /**
@@ -94,9 +94,9 @@ export const buildAnalysisPrompt = (
   customPrompt?: string,
   options: PromptBuildOptions = {},
 ): string => {
-  const result = buildAnalysisPromptDetailed(tableData, customPrompt, options);
-  return result.prompt;
-};
+  const result = buildAnalysisPromptDetailed(tableData, customPrompt, options)
+  return result.prompt
+}
 
 /**
  * 詳細な情報を含むプロンプト構築
@@ -115,55 +115,57 @@ export const buildAnalysisPromptDetailed = (
   customPrompt?: string,
   options: PromptBuildOptions = {},
 ): PromptBuildResult => {
-  const { useCustomPrompt = true, maxLength = 3000, debug = false } = options;
+  const { useCustomPrompt = true, maxLength = 3000, debug = false } = options
 
-  const warnings: string[] = [];
+  const warnings: string[] = []
 
   // データの前処理
-  const sanitizedData = sanitizeTableData(tableData);
+  const sanitizedData = sanitizeTableData(tableData)
 
   if (sanitizedData.length === 0) {
-    throw new Error('テーブルデータが空です');
+    throw new Error('テーブルデータが空です')
   }
 
   if (sanitizedData.length > 10) {
-    warnings.push(`データ項目数が多すぎます (${sanitizedData.length}項目)。最初の10項目のみ使用します。`);
-    sanitizedData.splice(10);
+    warnings.push(
+      `データ項目数が多すぎます (${sanitizedData.length}項目)。最初の10項目のみ使用します。`,
+    )
+    sanitizedData.splice(10)
   }
 
   // プロンプトの決定
-  let instructionPrompt = FALLBACK_PROMPT;
-  let promptType: 'default' | 'custom' | 'fallback' = 'fallback';
+  let instructionPrompt = FALLBACK_PROMPT
+  let promptType: 'default' | 'custom' | 'fallback' = 'fallback'
 
   if (useCustomPrompt && customPrompt && customPrompt.trim()) {
-    const trimmedCustomPrompt = customPrompt.trim();
+    const trimmedCustomPrompt = customPrompt.trim()
 
     if (trimmedCustomPrompt.length > 500) {
-      warnings.push('カスタムプロンプトが長すぎます。切り詰められる可能性があります。');
+      warnings.push('カスタムプロンプトが長すぎます。切り詰められる可能性があります。')
     }
 
-    instructionPrompt = trimmedCustomPrompt;
-    promptType = 'custom';
+    instructionPrompt = trimmedCustomPrompt
+    promptType = 'custom'
   } else if (sanitizedData.length >= 3) {
     // デフォルトプロンプトは3項目以上の場合のみ使用
-    promptType = 'default';
+    promptType = 'default'
   }
 
   // プロンプトの構築
-  let prompt: string;
+  let prompt: string
 
   if (promptType === 'default' && sanitizedData.length >= 3) {
     // SPECIFICATION.mdに従った標準フォーマット
-    prompt = buildDefaultPrompt(sanitizedData, customPrompt || FALLBACK_PROMPT);
+    prompt = buildDefaultPrompt(sanitizedData, customPrompt || FALLBACK_PROMPT)
   } else {
     // カスタムまたはフォールバック
-    prompt = buildFlexiblePrompt(sanitizedData, instructionPrompt);
+    prompt = buildFlexiblePrompt(sanitizedData, instructionPrompt)
   }
 
   // 文字数制限チェック
   if (prompt.length > maxLength) {
-    warnings.push(`プロンプトが最大文字数 (${maxLength}) を超えています。`);
-    prompt = truncatePrompt(prompt, maxLength);
+    warnings.push(`プロンプトが最大文字数 (${maxLength}) を超えています。`)
+    prompt = truncatePrompt(prompt, maxLength)
   }
 
   // デバッグ情報
@@ -174,7 +176,7 @@ export const buildAnalysisPromptDetailed = (
       promptType,
       characterCount: prompt.length,
       warnings,
-    });
+    })
   }
 
   return {
@@ -183,8 +185,8 @@ export const buildAnalysisPromptDetailed = (
     itemCount: sanitizedData.length,
     characterCount: prompt.length,
     warnings,
-  };
-};
+  }
+}
 
 /**
  * デフォルト形式のプロンプトを構築
@@ -199,7 +201,7 @@ const buildDefaultPrompt = (tableData: string[], instruction: string): string =>
   const items = tableData
     .slice(0, 3)
     .map((data, index) => `項目${index + 1}: ${data}`)
-    .join('\n');
+    .join('\n')
 
   return `以下の項目について、以下の指示に沿って書けているかそれぞれ分析してください。
 
@@ -218,8 +220,8 @@ ${items}
 -----
 項目2の内容についてですが、[分析内容]
 -----
-項目3の内容についてですが、[分析内容]`;
-};
+項目3の内容についてですが、[分析内容]`
+}
 
 /**
  * 柔軟な形式のプロンプトを構築
@@ -231,14 +233,14 @@ ${items}
  * @private
  */
 const buildFlexiblePrompt = (tableData: string[], instruction: string): string => {
-  const items = tableData.map((data, index) => `${index + 1}. ${data}`).join('\n');
-  const dataCount = tableData.length;
+  const items = tableData.map((data, index) => `${index + 1}. ${data}`).join('\n')
+  const dataCount = tableData.length
 
   // 期待する出力例を動的生成
   const expectedOutputExample = [
     '全体的な分析結果の総括をここに記載',
     ...tableData.map(data => `${data}についてですが、[この項目の具体的な分析内容]`),
-  ].join('\n-----\n');
+  ].join('\n-----\n')
 
   return `以下のテーブルデータについて分析してください。
 
@@ -263,8 +265,8 @@ ${items}
 【期待する出力形式】：
 ${expectedOutputExample}
 
-この形式を厳密に守って、${dataCount + 1}個のセクションで回答してください。`;
-};
+この形式を厳密に守って、${dataCount + 1}個のセクションで回答してください。`
+}
 
 /**
  * テーブルデータをサニタイズする
@@ -281,10 +283,10 @@ const sanitizeTableData = (tableData: string[]): string[] =>
     .filter(data => data.length > 0)
     .map(data => {
       // HTMLタグを除去
-      const cleanData = data.replace(/<[^>]*>/g, '');
+      const cleanData = data.replace(/<[^>]*>/g, '')
       // 長すぎるデータを切り詰め
-      return cleanData.length > 200 ? cleanData.substring(0, 200) + '...' : cleanData;
-    });
+      return cleanData.length > 200 ? `${cleanData.substring(0, 200)}...` : cleanData
+    })
 
 /**
  * プロンプトを指定した文字数で切り詰める
@@ -297,13 +299,13 @@ const sanitizeTableData = (tableData: string[]): string[] =>
  */
 const truncatePrompt = (prompt: string, maxLength: number): string => {
   if (prompt.length <= maxLength) {
-    return prompt;
+    return prompt
   }
 
   // 指示部分を保持しつつ、データ部分を切り詰める
-  const truncated = prompt.substring(0, maxLength - 3) + '...';
-  return truncated;
-};
+  const truncated = `${prompt.substring(0, maxLength - 3)}...`
+  return truncated
+}
 
 /**
  * デフォルトシステムプロンプトを取得する
@@ -312,7 +314,7 @@ const truncatePrompt = (prompt: string, maxLength: number): string => {
  *
  * @since 1.0.0
  */
-export const getDefaultPrompt = (): string => DEFAULT_SYSTEM_PROMPT;
+export const getDefaultPrompt = (): string => DEFAULT_SYSTEM_PROMPT
 
 /**
  * プロンプトをバリデーションする
@@ -323,25 +325,25 @@ export const getDefaultPrompt = (): string => DEFAULT_SYSTEM_PROMPT;
  * @since 1.0.0
  */
 export const validatePrompt = (prompt: string): { isValid: boolean; errors: string[] } => {
-  const errors: string[] = [];
+  const errors: string[] = []
 
   if (!prompt || typeof prompt !== 'string') {
-    errors.push('プロンプトが設定されていません');
-    return { isValid: false, errors };
+    errors.push('プロンプトが設定されていません')
+    return { isValid: false, errors }
   }
 
-  const trimmedPrompt = prompt.trim();
+  const trimmedPrompt = prompt.trim()
 
   if (trimmedPrompt.length === 0) {
-    errors.push('プロンプトが空です');
+    errors.push('プロンプトが空です')
   }
 
   if (trimmedPrompt.length > 3000) {
-    errors.push('プロンプトが長すぎます（3000文字以内）');
+    errors.push('プロンプトが長すぎます（3000文字以内）')
   }
 
   if (trimmedPrompt.length < 10) {
-    errors.push('プロンプトが短すぎます（10文字以上）');
+    errors.push('プロンプトが短すぎます（10文字以上）')
   }
 
   // 潜在的に問題のあるパターンをチェック
@@ -349,16 +351,16 @@ export const validatePrompt = (prompt: string): { isValid: boolean; errors: stri
     /ignore\s+(previous|above|all)\s+instructions?/i,
     /system\s*:\s*you\s+are/i,
     /forget\s+(everything|all)/i,
-  ];
+  ]
 
   dangerousPatterns.forEach(pattern => {
     if (pattern.test(trimmedPrompt)) {
-      errors.push('プロンプトに潜在的に危険なパターンが含まれています');
+      errors.push('プロンプトに潜在的に危険なパターンが含まれています')
     }
-  });
+  })
 
   return {
     isValid: errors.length === 0,
     errors,
-  };
-};
+  }
+}

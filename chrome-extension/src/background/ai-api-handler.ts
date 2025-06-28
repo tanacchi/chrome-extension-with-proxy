@@ -10,12 +10,12 @@
  * @since 1.0.0
  */
 
-import { getFixedResponse } from './ai-config/response-generator';
-import { getSystemPrompt, detectPromptType } from './ai-config/system-prompts';
-import { createOpenAI } from '@ai-sdk/openai';
-import { aiSettingsStorage } from '@extension/storage';
-import { generateText } from 'ai';
-import type { ChromeMessage, ChromeMessageResponse } from '@extension/ai-api';
+import { getFixedResponse } from './ai-config/response-generator'
+import { getSystemPrompt, detectPromptType } from './ai-config/system-prompts'
+import { createOpenAI } from '@ai-sdk/openai'
+import { aiSettingsStorage } from '@extension/storage'
+import { generateText } from 'ai'
+import type { ChromeMessage, ChromeMessageResponse } from '@extension/ai-api'
 
 /**
  * AI分析リクエストの型定義
@@ -24,14 +24,14 @@ import type { ChromeMessage, ChromeMessageResponse } from '@extension/ai-api';
  */
 interface AIAnalysisRequest {
   /** チャットメッセージの配列 */
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: string }>
   /** AI設定 */
   settings?: {
-    apiKey?: string;
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-  };
+    apiKey?: string
+    model?: string
+    temperature?: number
+    maxTokens?: number
+  }
 }
 
 /**
@@ -41,15 +41,15 @@ interface AIAnalysisRequest {
  */
 interface AIAnalysisResponse {
   /** 生成されたテキスト */
-  text: string;
+  text: string
   /** 使用量情報 */
   usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
   /** 処理時間（ミリ秒） */
-  processingTime: number;
+  processingTime: number
 }
 
 /**
@@ -67,7 +67,7 @@ interface AIAnalysisResponse {
  * @since 1.0.0
  */
 export class AIAPIHandler {
-  private isInitialized = false;
+  private isInitialized = false
 
   /**
    * ハンドラーを初期化します
@@ -77,8 +77,8 @@ export class AIAPIHandler {
    */
   public initialize(): void {
     if (this.isInitialized) {
-      console.warn('AI API Handler is already initialized');
-      return;
+      console.warn('AI API Handler is already initialized')
+      return
     }
 
     // Chrome拡張機能のメッセージリスナーを設定
@@ -90,15 +90,15 @@ export class AIAPIHandler {
       ) => {
         // AI分析リクエストのみを処理
         if (message.type === 'AI_ANALYSIS_REQUEST') {
-          this.handleAIAnalysisRequest(message, sender, sendResponse);
-          return true; // 非同期レスポンスを示す
+          this.handleAIAnalysisRequest(message, sender, sendResponse)
+          return true // 非同期レスポンスを示す
         }
-        return false;
+        return false
       },
-    );
+    )
 
-    this.isInitialized = true;
-    console.log('AI API Handler initialized successfully');
+    this.isInitialized = true
+    console.log('AI API Handler initialized successfully')
   }
 
   /**
@@ -115,45 +115,45 @@ export class AIAPIHandler {
     _sender: chrome.runtime.MessageSender,
     sendResponse: (response: ChromeMessageResponse<AIAnalysisResponse>) => void,
   ): Promise<void> {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     try {
       // リクエストデータの検証
       if (!message.data || !message.data.messages) {
-        throw new Error('Invalid request: messages are required');
+        throw new Error('Invalid request: messages are required')
       }
 
       // AI設定の取得
-      const settings = await this.getAISettings(message.data.settings);
+      const settings = await this.getAISettings(message.data.settings)
 
       // APIキーの検証
       if (!settings.apiKey) {
-        throw new Error('OpenAI API key is not configured');
+        throw new Error('OpenAI API key is not configured')
       }
 
       // 開発時はmock-api、本番時はOpenAI APIを使用
-      const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
+      const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder'
 
       let result: {
-        text: string;
+        text: string
         usage?: {
-          promptTokens: number;
-          completionTokens: number;
-          totalTokens: number;
-        };
-      };
+          promptTokens: number
+          completionTokens: number
+          totalTokens: number
+        }
+      }
 
       if (isDevelopment) {
         // Mock API サーバーを使用
-        console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
-        result = await this.callMockAPI(message.data);
+        console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)')
+        result = await this.callMockAPI(message.data)
       } else {
         // OpenAI API を使用
-        console.log('AI Analysis: OpenAI API使用');
-        result = await this.callOpenAIAPI(message.data, settings);
+        console.log('AI Analysis: OpenAI API使用')
+        result = await this.callOpenAIAPI(message.data, settings)
       }
 
-      const processingTime = Date.now() - startTime;
+      const processingTime = Date.now() - startTime
 
       // 成功レスポンス
       const response: ChromeMessageResponse<AIAnalysisResponse> = {
@@ -170,13 +170,13 @@ export class AIAPIHandler {
           processingTime,
         },
         requestId: message.requestId,
-      };
+      }
 
-      sendResponse(response);
+      sendResponse(response)
     } catch (error) {
-      const processingTime = Date.now() - startTime;
+      const processingTime = Date.now() - startTime
 
-      console.error('AI Analysis Error:', error, `(Processing time: ${processingTime}ms)`);
+      console.error('AI Analysis Error:', error, `(Processing time: ${processingTime}ms)`)
 
       // エラーレスポンス
       const errorResponse: ChromeMessageResponse<AIAnalysisResponse> = {
@@ -184,9 +184,9 @@ export class AIAPIHandler {
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         errorCode: this.getErrorCode(error),
         requestId: message.requestId,
-      };
+      }
 
-      sendResponse(errorResponse);
+      sendResponse(errorResponse)
     }
   }
 
@@ -202,7 +202,7 @@ export class AIAPIHandler {
   private async getAISettings(requestSettings?: AIAnalysisRequest['settings']) {
     try {
       // ストレージから基本設定を取得
-      const storedSettings = await aiSettingsStorage.get();
+      const storedSettings = await aiSettingsStorage.get()
 
       // リクエスト設定とマージ（リクエスト設定が優先）
       return {
@@ -210,16 +210,16 @@ export class AIAPIHandler {
         model: requestSettings?.model || storedSettings.model || 'gpt-4o-mini',
         temperature: requestSettings?.temperature ?? 0.7,
         maxTokens: requestSettings?.maxTokens ?? 1000,
-      };
+      }
     } catch (error) {
-      console.error('Failed to load AI settings:', error);
+      console.error('Failed to load AI settings:', error)
       // フォールバック設定
       return {
         apiKey: requestSettings?.apiKey || '',
         model: requestSettings?.model || 'gpt-4o-mini',
         temperature: requestSettings?.temperature ?? 0.7,
         maxTokens: requestSettings?.maxTokens ?? 1000,
-      };
+      }
     }
   }
 
@@ -232,23 +232,23 @@ export class AIAPIHandler {
    * @private
    */
   private async callMockAPI(requestData: AIAnalysisRequest): Promise<{
-    text: string;
+    text: string
     usage?: {
-      promptTokens: number;
-      completionTokens: number;
-      totalTokens: number;
-    };
+      promptTokens: number
+      completionTokens: number
+      totalTokens: number
+    }
   }> {
     // 設定ファイルから固定レスポンスを取得
-    const mockAnalysisResult = getFixedResponse(requestData.messages);
+    const mockAnalysisResult = getFixedResponse(requestData.messages)
 
     // トークン数の簡易計算（文字数ベース）
-    const inputText = requestData.messages.map(m => m.content).join(' ');
-    const promptTokens = Math.ceil(inputText.length / 4); // 大体4文字で1トークン
-    const completionTokens = Math.ceil(mockAnalysisResult.length / 4);
+    const inputText = requestData.messages.map(m => m.content).join(' ')
+    const promptTokens = Math.ceil(inputText.length / 4) // 大体4文字で1トークン
+    const completionTokens = Math.ceil(mockAnalysisResult.length / 4)
 
     // 実際のAPI呼び出しを模倣するため少し待機
-    await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+    await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200))
 
     return {
       text: mockAnalysisResult,
@@ -257,7 +257,7 @@ export class AIAPIHandler {
         completionTokens,
         totalTokens: promptTokens + completionTokens,
       },
-    };
+    }
   }
 
   /**
@@ -272,28 +272,28 @@ export class AIAPIHandler {
   private async callOpenAIAPI(
     requestData: AIAnalysisRequest,
     settings: {
-      apiKey: string;
-      model: string;
-      temperature: number;
-      maxTokens: number;
+      apiKey: string
+      model: string
+      temperature: number
+      maxTokens: number
     },
   ): Promise<{
-    text: string;
+    text: string
     usage?: {
-      promptTokens: number;
-      completionTokens: number;
-      totalTokens: number;
-    };
+      promptTokens: number
+      completionTokens: number
+      totalTokens: number
+    }
   }> {
     const openai = createOpenAI({
       apiKey: settings.apiKey, // 実際のOpenAI APIキー
-    });
+    })
 
-    const model = openai(settings.model);
+    const model = openai(settings.model)
 
     // 適切なシステムプロンプトを自動選択
-    const promptType = detectPromptType(requestData.messages);
-    const systemPrompt = getSystemPrompt(promptType, true);
+    const promptType = detectPromptType(requestData.messages)
+    const systemPrompt = getSystemPrompt(promptType, true)
 
     // システムプロンプトを先頭に追加
     const messagesWithSystem = [
@@ -302,14 +302,14 @@ export class AIAPIHandler {
         role: msg.role as 'system' | 'user' | 'assistant',
         content: msg.content,
       })),
-    ];
+    ]
 
     return await generateText({
       model: model,
       messages: messagesWithSystem,
       temperature: settings.temperature,
       maxTokens: settings.maxTokens,
-    });
+    })
   }
 
   /**
@@ -322,22 +322,22 @@ export class AIAPIHandler {
    */
   private getErrorCode(error: unknown): string {
     if (error instanceof Error) {
-      const message = error.message.toLowerCase();
+      const message = error.message.toLowerCase()
       // OpenAI API エラーの分類
       if (message.includes('api key')) {
-        return 'INVALID_API_KEY';
+        return 'INVALID_API_KEY'
       }
       if (message.includes('rate limit')) {
-        return 'RATE_LIMIT_EXCEEDED';
+        return 'RATE_LIMIT_EXCEEDED'
       }
       if (message.includes('quota')) {
-        return 'QUOTA_EXCEEDED';
+        return 'QUOTA_EXCEEDED'
       }
       if (message.includes('network') || message.includes('fetch')) {
-        return 'NETWORK_ERROR';
+        return 'NETWORK_ERROR'
       }
     }
-    return 'UNKNOWN_ERROR';
+    return 'UNKNOWN_ERROR'
   }
 
   /**
@@ -348,7 +348,7 @@ export class AIAPIHandler {
    * @since 1.0.0
    */
   public isReady(): boolean {
-    return this.isInitialized;
+    return this.isInitialized
   }
 
   /**
@@ -359,19 +359,19 @@ export class AIAPIHandler {
    */
   public shutdown(): void {
     if (!this.isInitialized) {
-      return;
+      return
     }
 
     // リスナーの削除
     // Note: chrome.runtime.onMessage.removeListener は特定のリスナー関数が必要
     // 実装上は通常拡張機能のライフサイクル終了時に自動的にクリーンアップされる
 
-    this.isInitialized = false;
-    console.log('AI API Handler shutdown completed');
+    this.isInitialized = false
+    console.log('AI API Handler shutdown completed')
   }
 }
 
 /**
  * グローバルハンドラーインスタンス
  */
-export const aiAPIHandler = new AIAPIHandler();
+export const aiAPIHandler = new AIAPIHandler()

@@ -6,5 +6,11 @@
     "composite": true
   },
   "include": ["index.mts", "lib", "vitest.config.ts"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "lib/**/test/**", "lib/**/*.spec.*", "lib/**/*.test.*"]
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "lib/**/test/**",
+    "lib/**/*.spec.*",
+    "lib/**/*.test.*"
+  ]
 }

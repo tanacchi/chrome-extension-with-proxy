@@ -31,7 +31,7 @@ export const TABLE_ANALYSIS_SYSTEM_PROMPT = `あなたは優秀なデータア�
 ## 注意事項
 - 推測に基づく分析の場合は明記する
 - データの限界や不足している情報があれば指摘する
-- 実用的で行動可能な提案を心がける`;
+- 実用的で行動可能な提案を心がける`
 
 /**
  * 一般的な質問応答用のシステムプロンプト
@@ -55,7 +55,7 @@ export const GENERAL_SYSTEM_PROMPT = `あなたは親切で知識豊富なAIア�
 ## 注意事項
 - 不確実な情報は推測であることを明記
 - 専門的な内容は適切に説明を加える
-- ユーザーの意図を正しく理解して回答`;
+- ユーザーの意図を正しく理解して回答`
 
 /**
  * データプライバシー保護用の追加プロンプト
@@ -67,7 +67,7 @@ export const PRIVACY_PROTECTION_PROMPT = `
 ## データプライバシーに関する注意
 - 個人情報や機密情報が含まれている可能性があるデータを分析する際は、プライバシーを尊重してください
 - 具体的な個人名、連絡先、機密の数値等は回答に含めないでください
-- 分析結果は一般化された形で提供してください`;
+- 分析結果は一般化された形で提供してください`
 
 /**
  * システムプロンプトのタイプ
@@ -90,23 +90,23 @@ export enum SystemPromptType {
  */
 export const getSystemPrompt = (
   type: SystemPromptType = SystemPromptType.TABLE_ANALYSIS,
-  includePrivacyProtection: boolean = true,
+  includePrivacyProtection = true,
 ): string => {
-  let basePrompt: string;
+  let basePrompt: string
 
   switch (type) {
     case SystemPromptType.TABLE_ANALYSIS:
-      basePrompt = TABLE_ANALYSIS_SYSTEM_PROMPT;
-      break;
+      basePrompt = TABLE_ANALYSIS_SYSTEM_PROMPT
+      break
     case SystemPromptType.GENERAL:
-      basePrompt = GENERAL_SYSTEM_PROMPT;
-      break;
+      basePrompt = GENERAL_SYSTEM_PROMPT
+      break
     default:
-      basePrompt = TABLE_ANALYSIS_SYSTEM_PROMPT;
+      basePrompt = TABLE_ANALYSIS_SYSTEM_PROMPT
   }
 
-  return includePrivacyProtection ? basePrompt + PRIVACY_PROTECTION_PROMPT : basePrompt;
-};
+  return includePrivacyProtection ? basePrompt + PRIVACY_PROTECTION_PROMPT : basePrompt
+}
 
 /**
  * メッセージ内容からプロンプトタイプを自動判定する
@@ -116,18 +116,20 @@ export const getSystemPrompt = (
  *
  * @since 1.0.0
  */
-export const detectPromptType = (messages: Array<{ role: string; content: string }>): SystemPromptType => {
-  const userMessage = messages.find(m => m.role === 'user')?.content || '';
-  const lowerMessage = userMessage.toLowerCase();
+export const detectPromptType = (
+  messages: Array<{ role: string; content: string }>,
+): SystemPromptType => {
+  const userMessage = messages.find(m => m.role === 'user')?.content || ''
+  const lowerMessage = userMessage.toLowerCase()
 
   // テーブルデータ関連のキーワードをチェック
-  const tableKeywords = ['table', 'テーブル', '\\t', '|', 'データ分析', '分析', 'data'];
+  const tableKeywords = ['table', 'テーブル', '\\t', '|', 'データ分析', '分析', 'data']
   const hasTableKeywords = tableKeywords.some(keyword => {
     if (keyword.startsWith('\\')) {
-      return userMessage.includes(keyword.slice(1));
+      return userMessage.includes(keyword.slice(1))
     }
-    return lowerMessage.includes(keyword);
-  });
+    return lowerMessage.includes(keyword)
+  })
 
-  return hasTableKeywords ? SystemPromptType.TABLE_ANALYSIS : SystemPromptType.GENERAL;
-};
+  return hasTableKeywords ? SystemPromptType.TABLE_ANALYSIS : SystemPromptType.GENERAL
+}

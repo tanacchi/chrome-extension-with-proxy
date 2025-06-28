@@ -1,15 +1,17 @@
-import { canSwitchTheme } from '../helpers/theme.js';
+import { canSwitchTheme } from '../helpers/theme.js'
 
 describe('拡張機能新しいタブ', () => {
   it('新しいタブを開いたときに拡張機能ページが開く', async () => {
-    const extensionPath = await browser.getExtensionPath();
+    const extensionPath = await browser.getExtensionPath()
     const newTabUrl =
-      process.env.CLI_CEB_FIREFOX === 'true' ? `${extensionPath}/new-tab/index.html` : 'chrome://newtab';
+      process.env.CLI_CEB_FIREFOX === 'true'
+        ? `${extensionPath}/new-tab/index.html`
+        : 'chrome://newtab'
 
-    await browser.url(newTabUrl);
+    await browser.url(newTabUrl)
 
-    const appDiv = await $('.App').getElement();
-    await expect(appDiv).toBeExisting();
-    await canSwitchTheme();
-  });
-});
+    const appDiv = await $('.App').getElement()
+    await expect(appDiv).toBeExisting()
+    await canSwitchTheme()
+  })
+})

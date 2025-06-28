@@ -28,9 +28,9 @@
     "zip:firefox": "pnpm build:firefox && pnpm -F zipper zip",
     "e2e": "bash scripts/start-e2e-servers.sh && pnpm zip && turbo e2e",
     "e2e:firefox": "bash scripts/start-e2e-servers.sh && pnpm zip:firefox && turbo e2e",
-    "lint": "turbo lint --continue && eslint scripts/ tests/ tests/e2e/",
-    "lint:fix": "turbo lint:fix --continue && eslint scripts/ tests/ tests/e2e/ --fix",
-    "format": "turbo format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
+    "lint": "turbo lint --continue && biome lint scripts/ tests/ tests/e2e/",
+    "lint:fix": "turbo lint:fix --continue && biome lint --write scripts/ tests/ tests/e2e/",
+    "format": "turbo format --continue && biome format --write .",
     "test": "run-p 'test:*'",
     "test:storage": "pnpm --filter=@extension/storage test",
     "test:options": "pnpm --filter=@extension/options test",
@@ -58,6 +58,7 @@
     "vitest": "^3.2.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.0.5",
     "@eslint/compat": "^1.2.9",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.27.0",
@@ -72,11 +73,9 @@
     "cross-env": "^7.0.3",
     "deepmerge": "^4.3.1",
     "eslint": "^9.27.0",
-    "eslint-config-prettier": "^10.1.5",
     "eslint-import-resolver-typescript": "^4.3.5",
     "eslint-plugin-import-x": "^4.12.2",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.4.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-tailwindcss": "^3.18.0",
@@ -92,8 +91,6 @@
     "npm-run-all2": "^8.0.4",
     "postcss": "^8.5.3",
     "postcss-load-config": "^6.0.1",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
     "rimraf": "^6.0.1",
     "run-script-os": "^1.1.6",
     "tailwindcss": "^3.4.17",
@@ -107,8 +104,8 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json}": [
-      "prettier --write --unsafe",
-      "eslint --fix"
+      "biome format --write",
+      "biome lint --write"
     ]
   },
   "packageManager": "pnpm@10.11.0",

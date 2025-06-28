@@ -8,11 +8,11 @@
  */
 export async function checkSampleServerHealth(): Promise<boolean> {
   try {
-    await browser.url('http://localhost:3000');
-    return true;
+    await browser.url('http://localhost:3000')
+    return true
   } catch (error) {
-    console.warn('Sample server health check failed:', error);
-    return false;
+    console.warn('Sample server health check failed:', error)
+    return false
   }
 }
 
@@ -20,16 +20,16 @@ export async function checkSampleServerHealth(): Promise<boolean> {
  * テーブル検出の待機
  */
 export async function waitForTableDetection(): Promise<void> {
-  await browser.pause(1000);
+  await browser.pause(1000)
 
   try {
-    const table = await browser.$('.ai-target-table-table');
+    const table = await browser.$('.ai-target-table-table')
     await browser.waitUntil(async () => await table.isExisting(), {
       timeout: 5000,
       timeoutMsg: 'Table detection timed out',
-    });
+    })
   } catch (error) {
-    console.warn('Table detection failed:', error);
+    console.warn('Table detection failed:', error)
   }
 }
 
@@ -38,14 +38,14 @@ export async function waitForTableDetection(): Promise<void> {
  */
 export async function waitForAnalysisButton(): Promise<WebdriverIO.Element | null> {
   try {
-    const button = await browser.$('[data-testid="ai-analysis-button"]');
+    const button = await browser.$('[data-testid="ai-analysis-button"]')
     if (await button.isExisting()) {
-      return button;
+      return button
     }
-    return null;
+    return null
   } catch (error) {
-    console.warn('Analysis button not found:', error);
-    return null;
+    console.warn('Analysis button not found:', error)
+    return null
   }
 }
 
@@ -53,35 +53,35 @@ export async function waitForAnalysisButton(): Promise<WebdriverIO.Element | nul
  * 分析完了の待機（簡略版）
  */
 export async function waitForAnalysisCompletion(): Promise<{
-  success: boolean;
-  result?: WebdriverIO.Element;
-  error?: WebdriverIO.Element;
+  success: boolean
+  result?: WebdriverIO.Element
+  error?: WebdriverIO.Element
 }> {
-  await browser.pause(2000);
+  await browser.pause(2000)
 
-  const resultDialog = await browser.$('[data-testid="analysis-result"]');
-  const errorDialog = await browser.$('[data-testid="analysis-error"]');
+  const resultDialog = await browser.$('[data-testid="analysis-result"]')
+  const errorDialog = await browser.$('[data-testid="analysis-error"]')
 
   if (await resultDialog.isExisting()) {
-    return { success: true, result: resultDialog };
-  } else if (await errorDialog.isExisting()) {
-    return { success: false, error: errorDialog };
-  } else {
-    return { success: false };
+    return { success: true, result: resultDialog }
   }
+  if (await errorDialog.isExisting()) {
+    return { success: false, error: errorDialog }
+  }
+  return { success: false }
 }
 
 /**
  * 拡張機能設定（簡略版）
  */
 export async function configureExtensionSettings(settings: {
-  apiKey?: string;
-  model?: string;
-  customPrompt?: string;
+  apiKey?: string
+  model?: string
+  customPrompt?: string
 }): Promise<void> {
   // 簡略化：設定画面を開いて基本的な確認のみ
-  console.log('Extension settings configured:', settings);
-  await browser.pause(500);
+  console.log('Extension settings configured:', settings)
+  await browser.pause(500)
 }
 
 /**
@@ -89,5 +89,5 @@ export async function configureExtensionSettings(settings: {
  */
 export async function cleanupTestData(): Promise<void> {
   // 基本的なクリーンアップ処理
-  await browser.pause(100);
+  await browser.pause(100)
 }

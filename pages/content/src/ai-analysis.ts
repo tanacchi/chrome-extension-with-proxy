@@ -9,8 +9,8 @@
  * @since 1.0.0
  */
 
-import { sendChromeMessage, buildAnalysisPrompt } from '@extension/ai-api';
-import { aiSettingsStorage } from '@extension/storage';
+import { sendChromeMessage, buildAnalysisPrompt } from '@extension/ai-api'
+import { aiSettingsStorage } from '@extension/storage'
 
 /**
  * AI分析結果の型定義
@@ -19,15 +19,15 @@ import { aiSettingsStorage } from '@extension/storage';
  */
 interface AnalysisResult {
   /** 分析結果テキスト */
-  text: string;
+  text: string
   /** 使用量情報 */
   usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
   /** 処理時間（ミリ秒） */
-  processingTime: number;
+  processingTime: number
 }
 
 /**
@@ -55,11 +55,11 @@ export enum AnalysisErrorType {
  */
 export interface AnalysisError extends Error {
   /** エラーの種別 */
-  type: AnalysisErrorType;
+  type: AnalysisErrorType
   /** エラーコード */
-  code?: string;
+  code?: string
   /** 詳細メッセージ */
-  details?: string;
+  details?: string
 }
 
 /**
@@ -69,13 +69,13 @@ export interface AnalysisError extends Error {
  */
 interface AnalysisOptions {
   /** カスタムプロンプト */
-  customPrompt?: string;
+  customPrompt?: string
   /** カスタムプロンプトを使用するかどうか */
-  useCustomPrompt?: boolean;
+  useCustomPrompt?: boolean
   /** 進捗コールバック */
-  onProgress?: (stage: string) => void;
+  onProgress?: (stage: string) => void
   /** エラーコールバック */
-  onError?: (error: AnalysisError) => void;
+  onError?: (error: AnalysisError) => void
 }
 
 /**
@@ -110,31 +110,37 @@ interface AnalysisOptions {
  *
  * @since 1.0.0
  */
-export const analyzeTableData = async (tableData: string[], options: AnalysisOptions = {}): Promise<AnalysisResult> => {
-  const { customPrompt, useCustomPrompt, onProgress, onError } = options;
+export const analyzeTableData = async (
+  tableData: string[],
+  options: AnalysisOptions = {},
+): Promise<AnalysisResult> => {
+  const { customPrompt, useCustomPrompt, onProgress, onError } = options
 
   try {
     // 1. データの検証
-    onProgress?.('データ検証中...');
+    onProgress?.('データ検証中...')
     if (!tableData || tableData.length === 0) {
-      throw createAnalysisError(AnalysisErrorType.INVALID_SETTINGS, '分析対象のデータが指定されていません');
+      throw createAnalysisError(
+        AnalysisErrorType.INVALID_SETTINGS,
+        '分析対象のデータが指定されていません',
+      )
     }
 
     // 2. AI設定の取得と検証
-    onProgress?.('設定確認中...');
-    const settings = await aiSettingsStorage.get();
+    onProgress?.('設定確認中...')
+    const settings = await aiSettingsStorage.get()
 
     if (!settings.apiKey || settings.apiKey.trim().length === 0) {
       throw createAnalysisError(
         AnalysisErrorType.NO_API_KEY,
         'OpenAI APIキーが設定されていません。設定ページで設定してください。',
-      );
+      )
     }
 
     // 3. プロンプトの構築
-    onProgress?.('プロンプト構築中...');
-    const finalCustomPrompt = useCustomPrompt && customPrompt ? customPrompt : settings.customPrompt;
-    const prompt = buildAnalysisPrompt(tableData, finalCustomPrompt);
+    onProgress?.('プロンプト構築中...')
+    const finalCustomPrompt = useCustomPrompt && customPrompt ? customPrompt : settings.customPrompt
+    const prompt = buildAnalysisPrompt(tableData, finalCustomPrompt)
 
     // 4. メッセージの準備
     const messages = [
@@ -142,10 +148,10 @@ export const analyzeTableData = async (tableData: string[], options: AnalysisOpt
         role: 'user',
         content: prompt,
       },
-    ];
+    ]
 
     // 5. Background Scriptとの通信
-    onProgress?.('AI分析実行中...');
+    onProgress?.('AI分析実行中...')
     const response = await sendChromeMessage({
       type: 'AI_ANALYSIS_REQUEST',
       data: {
@@ -157,42 +163,46 @@ export const analyzeTableData = async (tableData: string[], options: AnalysisOpt
           maxTokens: 1000,
         },
       },
-    });
+    })
 
     // 6. レスポンスの検証
     if (!response.success) {
-      const errorType = classifyAPIError(response.errorCode);
-      throw createAnalysisError(errorType, response.error || '分析処理でエラーが発生しました', response.errorCode);
+      const errorType = classifyAPIError(response.errorCode)
+      throw createAnalysisError(
+        errorType,
+        response.error || '分析処理でエラーが発生しました',
+        response.errorCode,
+      )
     }
 
     if (!response.data) {
-      throw createAnalysisError(AnalysisErrorType.UNKNOWN_ERROR, '分析結果を取得できませんでした');
+      throw createAnalysisError(AnalysisErrorType.UNKNOWN_ERROR, '分析結果を取得できませんでした')
     }
 
-    onProgress?.('分析完了');
+    onProgress?.('分析完了')
 
     return {
       text: (response.data as { text: string }).text,
       usage: (response.data as { usage?: AnalysisResult['usage'] }).usage,
       processingTime: (response.data as { processingTime: number }).processingTime,
-    };
+    }
   } catch (error) {
-    console.error('AI Analysis Error:', error);
+    console.error('AI Analysis Error:', error)
 
     // AnalysisError以外のエラーを変換
     if (!(error instanceof Error) || !('type' in error)) {
       const analysisError = createAnalysisError(
         AnalysisErrorType.UNKNOWN_ERROR,
         error instanceof Error ? error.message : '不明なエラーが発生しました',
-      );
-      onError?.(analysisError);
-      throw analysisError;
+      )
+      onError?.(analysisError)
+      throw analysisError
     }
 
-    onError?.(error as AnalysisError);
-    throw error;
+    onError?.(error as AnalysisError)
+    throw error
   }
-};
+}
 
 /**
  * AI設定が正しく設定されているかチェックします
@@ -202,24 +212,24 @@ export const analyzeTableData = async (tableData: string[], options: AnalysisOpt
  * @since 1.0.0
  */
 export const checkAISettings = async (): Promise<{
-  isValid: boolean;
-  hasApiKey: boolean;
-  model: string;
-  errors: string[];
+  isValid: boolean
+  hasApiKey: boolean
+  model: string
+  errors: string[]
 }> => {
   try {
-    console.log('AI Settings: チェック開始');
-    const settings = await aiSettingsStorage.get();
-    console.log('AI Settings: 取得された設定', settings);
-    const errors: string[] = [];
+    console.log('AI Settings: チェック開始')
+    const settings = await aiSettingsStorage.get()
+    console.log('AI Settings: 取得された設定', settings)
+    const errors: string[] = []
 
-    const hasApiKey = Boolean(settings.apiKey && settings.apiKey.trim().length > 0);
+    const hasApiKey = Boolean(settings.apiKey && settings.apiKey.trim().length > 0)
     if (!hasApiKey) {
-      errors.push('OpenAI APIキーが設定されていません');
+      errors.push('OpenAI APIキーが設定されていません')
     }
 
     if (!settings.model) {
-      errors.push('AIモデルが設定されていません');
+      errors.push('AIモデルが設定されていません')
     }
 
     const result = {
@@ -227,20 +237,20 @@ export const checkAISettings = async (): Promise<{
       hasApiKey,
       model: settings.model || 'gpt-4o-mini',
       errors,
-    };
+    }
 
-    console.log('AI Settings: チェック結果', result);
-    return result;
+    console.log('AI Settings: チェック結果', result)
+    return result
   } catch (error) {
-    console.error('Failed to check AI settings:', error);
+    console.error('Failed to check AI settings:', error)
     return {
       isValid: false,
       hasApiKey: false,
       model: '',
       errors: ['設定の読み込みに失敗しました'],
-    };
+    }
   }
-};
+}
 
 /**
  * AnalysisErrorを作成するヘルパー関数
@@ -252,12 +262,16 @@ export const checkAISettings = async (): Promise<{
  *
  * @private
  */
-const createAnalysisError = (type: AnalysisErrorType, message: string, code?: string): AnalysisError => {
-  const error = new Error(message) as AnalysisError;
-  error.type = type;
-  error.code = code;
-  return error;
-};
+const createAnalysisError = (
+  type: AnalysisErrorType,
+  message: string,
+  code?: string,
+): AnalysisError => {
+  const error = new Error(message) as AnalysisError
+  error.type = type
+  error.code = code
+  return error
+}
 
 /**
  * APIエラーコードからAnalysisErrorTypeに分類します
@@ -268,20 +282,20 @@ const createAnalysisError = (type: AnalysisErrorType, message: string, code?: st
  * @private
  */
 const classifyAPIError = (errorCode?: string): AnalysisErrorType => {
-  if (!errorCode) return AnalysisErrorType.UNKNOWN_ERROR;
+  if (!errorCode) return AnalysisErrorType.UNKNOWN_ERROR
 
   switch (errorCode) {
     case 'INVALID_API_KEY':
-      return AnalysisErrorType.NO_API_KEY;
+      return AnalysisErrorType.NO_API_KEY
     case 'RATE_LIMIT_EXCEEDED':
     case 'QUOTA_EXCEEDED':
-      return AnalysisErrorType.API_LIMIT_ERROR;
+      return AnalysisErrorType.API_LIMIT_ERROR
     case 'NETWORK_ERROR':
-      return AnalysisErrorType.NETWORK_ERROR;
+      return AnalysisErrorType.NETWORK_ERROR
     default:
-      return AnalysisErrorType.UNKNOWN_ERROR;
+      return AnalysisErrorType.UNKNOWN_ERROR
   }
-};
+}
 
 /**
  * 分析結果を表示用に整形します
@@ -292,20 +306,20 @@ const classifyAPIError = (errorCode?: string): AnalysisErrorType => {
  * @since 1.0.0
  */
 export const formatAnalysisResult = (result: AnalysisResult): string => {
-  let formatted = result.text;
+  let formatted = result.text
 
   // 使用量情報を追加
   if (result.usage) {
-    formatted += `\n\n--- 使用量情報 ---\n`;
-    formatted += `プロンプトトークン: ${result.usage.promptTokens}\n`;
-    formatted += `完了トークン: ${result.usage.completionTokens}\n`;
-    formatted += `総トークン: ${result.usage.totalTokens}`;
+    formatted += '\n\n--- 使用量情報 ---\n'
+    formatted += `プロンプトトークン: ${result.usage.promptTokens}\n`
+    formatted += `完了トークン: ${result.usage.completionTokens}\n`
+    formatted += `総トークン: ${result.usage.totalTokens}`
   }
 
   // 処理時間を追加
   if (result.processingTime) {
-    formatted += `\n処理時間: ${(result.processingTime / 1000).toFixed(2)}秒`;
+    formatted += `\n処理時間: ${(result.processingTime / 1000).toFixed(2)}秒`
   }
 
-  return formatted;
-};
+  return formatted
+}

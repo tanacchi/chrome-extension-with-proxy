@@ -16,11 +16,11 @@
  */
 export interface ChatMessage {
   /** メッセージの役割 */
-  role: 'system' | 'user' | 'assistant';
+  role: 'system' | 'user' | 'assistant'
   /** メッセージの内容 */
-  content: string;
+  content: string
   /** メッセージの名前（オプション） */
-  name?: string;
+  name?: string
 }
 
 /**
@@ -30,23 +30,23 @@ export interface ChatMessage {
  */
 export interface ChatCompletionRequest {
   /** 使用するモデル */
-  model: 'gpt-4o' | 'gpt-4o-mini';
+  model: 'gpt-4o' | 'gpt-4o-mini'
   /** メッセージの配列 */
-  messages: ChatMessage[];
+  messages: ChatMessage[]
   /** 応答の最大トークン数 */
-  max_tokens?: number;
+  max_tokens?: number
   /** 温度パラメータ（0-2） */
-  temperature?: number;
+  temperature?: number
   /** トップPパラメータ（0-1） */
-  top_p?: number;
+  top_p?: number
   /** ストリーミングの有効化 */
-  stream?: boolean;
+  stream?: boolean
   /** ストップシーケンス */
-  stop?: string | string[];
+  stop?: string | string[]
   /** 存在ペナルティ */
-  presence_penalty?: number;
+  presence_penalty?: number
   /** 頻度ペナルティ */
-  frequency_penalty?: number;
+  frequency_penalty?: number
 }
 
 /**
@@ -56,19 +56,19 @@ export interface ChatCompletionRequest {
  */
 export interface ChatCompletionResponse {
   /** 一意のID */
-  id: string;
+  id: string
   /** オブジェクトタイプ */
-  object: 'chat.completion';
+  object: 'chat.completion'
   /** 作成日時（Unix timestamp） */
-  created: number;
+  created: number
   /** 使用されたモデル */
-  model: string;
+  model: string
   /** 選択肢の配列 */
-  choices: ChatCompletionChoice[];
+  choices: ChatCompletionChoice[]
   /** 使用量情報 */
-  usage?: ChatCompletionUsage;
+  usage?: ChatCompletionUsage
   /** システムフィンガープリント */
-  system_fingerprint?: string;
+  system_fingerprint?: string
 }
 
 /**
@@ -78,13 +78,13 @@ export interface ChatCompletionResponse {
  */
 export interface ChatCompletionChoice {
   /** インデックス */
-  index: number;
+  index: number
   /** メッセージ */
-  message: ChatMessage;
+  message: ChatMessage
   /** 終了理由 */
-  finish_reason: 'stop' | 'length' | 'content_filter' | null;
+  finish_reason: 'stop' | 'length' | 'content_filter' | null
   /** ログ確率（オプション） */
-  logprobs?: unknown;
+  logprobs?: unknown
 }
 
 /**
@@ -94,11 +94,11 @@ export interface ChatCompletionChoice {
  */
 export interface ChatCompletionUsage {
   /** プロンプトトークン数 */
-  prompt_tokens: number;
+  prompt_tokens: number
   /** 補完トークン数 */
-  completion_tokens: number;
+  completion_tokens: number
   /** 総トークン数 */
-  total_tokens: number;
+  total_tokens: number
 }
 
 /**
@@ -108,17 +108,17 @@ export interface ChatCompletionUsage {
  */
 export interface ChatCompletionChunk {
   /** 一意のID */
-  id: string;
+  id: string
   /** オブジェクトタイプ */
-  object: 'chat.completion.chunk';
+  object: 'chat.completion.chunk'
   /** 作成日時（Unix timestamp） */
-  created: number;
+  created: number
   /** 使用されたモデル */
-  model: string;
+  model: string
   /** デルタの配列 */
-  choices: ChatCompletionDelta[];
+  choices: ChatCompletionDelta[]
   /** システムフィンガープリント */
-  system_fingerprint?: string;
+  system_fingerprint?: string
 }
 
 /**
@@ -128,16 +128,16 @@ export interface ChatCompletionChunk {
  */
 export interface ChatCompletionDelta {
   /** インデックス */
-  index: number;
+  index: number
   /** デルタメッセージ */
   delta: {
     /** 役割（最初のチャンクのみ） */
-    role?: string;
+    role?: string
     /** コンテンツの差分 */
-    content?: string;
-  };
+    content?: string
+  }
   /** 終了理由 */
-  finish_reason: 'stop' | 'length' | 'content_filter' | null;
+  finish_reason: 'stop' | 'length' | 'content_filter' | null
 }
 
 /**
@@ -170,15 +170,15 @@ export enum APIErrorType {
  */
 export interface APIError extends Error {
   /** エラーの種別 */
-  type: APIErrorType;
+  type: APIErrorType
   /** HTTPステータスコード */
-  statusCode?: number;
+  statusCode?: number
   /** リトライ可能時間（秒） */
-  retryAfter?: number;
+  retryAfter?: number
   /** エラーの詳細情報 */
-  details?: unknown;
+  details?: unknown
   /** オリジナルのエラー */
-  originalError?: Error;
+  originalError?: Error
 }
 
 /**
@@ -188,15 +188,15 @@ export interface APIError extends Error {
  */
 export interface RetryConfig {
   /** 最大リトライ回数 */
-  maxRetries: number;
+  maxRetries: number
   /** 基本遅延時間（ミリ秒） */
-  baseDelay: number;
+  baseDelay: number
   /** 最大遅延時間（ミリ秒） */
-  maxDelay: number;
+  maxDelay: number
   /** バックオフ倍率 */
-  backoffMultiplier: number;
+  backoffMultiplier: number
   /** リトライ可能なエラータイプ */
-  retryableErrors: APIErrorType[];
+  retryableErrors: APIErrorType[]
 }
 
 /**
@@ -206,13 +206,13 @@ export interface RetryConfig {
  */
 export interface RateLimitStatus {
   /** リクエスト制限数 */
-  limit: number;
+  limit: number
   /** 残りリクエスト数 */
-  remaining: number;
+  remaining: number
   /** リセット時刻（Unix timestamp） */
-  resetTime: number;
+  resetTime: number
   /** 次のリクエスト可能時刻 */
-  nextRequestTime?: number;
+  nextRequestTime?: number
 }
 
 /**
@@ -222,21 +222,21 @@ export interface RateLimitStatus {
  */
 export interface AnalysisResult {
   /** 一意のID */
-  id: string;
+  id: string
   /** 入力データ */
-  inputData: string[];
+  inputData: string[]
   /** 分析結果の配列 */
-  responses: string[];
+  responses: string[]
   /** 使用されたモデル */
-  model: string;
+  model: string
   /** 使用されたプロンプト */
-  promptUsed: string;
+  promptUsed: string
   /** 作成日時 */
-  timestamp: Date;
+  timestamp: Date
   /** 処理時間（ミリ秒） */
-  processingTime: number;
+  processingTime: number
   /** トークン使用量 */
-  tokenUsage?: ChatCompletionUsage;
+  tokenUsage?: ChatCompletionUsage
 }
 
 /**
@@ -246,11 +246,11 @@ export interface AnalysisResult {
  */
 export interface ValidationResult {
   /** 検証結果 */
-  isValid: boolean;
+  isValid: boolean
   /** エラーメッセージ（検証失敗時） */
-  errors: string[];
+  errors: string[]
   /** 警告メッセージ */
-  warnings: string[];
+  warnings: string[]
 }
 
 /**
@@ -260,15 +260,15 @@ export interface ValidationResult {
  */
 export interface CacheEntry<T = unknown> {
   /** キャッシュされたデータ */
-  data: T;
+  data: T
   /** 作成日時 */
-  createdAt: Date;
+  createdAt: Date
   /** 有効期限 */
-  expiresAt: Date;
+  expiresAt: Date
   /** アクセス回数 */
-  accessCount: number;
+  accessCount: number
   /** 最終アクセス日時 */
-  lastAccessedAt: Date;
+  lastAccessedAt: Date
 }
 
 /**
@@ -278,31 +278,31 @@ export interface CacheEntry<T = unknown> {
  */
 export interface ExtendedAISettings {
   /** OpenAI APIキー */
-  apiKey: string;
+  apiKey: string
   /** 使用するモデル */
-  model: 'gpt-4o' | 'gpt-4o-mini';
+  model: 'gpt-4o' | 'gpt-4o-mini'
   /** カスタムプロンプト */
-  customPrompt?: string;
+  customPrompt?: string
   /** カスタムプロンプトの使用フラグ */
-  useCustomPrompt: boolean;
+  useCustomPrompt: boolean
   /** リクエスト設定 */
   requestConfig?: {
     /** 最大トークン数 */
-    maxTokens?: number;
+    maxTokens?: number
     /** 温度パラメータ */
-    temperature?: number;
+    temperature?: number
     /** タイムアウト（ミリ秒） */
-    timeout?: number;
-  };
+    timeout?: number
+  }
   /** キャッシュ設定 */
   cacheConfig?: {
     /** キャッシュの有効化 */
-    enabled: boolean;
+    enabled: boolean
     /** TTL（秒） */
-    ttl: number;
+    ttl: number
     /** 最大キャッシュサイズ */
-    maxSize: number;
-  };
+    maxSize: number
+  }
 }
 
 /**
@@ -312,15 +312,15 @@ export interface ExtendedAISettings {
  */
 export interface ClientConfig {
   /** APIキー */
-  apiKey: string;
+  apiKey: string
   /** ベースURL */
-  baseURL?: string;
+  baseURL?: string
   /** タイムアウト（ミリ秒） */
-  timeout?: number;
+  timeout?: number
   /** リトライ設定 */
-  retryConfig?: RetryConfig;
+  retryConfig?: RetryConfig
   /** ユーザーエージェント */
-  userAgent?: string;
+  userAgent?: string
 }
 
 /**
@@ -330,11 +330,11 @@ export interface ClientConfig {
  */
 export interface HealthCheckResult {
   /** ヘルスチェック結果 */
-  healthy: boolean;
+  healthy: boolean
   /** レスポンス時間（ミリ秒） */
-  responseTime: number;
+  responseTime: number
   /** エラーメッセージ（失敗時） */
-  error?: string;
+  error?: string
   /** チェック実行日時 */
-  timestamp: Date;
+  timestamp: Date
 }

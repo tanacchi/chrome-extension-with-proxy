@@ -9,12 +9,12 @@
  * @since 1.0.0
  */
 
-import { useAISettings } from './use-ai-settings';
-import { buildAnalysisPrompt } from '../services/prompt-service';
-import { sendChromeMessage } from '../utils/message-utils';
-import { useChat } from '@ai-sdk/react';
-import { useCallback, useMemo } from 'react';
-import type { AnalysisResult } from '../types/analysis';
+import { useAISettings } from './use-ai-settings'
+import { buildAnalysisPrompt } from '../services/prompt-service'
+import { sendChromeMessage } from '../utils/message-utils'
+import { useChat } from '@ai-sdk/react'
+import { useCallback, useMemo } from 'react'
+import type { AnalysisResult } from '../types/analysis'
 
 /**
  * AI分析フックのオプション
@@ -23,11 +23,11 @@ import type { AnalysisResult } from '../types/analysis';
  */
 export interface UseAnalysisOptions {
   /** 分析完了時のコールバック */
-  onAnalysisComplete?: (result: AnalysisResult) => void;
+  onAnalysisComplete?: (result: AnalysisResult) => void
   /** エラー発生時のコールバック */
-  onError?: (error: Error) => void;
+  onError?: (error: Error) => void
   /** 分析開始時のコールバック */
-  onAnalysisStart?: () => void;
+  onAnalysisStart?: () => void
 }
 
 /**
@@ -37,19 +37,19 @@ export interface UseAnalysisOptions {
  */
 export interface UseAnalysisReturn {
   /** テーブルデータを分析する関数 */
-  analyzeTableData: (tableData: string[]) => Promise<void>;
+  analyzeTableData: (tableData: string[]) => Promise<void>
   /** 分析実行中かどうか */
-  isAnalyzing: boolean;
+  isAnalyzing: boolean
   /** 分析結果のメッセージリスト */
-  analysisMessages: Array<{ role: string; content: string }>;
+  analysisMessages: Array<{ role: string; content: string }>
   /** 最新の分析結果 */
-  latestResult: string | null;
+  latestResult: string | null
   /** エラー情報 */
-  error: Error | null;
+  error: Error | null
   /** 分析をリセットする関数 */
-  resetAnalysis: () => void;
+  resetAnalysis: () => void
   /** 分析を停止する関数 */
-  stopAnalysis: () => void;
+  stopAnalysis: () => void
 }
 
 /**
@@ -94,8 +94,8 @@ export interface UseAnalysisReturn {
  * @since 1.0.0
  */
 export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn => {
-  const { onAnalysisComplete, onError, onAnalysisStart } = options;
-  const { settings, isLoading: settingsLoading } = useAISettings();
+  const { onAnalysisComplete, onError, onAnalysisStart } = options
+  const { settings, isLoading: settingsLoading } = useAISettings()
 
   /**
    * Chrome拡張機能用のカスタムAPI関数
@@ -110,20 +110,20 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
             messages: request.messages,
             settings: settings,
           },
-        });
+        })
 
         if (!response.success) {
-          throw new Error(response.error || 'Analysis request failed');
+          throw new Error(response.error || 'Analysis request failed')
         }
 
-        return response.data;
+        return response.data
       } catch (error) {
-        console.error('Chrome message error:', error);
-        throw error;
+        console.error('Chrome message error:', error)
+        throw error
       }
     },
     [settings],
-  );
+  )
 
   /**
    * useChatフックの設定
@@ -131,8 +131,8 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
   const { messages, append, isLoading, error, stop, setMessages } = useChat({
     api: chromeExtensionAPI as unknown as string,
     onError: (error: Error) => {
-      console.error('AI Analysis Error:', error);
-      onError?.(error);
+      console.error('AI Analysis Error:', error)
+      onError?.(error)
     },
     onFinish: message => {
       if (message.role === 'assistant' && message.content) {
@@ -143,11 +143,11 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
           model: settings?.model || 'unknown',
           inputData: [], // 後で設定される
           processingTime: 0, // 後で計算される
-        };
-        onAnalysisComplete?.(result);
+        }
+        onAnalysisComplete?.(result)
       }
     },
-  });
+  })
 
   /**
    * テーブルデータを分析する関数
@@ -155,66 +155,66 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
   const analyzeTableData = useCallback(
     async (tableData: string[]) => {
       if (!settings) {
-        throw new Error('AI settings not loaded');
+        throw new Error('AI settings not loaded')
       }
 
       if (settingsLoading) {
-        throw new Error('AI settings are still loading');
+        throw new Error('AI settings are still loading')
       }
 
       if (!tableData || tableData.length === 0) {
-        throw new Error('Table data is empty');
+        throw new Error('Table data is empty')
       }
 
       try {
-        onAnalysisStart?.();
+        onAnalysisStart?.()
 
         // プロンプトを構築
-        const prompt = buildAnalysisPrompt(tableData, settings.customPrompt);
+        const prompt = buildAnalysisPrompt(tableData, settings.customPrompt)
 
         // AI分析を実行
         await append({
           role: 'user',
           content: prompt,
-        });
+        })
       } catch (error) {
-        console.error('Analysis error:', error);
-        const analysisError = error instanceof Error ? error : new Error('Unknown analysis error');
-        onError?.(analysisError);
-        throw analysisError;
+        console.error('Analysis error:', error)
+        const analysisError = error instanceof Error ? error : new Error('Unknown analysis error')
+        onError?.(analysisError)
+        throw analysisError
       }
     },
     [settings, settingsLoading, append, onAnalysisStart, onError],
-  );
+  )
 
   /**
    * 分析をリセットする関数
    */
   const resetAnalysis = useCallback(() => {
-    setMessages([]);
-  }, [setMessages]);
+    setMessages([])
+  }, [setMessages])
 
   /**
    * 分析を停止する関数
    */
   const stopAnalysis = useCallback(() => {
-    stop();
-  }, [stop]);
+    stop()
+  }, [stop])
 
   /**
    * 最新の分析結果を取得
    */
   const latestResult = useMemo(() => {
-    const assistantMessages = messages.filter(m => m.role === 'assistant');
-    const latestMessage = assistantMessages[assistantMessages.length - 1];
-    return latestMessage?.content || null;
-  }, [messages]);
+    const assistantMessages = messages.filter(m => m.role === 'assistant')
+    const latestMessage = assistantMessages[assistantMessages.length - 1]
+    return latestMessage?.content || null
+  }, [messages])
 
   /**
    * 分析実行中の判定
    * 設定読み込み中も含める
    */
-  const isAnalyzing = isLoading || settingsLoading;
+  const isAnalyzing = isLoading || settingsLoading
 
   return {
     analyzeTableData,
@@ -224,8 +224,8 @@ export const useAnalysis = (options: UseAnalysisOptions = {}): UseAnalysisReturn
     error: error || null,
     resetAnalysis,
     stopAnalysis,
-  };
-};
+  }
+}
 
 /**
  * 分析結果のメッセージをフィルタリングするヘルパー関数
@@ -239,7 +239,7 @@ export const getAnalysisResults = (messages: Array<{ role: string; content: stri
   messages
     .filter(message => message.role === 'assistant')
     .map(message => message.content)
-    .filter(Boolean);
+    .filter(Boolean)
 
 /**
  * 分析実行時間を計算するヘルパー関数
@@ -249,16 +249,18 @@ export const getAnalysisResults = (messages: Array<{ role: string; content: stri
  *
  * @since 1.0.0
  */
-export const calculateAnalysisTime = (messages: Array<{ role: string; content: string; createdAt?: Date }>): number => {
-  if (messages.length < 2) return 0;
+export const calculateAnalysisTime = (
+  messages: Array<{ role: string; content: string; createdAt?: Date }>,
+): number => {
+  if (messages.length < 2) return 0
 
-  const userMessage = messages.find(m => m.role === 'user');
-  const assistantMessage = messages.find(m => m.role === 'assistant');
+  const userMessage = messages.find(m => m.role === 'user')
+  const assistantMessage = messages.find(m => m.role === 'assistant')
 
-  if (!userMessage?.createdAt || !assistantMessage?.createdAt) return 0;
+  if (!userMessage?.createdAt || !assistantMessage?.createdAt) return 0
 
-  const startTime = new Date(userMessage.createdAt).getTime();
-  const endTime = new Date(assistantMessage.createdAt).getTime();
+  const startTime = new Date(userMessage.createdAt).getTime()
+  const endTime = new Date(assistantMessage.createdAt).getTime()
 
-  return endTime - startTime;
-};
+  return endTime - startTime
+}

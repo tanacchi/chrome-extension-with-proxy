@@ -8,8 +8,8 @@
  * @since 1.0.0
  */
 
-import { APIErrorType } from '../client/api-types';
-import type { APIError, RetryConfig } from '../client/api-types';
+import { APIErrorType } from '../client/api-types'
+import type { APIError, RetryConfig } from '../client/api-types'
 
 /**
  * APIエラーの分類と処理を行うエラーハンドラー
@@ -43,7 +43,7 @@ export class APIErrorHandler {
     /api[_-]?key['":\s=]+[a-zA-Z0-9._-]+/gi, // APIキー
     /token['":\s=]+[a-zA-Z0-9._-]+/gi, // トークン
     /password['":\s=]+[^\s'"]+/gi, // パスワード
-  ];
+  ]
 
   /**
    * エラーを APIError 形式に変換・分類する
@@ -56,7 +56,7 @@ export class APIErrorHandler {
   public handleError(error: unknown): APIError {
     // HTTPエラーの場合
     if (error && typeof error === 'object' && ('status' in error || 'statusCode' in error)) {
-      return this.handleHTTPError(error);
+      return this.handleHTTPError(error)
     }
 
     // ネットワークエラーの場合
@@ -68,7 +68,7 @@ export class APIErrorHandler {
         undefined,
         undefined,
         error instanceof Error ? error : undefined,
-      );
+      )
     }
 
     // その他の不明なエラー
@@ -79,7 +79,7 @@ export class APIErrorHandler {
       undefined,
       undefined,
       error instanceof Error ? error : undefined,
-    );
+    )
   }
 
   /**
@@ -91,47 +91,52 @@ export class APIErrorHandler {
    * @private
    */
   private handleHTTPError(error: unknown): APIError {
-    const errorObj = error as Record<string, unknown>;
-    const statusCode = (errorObj.status || errorObj.statusCode) as number | undefined;
+    const errorObj = error as Record<string, unknown>
+    const statusCode = (errorObj.status || errorObj.statusCode) as number | undefined
     const message = (
-      typeof errorObj.message === 'string' ? errorObj.message : `HTTP Error ${statusCode || 'Unknown'}`
-    ) as string;
-    let errorType: APIErrorType;
-    let retryAfter: number | undefined;
+      typeof errorObj.message === 'string'
+        ? errorObj.message
+        : `HTTP Error ${statusCode || 'Unknown'}`
+    ) as string
+    let errorType: APIErrorType
+    let retryAfter: number | undefined
 
     // ステータスコードに基づく分類
     switch (statusCode) {
       case 401:
       case 403:
-        errorType = APIErrorType.AUTHENTICATION;
-        break;
+        errorType = APIErrorType.AUTHENTICATION
+        break
       case 429:
-        errorType = APIErrorType.RATE_LIMIT;
-        retryAfter = this.extractRetryAfter(error);
-        break;
+        errorType = APIErrorType.RATE_LIMIT
+        retryAfter = this.extractRetryAfter(error)
+        break
       case 400:
       case 422:
-        errorType = APIErrorType.INVALID_REQUEST;
-        break;
+        errorType = APIErrorType.INVALID_REQUEST
+        break
       case 500:
       case 502:
       case 503:
       case 504:
-        errorType = APIErrorType.SERVER_ERROR;
-        break;
+        errorType = APIErrorType.SERVER_ERROR
+        break
       default:
         if (statusCode && statusCode >= 400 && statusCode < 500) {
-          errorType = APIErrorType.INVALID_REQUEST;
+          errorType = APIErrorType.INVALID_REQUEST
         } else if (statusCode && statusCode >= 500) {
-          errorType = APIErrorType.SERVER_ERROR;
+          errorType = APIErrorType.SERVER_ERROR
         } else {
-          errorType = APIErrorType.UNKNOWN;
+          errorType = APIErrorType.UNKNOWN
         }
     }
 
     // クォータ超過の特別処理
-    if (message.toLowerCase().includes('quota') || message.toLowerCase().includes('insufficient_quota')) {
-      errorType = APIErrorType.QUOTA_EXCEEDED;
+    if (
+      message.toLowerCase().includes('quota') ||
+      message.toLowerCase().includes('insufficient_quota')
+    ) {
+      errorType = APIErrorType.QUOTA_EXCEEDED
     }
 
     return createAPIError(
@@ -140,9 +145,10 @@ export class APIErrorHandler {
       statusCode,
       retryAfter,
       (errorObj as Record<string, unknown>).data ||
-        ((errorObj as Record<string, unknown>).response as Record<string, unknown> | undefined)?.data,
+        ((errorObj as Record<string, unknown>).response as Record<string, unknown> | undefined)
+          ?.data,
       errorObj instanceof Error ? errorObj : undefined,
-    );
+    )
   }
 
   /**
@@ -155,10 +161,10 @@ export class APIErrorHandler {
    */
   private isNetworkError(error: unknown): boolean {
     if (!error || typeof error !== 'object') {
-      return false;
+      return false
     }
 
-    const err = error as { name?: string; code?: string; message?: string };
+    const err = error as { name?: string; code?: string; message?: string }
     return Boolean(
       err.name === 'NetworkError' ||
         err.name === 'TimeoutError' ||
@@ -174,7 +180,7 @@ export class APIErrorHandler {
             err.message.toLowerCase().includes('failed') ||
             err.message.toLowerCase().includes('request timeout') ||
             err.message.includes('fetch'))),
-    );
+    )
   }
 
   /**
@@ -186,17 +192,18 @@ export class APIErrorHandler {
    * @private
    */
   private extractRetryAfter(error: unknown): number | undefined {
-    const errorObj = error as Record<string, unknown>;
-    const headers = (errorObj.headers || (errorObj.response as Record<string, unknown> | undefined)?.headers) as
+    const errorObj = error as Record<string, unknown>
+    const headers = (errorObj.headers ||
+      (errorObj.response as Record<string, unknown> | undefined)?.headers) as
       | Record<string, unknown>
-      | undefined;
-    if (!headers) return undefined;
+      | undefined
+    if (!headers) return undefined
 
-    const retryAfter = headers['retry-after'] || headers['Retry-After'];
-    if (!retryAfter) return undefined;
+    const retryAfter = headers['retry-after'] || headers['Retry-After']
+    if (!retryAfter) return undefined
 
-    const seconds = parseInt(String(retryAfter), 10);
-    return isNaN(seconds) ? undefined : seconds;
+    const seconds = Number.parseInt(String(retryAfter), 10)
+    return Number.isNaN(seconds) ? undefined : seconds
   }
 
   /**
@@ -212,11 +219,11 @@ export class APIErrorHandler {
   public shouldRetry(error: APIError, currentRetry: number, maxRetries: number): boolean {
     // 最大リトライ回数を超えている場合
     if (currentRetry >= maxRetries) {
-      return false;
+      return false
     }
 
     // リトライ可能なエラータイプかチェック
-    return isRetryableError(error);
+    return isRetryableError(error)
   }
 
   /**
@@ -233,25 +240,25 @@ export class APIErrorHandler {
    */
   public calculateBackoffDelay(
     retryCount: number,
-    baseDelay: number = 1000,
-    maxDelay: number = 30000,
-    backoffMultiplier: number = 2,
-    enableJitter: boolean = true,
+    baseDelay = 1000,
+    maxDelay = 30000,
+    backoffMultiplier = 2,
+    enableJitter = true,
   ): number {
     // 指数バックオフ計算
-    const exponentialDelay = baseDelay * Math.pow(backoffMultiplier, retryCount);
+    const exponentialDelay = baseDelay * backoffMultiplier ** retryCount
 
     // 最大遅延時間の制限
-    const boundedDelay = Math.min(exponentialDelay, maxDelay);
+    const boundedDelay = Math.min(exponentialDelay, maxDelay)
 
     if (!enableJitter) {
-      return boundedDelay;
+      return boundedDelay
     }
 
     // ジッターを追加（25%の範囲でランダム化）
-    const jitter = boundedDelay * 0.25 * Math.random();
+    const jitter = boundedDelay * 0.25 * Math.random()
 
-    return Math.floor(boundedDelay + jitter);
+    return Math.floor(boundedDelay + jitter)
   }
 
   /**
@@ -265,17 +272,17 @@ export class APIErrorHandler {
    * @since 1.0.0
    */
   public sanitizeErrorForLogging(error: APIError): APIError {
-    const sanitized = { ...error };
+    const sanitized = { ...error }
 
     // メッセージのサニタイズ
-    sanitized.message = this.sanitizeString(error.message);
+    sanitized.message = this.sanitizeString(error.message)
 
     // 詳細情報のサニタイズ
     if (error.details && typeof error.details === 'object') {
-      sanitized.details = this.sanitizeObject(error.details);
+      sanitized.details = this.sanitizeObject(error.details)
     }
 
-    return sanitized;
+    return sanitized
   }
 
   /**
@@ -287,13 +294,13 @@ export class APIErrorHandler {
    * @private
    */
   private sanitizeString(text: string): string {
-    let sanitized = text;
+    let sanitized = text
 
     this.sensitivePatterns.forEach(pattern => {
-      sanitized = sanitized.replace(pattern, '[REDACTED]');
-    });
+      sanitized = sanitized.replace(pattern, '[REDACTED]')
+    })
 
-    return sanitized;
+    return sanitized
   }
 
   /**
@@ -306,27 +313,27 @@ export class APIErrorHandler {
    */
   private sanitizeObject(obj: unknown): unknown {
     if (typeof obj !== 'object' || obj === null) {
-      return obj;
+      return obj
     }
 
-    const sanitized: Record<string, unknown> = {};
-    const sensitiveKeys = ['apikey', 'api_key', 'token', 'password', 'secret', 'authorization'];
+    const sanitized: Record<string, unknown> = {}
+    const sensitiveKeys = ['apikey', 'api_key', 'token', 'password', 'secret', 'authorization']
 
     for (const [key, value] of Object.entries(obj)) {
-      const lowerKey = key.toLowerCase();
+      const lowerKey = key.toLowerCase()
 
       if (sensitiveKeys.some(sensitiveKey => lowerKey.includes(sensitiveKey))) {
-        sanitized[key] = '[REDACTED]';
+        sanitized[key] = '[REDACTED]'
       } else if (typeof value === 'string') {
-        sanitized[key] = this.sanitizeString(value);
+        sanitized[key] = this.sanitizeString(value)
       } else if (typeof value === 'object') {
-        sanitized[key] = this.sanitizeObject(value);
+        sanitized[key] = this.sanitizeObject(value)
       } else {
-        sanitized[key] = value;
+        sanitized[key] = value
       }
     }
 
-    return sanitized;
+    return sanitized
   }
 }
 
@@ -351,16 +358,16 @@ export const createAPIError = (
   details?: unknown,
   originalError?: Error,
 ): APIError => {
-  const error = new Error(message) as APIError;
-  error.name = 'APIError';
-  error.type = type;
-  error.statusCode = statusCode;
-  error.retryAfter = retryAfter;
-  error.details = details;
-  error.originalError = originalError;
+  const error = new Error(message) as APIError
+  error.name = 'APIError'
+  error.type = type
+  error.statusCode = statusCode
+  error.retryAfter = retryAfter
+  error.details = details
+  error.originalError = originalError
 
-  return error;
-};
+  return error
+}
 
 /**
  * エラーがリトライ可能かどうかを判定する
@@ -371,10 +378,10 @@ export const createAPIError = (
  * @since 1.0.0
  */
 export const isRetryableError = (error: APIError): boolean => {
-  const retryableTypes = [APIErrorType.RATE_LIMIT, APIErrorType.NETWORK, APIErrorType.SERVER_ERROR];
+  const retryableTypes = [APIErrorType.RATE_LIMIT, APIErrorType.NETWORK, APIErrorType.SERVER_ERROR]
 
-  return retryableTypes.includes(error.type);
-};
+  return retryableTypes.includes(error.type)
+}
 
 /**
  * デフォルトのリトライ設定
@@ -387,4 +394,4 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxDelay: 30000,
   backoffMultiplier: 2,
   retryableErrors: [APIErrorType.RATE_LIMIT, APIErrorType.NETWORK, APIErrorType.SERVER_ERROR],
-};
+}

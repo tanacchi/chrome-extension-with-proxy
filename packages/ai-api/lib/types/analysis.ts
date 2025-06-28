@@ -15,25 +15,25 @@
  */
 export interface AnalysisResult {
   /** 一意のID */
-  id: string;
+  id: string
   /** 分析結果の内容 */
-  content: string;
+  content: string
   /** 分析実行日時 */
-  timestamp: Date;
+  timestamp: Date
   /** 使用されたモデル */
-  model: string;
+  model: string
   /** 入力データ */
-  inputData: string[];
+  inputData: string[]
   /** 処理時間（ミリ秒） */
-  processingTime: number;
+  processingTime: number
   /** 使用されたプロンプト */
-  promptUsed?: string;
+  promptUsed?: string
   /** トークン使用量 */
   tokenUsage?: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
 }
 
 /**
@@ -43,18 +43,18 @@ export interface AnalysisResult {
  */
 export interface TableAnalysisRequest {
   /** テーブルデータ */
-  tableData: string[];
+  tableData: string[]
   /** AI設定 */
   settings: {
-    apiKey: string;
-    model: 'gpt-4o' | 'gpt-4o-mini';
-    customPrompt?: string;
-    useCustomPrompt: boolean;
-  };
+    apiKey: string
+    model: 'gpt-4o' | 'gpt-4o-mini'
+    customPrompt?: string
+    useCustomPrompt: boolean
+  }
   /** リクエストID */
-  requestId?: string;
+  requestId?: string
   /** タイムスタンプ */
-  timestamp?: number;
+  timestamp?: number
 }
 
 /**
@@ -82,9 +82,9 @@ export enum AnalysisStatus {
  */
 export interface AnalysisHistoryEntry {
   /** 分析結果 */
-  result: AnalysisResult;
+  result: AnalysisResult
   /** 分析状態 */
-  status: AnalysisStatus;
+  status: AnalysisStatus
   /** エラー情報（エラー時） */
-  error?: string;
+  error?: string
 }

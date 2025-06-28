@@ -34,7 +34,7 @@ export const TABLE_ANALYSIS_RESPONSE = `AI分析結果（開発モード）
 -----
 
 推奨事項: データの可視化を検討することをお勧めします
-より詳細な分析には追加のデータが有効です。定期的なデータ更新で傾向を追跡し、ビジネス価値の向上を図ることができます。`;
+より詳細な分析には追加のデータが有効です。定期的なデータ更新で傾向を追跡し、ビジネス価値の向上を図ることができます。`
 
 /**
  * 一般的な質問応答用の固定レスポンス
@@ -61,7 +61,7 @@ export const GENERAL_RESPONSE = `AI応答（開発モード）
 -----
 
 推奨される次のステップ: 具体的なアクションをご提案します
-さらなる詳細が必要な場合はお知らせください。継続的なサポートが可能で、段階的な改善アプローチをお勧めします。`;
+さらなる詳細が必要な場合はお知らせください。継続的なサポートが可能で、段階的な改善アプローチをお勧めします。`
 
 /**
  * テーブルデータを検出する条件
@@ -73,7 +73,7 @@ export const TABLE_DATA_INDICATORS = [
   '|', // パイプ文字
   'table', // table キーワード（英語）
   'テーブル', // テーブル キーワード（日本語）
-];
+]
 
 /**
  * メッセージからテーブルデータの存在を判定する
@@ -84,16 +84,16 @@ export const TABLE_DATA_INDICATORS = [
  * @since 1.0.0
  */
 export const hasTableData = (userMessage: string): boolean => {
-  const lowerMessage = userMessage.toLowerCase();
+  const lowerMessage = userMessage.toLowerCase()
 
   return TABLE_DATA_INDICATORS.some(indicator => {
     if (indicator.startsWith('\\')) {
       // エスケープ文字の場合
-      return userMessage.includes(indicator.slice(1));
+      return userMessage.includes(indicator.slice(1))
     }
-    return lowerMessage.includes(indicator.toLowerCase());
-  });
-};
+    return lowerMessage.includes(indicator.toLowerCase())
+  })
+}
 
 /**
  * テーブルデータから動的な固定レスポンスを生成する
@@ -112,15 +112,15 @@ export const generateDynamicTableResponse = (tableData: string[]): string => {
       '注意が必要です',
       '優秀な状態です',
       '標準的なレベルです',
-    ];
+    ]
 
-    const randomAnalysis = analysisTexts[index % analysisTexts.length];
-    return `${cellContent}についてですが、${randomAnalysis}。データの特徴を分析した結果、適切な管理が行われていることを確認しました。`;
-  });
+    const randomAnalysis = analysisTexts[index % analysisTexts.length]
+    return `${cellContent}についてですが、${randomAnalysis}。データの特徴を分析した結果、適切な管理が行われていることを確認しました。`
+  })
 
   // 最初のセルは特別処理（2つ目のセルは後でオーバーライドされる）
   if (cellAnalyses.length > 1) {
-    cellAnalyses[1] = '特に問題ありません';
+    cellAnalyses[1] = '特に問題ありません'
   }
 
   // モーダル用のサマリーを作成
@@ -133,10 +133,10 @@ ${tableData.length}個の項目を分析しました。各項目について個�
 
 -----
 
-${cellAnalyses.join('\n\n-----\n\n')}`;
+${cellAnalyses.join('\n\n-----\n\n')}`
 
-  return summary;
-};
+  return summary
+}
 
 /**
  * 適切な固定レスポンスを取得する
@@ -147,26 +147,25 @@ ${cellAnalyses.join('\n\n-----\n\n')}`;
  * @since 1.0.0
  */
 export const getFixedResponse = (messages: Array<{ role: string; content: string }>): string => {
-  const userMessage = messages.find(m => m.role === 'user')?.content || '';
+  const userMessage = messages.find(m => m.role === 'user')?.content || ''
 
   if (hasTableData(userMessage)) {
     // テーブルデータがある場合は、メッセージからデータを抽出して動的レスポンスを生成
-    const tableDataMatch = userMessage.match(/データ:\s*([\s\S]*?)(?:\n\n|$)/);
+    const tableDataMatch = userMessage.match(/データ:\s*([\s\S]*?)(?:\n\n|$)/)
     if (tableDataMatch) {
-      const dataSection = tableDataMatch[1];
+      const dataSection = tableDataMatch[1]
       const tableData = dataSection
         .split('\n')
         .map(line => line.replace(/^\d+\.\s*/, '').trim())
-        .filter(line => line.length > 0);
+        .filter(line => line.length > 0)
 
       if (tableData.length > 0) {
-        return generateDynamicTableResponse(tableData);
+        return generateDynamicTableResponse(tableData)
       }
     }
 
     // フォールバック：デフォルトのテーブル分析レスポンス
-    return TABLE_ANALYSIS_RESPONSE;
-  } else {
-    return GENERAL_RESPONSE;
+    return TABLE_ANALYSIS_RESPONSE
   }
-};
+  return GENERAL_RESPONSE
+}

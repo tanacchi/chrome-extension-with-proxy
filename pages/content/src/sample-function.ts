@@ -16,5 +16,5 @@
  * @see {@link https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts} Content Scripts documentation
  */
 export const sampleFunction = () => {
-  console.log('content script - sampleFunction() called from another module');
-};
+  console.log('content script - sampleFunction() called from another module')
+}
