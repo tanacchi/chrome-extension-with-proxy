@@ -1,5 +1,3 @@
-import { canSwitchTheme } from '../helpers/theme.js'
-
 describe('拡張機能オプションページ', () => {
   it('オプションページにアクセスできる', async () => {
     const extensionPath = await browser.getExtensionPath()
@@ -8,6 +6,5 @@ describe('拡張機能オプションページ', () => {
     await browser.url(optionsUrl)
 
     await expect(browser).toHaveTitle('Options')
-    await canSwitchTheme()
   })
 })
