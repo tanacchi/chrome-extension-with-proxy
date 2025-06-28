@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom'
 
 // Mock chrome APIs
 global.chrome = {
@@ -18,4 +18,4 @@ global.chrome = {
       },
     },
   },
-} as any;
+} as typeof global

@@ -18,8 +18,8 @@ import {
   BALLOON_MAX_WIDTH,
   BORDER_RADIUS,
   PADDING,
-} from './constants';
-import { detectTargetTable } from './table-detection';
+} from './constants'
+import { detectTargetTable } from './table-detection'
 
 /**
  * @fileoverview UI注入機能モジュール
@@ -63,40 +63,40 @@ import { detectTargetTable } from './table-detection';
  */
 export const createAnalyzeButton = (onClick: () => void): HTMLButtonElement => {
   // ボタン要素を作成
-  const button = document.createElement('button');
-  button.textContent = ANALYZE_BUTTON_TEXT;
-  button.className = ANALYZE_BUTTON_CLASS;
+  const button = document.createElement('button')
+  button.textContent = ANALYZE_BUTTON_TEXT
+  button.className = ANALYZE_BUTTON_CLASS
 
   // ボタンの基本スタイリングを設定
   // 絶対位置指定により、ページ上の任意の場所に配置可能
-  button.style.position = 'absolute';
-  button.style.zIndex = ANALYZE_BUTTON_Z_INDEX.toString();
-  button.style.backgroundColor = BUTTON_BACKGROUND_COLOR;
-  button.style.color = 'white';
-  button.style.border = 'none';
-  button.style.borderRadius = BORDER_RADIUS.button;
-  button.style.padding = PADDING.button;
-  button.style.fontSize = '12px';
-  button.style.fontWeight = 'bold';
-  button.style.cursor = 'pointer';
-  button.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+  button.style.position = 'absolute'
+  button.style.zIndex = ANALYZE_BUTTON_Z_INDEX.toString()
+  button.style.backgroundColor = BUTTON_BACKGROUND_COLOR
+  button.style.color = 'white'
+  button.style.border = 'none'
+  button.style.borderRadius = BORDER_RADIUS.button
+  button.style.padding = PADDING.button
+  button.style.fontSize = '12px'
+  button.style.fontWeight = 'bold'
+  button.style.cursor = 'pointer'
+  button.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
 
   // ホバー効果を追加してユーザビリティを向上
   button.addEventListener('mouseenter', () => {
     // マウスオーバー時: より濃い青色に変更
-    button.style.backgroundColor = BUTTON_HOVER_COLOR;
-  });
+    button.style.backgroundColor = BUTTON_HOVER_COLOR
+  })
 
   button.addEventListener('mouseleave', () => {
     // マウスアウト時: 元の青色に戻す
-    button.style.backgroundColor = BUTTON_BACKGROUND_COLOR;
-  });
+    button.style.backgroundColor = BUTTON_BACKGROUND_COLOR
+  })
 
   // クリックイベントハンドラーを設定
-  button.addEventListener('click', onClick);
+  button.addEventListener('click', onClick)
 
-  return button;
-};
+  return button
+}
 
 /**
  * 対象テーブルの近くに分析ボタンを注入する
@@ -135,29 +135,29 @@ export const createAnalyzeButton = (onClick: () => void): HTMLButtonElement => {
  */
 export const injectAnalyzeButton = (onClick: () => void): boolean => {
   // 対象テーブルを検出
-  const table = detectTargetTable();
+  const table = detectTargetTable()
   if (!table) {
-    return false;
+    return false
   }
 
   // 既にボタンが存在するかチェックして重複を防ぐ
-  const existingButton = document.querySelector(ANALYZE_BUTTON_SELECTOR);
+  const existingButton = document.querySelector(ANALYZE_BUTTON_SELECTOR)
   if (existingButton) {
-    return true;
+    return true
   }
 
   // 新しい分析ボタンを作成
-  const button = createAnalyzeButton(onClick);
+  const button = createAnalyzeButton(onClick)
 
   // テーブルの位置に基づいてボタンの位置を計算
-  const tableRect = table.getBoundingClientRect();
-  button.style.left = `${tableRect.left - BUTTON_LEFT_OFFSET}px`;
-  button.style.top = `${tableRect.top + window.scrollY}px`;
+  const tableRect = table.getBoundingClientRect()
+  button.style.left = `${tableRect.left - BUTTON_LEFT_OFFSET}px`
+  button.style.top = `${tableRect.top + window.scrollY}px`
 
   // ページにボタンを追加
-  document.body.appendChild(button);
-  return true;
-};
+  document.body.appendChild(button)
+  return true
+}
 
 /**
  * AI分析結果を表示する吹き出し（バルーン）を表示する
@@ -188,34 +188,34 @@ export const injectAnalyzeButton = (onClick: () => void): boolean => {
  */
 export const showBalloon = (content: string, targetElement: HTMLElement): void => {
   // 既存の吹き出しを削除してから新しいものを表示
-  hideBalloon();
+  hideBalloon()
 
   // 吹き出し要素を作成
-  const balloon = document.createElement('div');
-  balloon.className = BALLOON_CLASS;
-  balloon.textContent = content;
+  const balloon = document.createElement('div')
+  balloon.className = BALLOON_CLASS
+  balloon.textContent = content
 
   // 吹き出しのスタイリングを設定
-  balloon.style.position = 'absolute';
-  balloon.style.zIndex = BALLOON_Z_INDEX.toString();
-  balloon.style.backgroundColor = 'white';
-  balloon.style.border = '1px solid #ccc';
-  balloon.style.borderRadius = BORDER_RADIUS.balloon;
-  balloon.style.padding = PADDING.balloon;
-  balloon.style.maxWidth = BALLOON_MAX_WIDTH;
-  balloon.style.fontSize = '14px';
-  balloon.style.lineHeight = '1.4';
-  balloon.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-  balloon.style.wordWrap = 'break-word'; // 長いテキストの折り返し
+  balloon.style.position = 'absolute'
+  balloon.style.zIndex = BALLOON_Z_INDEX.toString()
+  balloon.style.backgroundColor = 'white'
+  balloon.style.border = '1px solid #ccc'
+  balloon.style.borderRadius = BORDER_RADIUS.balloon
+  balloon.style.padding = PADDING.balloon
+  balloon.style.maxWidth = BALLOON_MAX_WIDTH
+  balloon.style.fontSize = '14px'
+  balloon.style.lineHeight = '1.4'
+  balloon.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)'
+  balloon.style.overflowWrap = 'break-word' // 長いテキストの折り返し
 
   // 対象要素の右側に吹き出しを配置
-  const targetRect = targetElement.getBoundingClientRect();
-  balloon.style.left = `${targetRect.right + RIGHT_ELEMENT_OFFSET}px`;
-  balloon.style.top = `${targetRect.top + window.scrollY}px`;
+  const targetRect = targetElement.getBoundingClientRect()
+  balloon.style.left = `${targetRect.right + RIGHT_ELEMENT_OFFSET}px`
+  balloon.style.top = `${targetRect.top + window.scrollY}px`
 
   // ページに吹き出しを追加
-  document.body.appendChild(balloon);
-};
+  document.body.appendChild(balloon)
+}
 
 /**
  * 表示されている分析結果の吹き出しを非表示にする
@@ -235,12 +235,12 @@ export const showBalloon = (content: string, targetElement: HTMLElement): void =
  */
 export const hideBalloon = (): void => {
   // constants.tsで定義されたセレクタを使用して要素を検索
-  const balloon = document.querySelector(BALLOON_SELECTOR);
+  const balloon = document.querySelector(BALLOON_SELECTOR)
   if (balloon) {
     // 要素が存在する場合はDOMから削除
-    balloon.remove();
+    balloon.remove()
   }
-};
+}
 
 /**
  * AI分析処理中のローディングインジケーターを表示する
@@ -270,32 +270,32 @@ export const hideBalloon = (): void => {
  */
 export const showLoading = (targetElement: HTMLElement): void => {
   // 既存のローディング表示を削除してから新しいものを表示
-  hideLoading();
+  hideLoading()
 
   // ローディング要素を作成
-  const loading = document.createElement('div');
-  loading.className = LOADING_CLASS;
-  loading.textContent = LOADING_TEXT;
+  const loading = document.createElement('div')
+  loading.className = LOADING_CLASS
+  loading.textContent = LOADING_TEXT
 
   // ローディングのスタイリングを設定
-  loading.style.position = 'absolute';
-  loading.style.zIndex = LOADING_Z_INDEX.toString();
-  loading.style.backgroundColor = LOADING_BACKGROUND_COLOR;
-  loading.style.color = 'white';
-  loading.style.border = 'none';
-  loading.style.borderRadius = BORDER_RADIUS.loading;
-  loading.style.padding = PADDING.loading;
-  loading.style.fontSize = '12px';
-  loading.style.fontWeight = 'bold';
+  loading.style.position = 'absolute'
+  loading.style.zIndex = LOADING_Z_INDEX.toString()
+  loading.style.backgroundColor = LOADING_BACKGROUND_COLOR
+  loading.style.color = 'white'
+  loading.style.border = 'none'
+  loading.style.borderRadius = BORDER_RADIUS.loading
+  loading.style.padding = PADDING.loading
+  loading.style.fontSize = '12px'
+  loading.style.fontWeight = 'bold'
 
   // 対象要素の右側にローディング表示を配置
-  const targetRect = targetElement.getBoundingClientRect();
-  loading.style.left = `${targetRect.right + RIGHT_ELEMENT_OFFSET}px`;
-  loading.style.top = `${targetRect.top + window.scrollY}px`;
+  const targetRect = targetElement.getBoundingClientRect()
+  loading.style.left = `${targetRect.right + RIGHT_ELEMENT_OFFSET}px`
+  loading.style.top = `${targetRect.top + window.scrollY}px`
 
   // ページにローディング表示を追加
-  document.body.appendChild(loading);
-};
+  document.body.appendChild(loading)
+}
 
 /**
  * 表示されているローディングインジケーターを非表示にする
@@ -316,9 +316,109 @@ export const showLoading = (targetElement: HTMLElement): void => {
  */
 export const hideLoading = (): void => {
   // constants.tsで定義されたセレクタを使用して要素を検索
-  const loading = document.querySelector(LOADING_SELECTOR);
+  const loading = document.querySelector(LOADING_SELECTOR)
   if (loading) {
     // 要素が存在する場合はDOMから削除
-    loading.remove();
+    loading.remove()
   }
-};
+}
+
+/**
+ * テーブルの2列目に解析結果を赤文字で注入する
+ *
+ * このメソッドは、AI分析結果をテーブルの各行の2列目に赤文字で表示します。
+ * 既存の解析結果がある場合は置き換えます。
+ *
+ * @example
+ * ```typescript
+ * const analysisResults = [
+ *   '高品質な商品です',
+ *   '価格が競争力があります',
+ *   '在庫に注意が必要です'
+ * ];
+ * injectAnalysisResultsToTable(analysisResults);
+ * ```
+ *
+ * @param {string[]} results - 各行に表示する解析結果の配列
+ * @returns {boolean} 注入が成功したかどうか
+ *
+ * @since 1.0.0
+ */
+export const injectAnalysisResultsToTable = (results: string[]): boolean => {
+  const table = detectTargetTable()
+  if (!table) {
+    console.warn('テーブルが見つからないため、解析結果を注入できませんでした')
+    return false
+  }
+
+  // 既存の解析結果を削除
+  clearAnalysisResultsFromTable()
+
+  // tbodyがある場合は優先的に使用、ない場合は直接テーブルの行を取得
+  const tbody = table.querySelector('tbody')
+  const rows = tbody ? tbody.querySelectorAll('tr') : table.querySelectorAll('tr')
+
+  if (rows.length === 0) {
+    console.warn('テーブルに行が見つかりませんでした')
+    return false
+  }
+
+  let injectedCount = 0
+
+  // 各行に解析結果を注入
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll('td, th')
+
+    // 2列目が存在するかチェック
+    if (cells.length > 1) {
+      const secondCell = cells[1]
+
+      // 解析結果がある場合のみ注入
+      if (index < results.length && results[index].trim()) {
+        // 解析結果を表示するdiv要素を作成（ブロック要素で下に配置）
+        const analysisDiv = document.createElement('div')
+        analysisDiv.className = 'ai-analysis-result'
+
+        // 「特に問題ありません」の場合は緑色表示
+        const isNoProblem = results[index].trim() === '特に問題ありません'
+        const textColor = isNoProblem ? '#28a745' : '#dc3545'
+        const backgroundColor = isNoProblem ? '#f5fff5' : '#fff5f5'
+        const borderColor = isNoProblem ? '#c3e6cb' : '#fecaca'
+
+        analysisDiv.style.cssText = `
+          color: ${textColor};
+          font-weight: bold;
+          margin-top: 4px;
+          padding: 2px 6px;
+          background-color: ${backgroundColor};
+          border-radius: 3px;
+          font-size: 11px;
+          border: 1px solid ${borderColor};
+          display: block;
+          width: fit-content;
+        `
+        analysisDiv.textContent = results[index]
+
+        // 2列目に解析結果を追加（既存テキストの下に配置）
+        secondCell.appendChild(analysisDiv)
+        injectedCount++
+      }
+    }
+  })
+
+  console.log(`テーブルに${injectedCount}件の解析結果を注入しました`)
+  return injectedCount > 0
+}
+
+/**
+ * テーブルから既存の解析結果を削除する
+ *
+ * このメソッドは、テーブル内に表示されている解析結果を全て削除します。
+ * 新しい解析結果を表示する前のクリーンアップに使用されます。
+ *
+ * @since 1.0.0
+ */
+export const clearAnalysisResultsFromTable = (): void => {
+  const existingResults = document.querySelectorAll('.ai-analysis-result')
+  existingResults.forEach(result => result.remove())
+}

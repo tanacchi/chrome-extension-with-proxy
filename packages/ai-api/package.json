@@ -12,7 +12,7 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
-    "lint": "eslint . --fix",
+    "lint": "biome lint --write .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

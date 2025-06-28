@@ -1,13 +1,12 @@
-import { fixupConfigRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import { flatConfigs as importXFlatConfig } from 'eslint-plugin-import-x';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import reactPlugin from 'eslint-plugin-react';
-import { browser, es2020, node } from 'globals';
-import { config, configs as tsConfigs, parser as tsParser } from 'typescript-eslint';
-import type { FixupConfigArray } from '@eslint/compat';
+import { fixupConfigRules } from '@eslint/compat'
+import { FlatCompat } from '@eslint/eslintrc'
+import js from '@eslint/js'
+import { flatConfigs as importXFlatConfig } from 'eslint-plugin-import-x'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
+import reactPlugin from 'eslint-plugin-react'
+import { browser, es2020, node } from 'globals'
+import { config, configs as tsConfigs, parser as tsParser } from 'typescript-eslint'
+import type { FixupConfigArray } from '@eslint/compat'
 
 export default config(
   // Shared configs
@@ -16,8 +15,9 @@ export default config(
   jsxA11y.flatConfigs.recommended,
   importXFlatConfig.recommended,
   importXFlatConfig.typescript,
-  eslintPluginPrettierRecommended,
-  ...fixupConfigRules(new FlatCompat().extends('plugin:react-hooks/recommended') as FixupConfigArray),
+  ...fixupConfigRules(
+    new FlatCompat().extends('plugin:react-hooks/recommended') as FixupConfigArray,
+  ),
   {
     files: ['**/*.{ts,tsx}'],
     ...reactPlugin.configs.flat.recommended,
@@ -25,7 +25,14 @@ export default config(
   },
   // Custom config
   {
-    ignores: ['**/build/**', '**/dist/**', '**/node_modules/**', 'chrome-extension/manifest.js', 'dev-servers/**'],
+    ignores: [
+      '**/build/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      'chrome-extension/manifest.js',
+      'dev-servers/**',
+      'packages/storage/lib/**/*.spec.ts', // Exclude storage test files from lint
+    ],
   },
   // Node.js scripts configuration
   {
@@ -98,7 +105,16 @@ export default config(
         {
           'newlines-between': 'never',
           alphabetize: { order: 'asc', caseInsensitive: true },
-          groups: ['index', 'sibling', 'parent', 'internal', 'external', 'builtin', 'object', 'type'],
+          groups: [
+            'index',
+            'sibling',
+            'parent',
+            'internal',
+            'external',
+            'builtin',
+            'object',
+            'type',
+          ],
           pathGroups: [
             {
               pattern: '@*/**',
@@ -130,6 +146,13 @@ export default config(
       'no-restricted-imports': 'off',
     },
   },
+  // Library files configuration
+  {
+    files: ['**/packages/ai-api/lib/**/*.ts', '**/pages/content/src/**/*.ts'],
+    rules: {
+      'import-x/exports-last': 'off', // Allow exports anywhere in library files
+    },
+  },
   // Test files configuration
   {
     files: ['**/tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
@@ -140,4 +163,4 @@ export default config(
       '@typescript-eslint/no-unused-vars': 'off', // Allow unused vars in tests for clarity
     },
   },
-);
+)

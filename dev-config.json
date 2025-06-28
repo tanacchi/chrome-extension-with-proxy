@@ -1,0 +1,7 @@
+{
+  "apiKey": "sk-test-development-api-key-placeholder",
+  "model": "gpt-4o-mini",
+  "customPrompt": "以下のテーブルデータを分析して、パターンや傾向を教えてください：",
+  "useCustomPrompt": false,
+  "_comment": "開発時のデフォルト値です。apiKeyを実際のOpenAI APIキーに置き換えてください。"
+}
