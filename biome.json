@@ -69,6 +69,7 @@
       "!**/dev-servers/**",
       "!**/packages/storage/lib/**/*.spec.ts",
       "!**/coverage/**",
+      "!**/reports/**",
       "!**/scripts/**"
     ],
     "experimentalScannerIgnores": [".stryker-tmp/*"]
