@@ -165,7 +165,6 @@ console.log('Static files directory:', path.join(__dirname, 'public'));
 
 - [E2Eテストガイド](../../tests/e2e/README.md)
 - [Content Scriptドキュメント](../../pages/content/README.md)
-- [Mock APIサーバー](../mock-api/README.md)
 
 ## メンテナンス
 

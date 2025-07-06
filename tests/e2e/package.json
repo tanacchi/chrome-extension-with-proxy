@@ -13,8 +13,8 @@
     "report:open": "allure open reports/allure-report",
     "report:serve": "allure serve reports/allure-results",
     "clean:reports": "rimraf reports",
-    "clean:node_modules": "pnpx rimraf node_modules",
-    "clean:turbo": "pnpx rimraf .turbo",
+    "clean:node_modules": "pnpm dlx rimraf node_modules",
+    "clean:turbo": "pnpm dlx rimraf .turbo",
     "clean": "pnpm clean:turbo && pnpm clean:node_modules && pnpm clean:reports"
   },
   "devDependencies": {

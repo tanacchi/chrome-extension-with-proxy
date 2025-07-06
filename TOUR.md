@@ -39,7 +39,7 @@
 
 **重要ポイント**:
 - `sk-test-development-api-key-placeholder`は開発モードの判定キー
-- この値の時は Mock APIサーバー（localhost:3001）を使用
+- この値の時は外部モックAPIサービスを使用
 - 実際のOpenAI APIキーを設定すると本番モードに切り替わる
 - 開発時のUI設定画面で「開発用設定をロード」ボタンでこの値が読み込まれる
 

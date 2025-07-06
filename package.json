@@ -12,7 +12,7 @@
   "type": "module",
   "scripts": {
     "clean:bundle": "rimraf dist && turbo clean:bundle",
-    "clean:node_modules": "pnpx rimraf node_modules && pnpx turbo clean:node_modules",
+    "clean:node_modules": "pnpm dlx rimraf node_modules && pnpm dlx turbo clean:node_modules",
     "clean:turbo": "rimraf .turbo && turbo clean:turbo",
     "clean": "pnpm clean:bundle && pnpm clean:turbo && pnpm clean:node_modules",
     "clean:install": "pnpm clean:node_modules && pnpm install --frozen-lockfile",
@@ -113,11 +113,8 @@
       "biome lint --write"
     ]
   },
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.12.4",
   "engines": {
     "node": ">=22.15.1"
-  },
-  "volta": {
-    "node": "22.16.0"
   }
 }
