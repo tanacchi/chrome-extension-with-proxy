@@ -185,14 +185,16 @@ packages/ai-api/
 │   ├── services/
 │   └── utils/
 ├── package.json
-├── tsconfig.json
-└── vitest.config.ts
+└── tsconfig.json
 ```
 
 ## テスト
 
 ```bash
-# テスト実行
+# テスト実行（ルートから統合ワークスペースで実行）
+pnpm test --project ai-api
+
+# 個別パッケージ内でのテスト実行
 pnpm test
 
 # ウォッチモードでテスト実行
@@ -201,6 +203,8 @@ pnpm test:watch
 # カバレッジ付きテスト実行
 pnpm test:coverage
 ```
+
+注意: プロジェクトはVitest統合ワークスペース設定を使用しており、ルートディレクトリから全プロジェクトの統合テストが実行できます。
 
 ## ビルド
 

@@ -26,11 +26,18 @@ global.chrome = mockChrome as unknown as typeof chrome
 
 // AI SDK のモック
 vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => (model: string) => model),
+  createOpenAI: vi.fn(() => vi.fn((model: string) => `mocked-${model}`)),
 }))
 
 vi.mock('ai', () => ({
-  generateText: vi.fn(),
+  generateText: vi.fn().mockResolvedValue({
+    text: 'Mock AI analysis result',
+    usage: {
+      promptTokens: 10,
+      completionTokens: 20,
+      totalTokens: 30,
+    },
+  }),
 }))
 
 // Storage のモック
@@ -116,12 +123,23 @@ describe('AIAPIHandler', () => {
       // 少し待機して非同期処理の完了を待つ
       await new Promise(resolve => setTimeout(resolve, 10))
 
-      expect(mockGenerateText).toHaveBeenCalledWith({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: 'テストメッセージ' }],
-        temperature: 0.7,
-        maxTokens: 1000,
-      })
+      expect(mockGenerateText).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'mocked-gpt-4o-mini',
+          temperature: 0.7,
+          maxTokens: 1000,
+          messages: expect.arrayContaining([
+            expect.objectContaining({
+              role: 'system',
+              content: expect.stringContaining('あなたは親切で知識豊富な'),
+            }),
+            expect.objectContaining({
+              role: 'user',
+              content: 'テストメッセージ',
+            }),
+          ]),
+        }),
+      )
 
       expect(mockSendResponse).toHaveBeenCalledWith({
         success: true,
@@ -306,12 +324,23 @@ describe('AIAPIHandler', () => {
 
       await new Promise(resolve => setTimeout(resolve, 10))
 
-      expect(mockGenerateText).toHaveBeenCalledWith({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: 'test' }],
-        temperature: 0.5,
-        maxTokens: 500,
-      })
+      expect(mockGenerateText).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'mocked-gpt-4o',
+          temperature: 0.5,
+          maxTokens: 500,
+          messages: expect.arrayContaining([
+            expect.objectContaining({
+              role: 'system',
+              content: expect.stringContaining('あなたは優秀なデータアナリスト'),
+            }),
+            expect.objectContaining({
+              role: 'user',
+              content: 'test',
+            }),
+          ]),
+        }),
+      )
     })
   })
 
