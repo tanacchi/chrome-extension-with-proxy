@@ -4,7 +4,7 @@ on: [ pull_request_target ]
 
 permissions:
   contents: read
-  
+
 env:
   ALL_SCENARIOS: '["content", "content-ui", "content-runtime", "background", "new-tab", "popup", "devtools", "side-panel", "options"]'
 
@@ -27,7 +27,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'package.json'
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile --prefer-offline

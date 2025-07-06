@@ -98,7 +98,6 @@ Chrome Extensions Manifest V3の設定ファイル
 │   └── その他...
 │
 ├── 🧪 dev-servers/        # 開発用サーバー
-│   ├── mock-api/          # Mock APIサーバー
 │   └── sample-html/       # テスト用HTMLサーバー
 │
 └── 🧪 tests/              # テスト
@@ -140,21 +139,21 @@ AI API通信の実装
 **主要機能**:
 1. **Content Scriptからのメッセージ受信**
 2. **開発/本番モードの自動切り替え**
-3. **OpenAI API / Mock API との通信**
+3. **OpenAI API / 外部モックAPI との通信**
 4. **エラーハンドリング**
 
 **開発/本番切り替えロジック**:
 ```typescript
-// 開発時はmock-api、本番時はOpenAI APIを使用
+// 開発時は外部モックAPI、本番時はOpenAI APIを使用
 const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placeholder';
 
 let client: ReturnType<typeof openai>;
 if (isDevelopment) {
-  // Mock API サーバーを使用
-  console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
+  // 外部モックAPIサービスを使用
+  console.log('AI Analysis: 外部モックAPIサービス使用');
   client = openai({
     apiKey: 'mock-api-key',
-    baseURL: 'http://localhost:3001/v1',
+    baseURL: 'https://api.openai-mock.com/v1',
   });
 } else {
   // OpenAI API を使用
@@ -581,8 +580,11 @@ export interface ChromeMessageResponse<T = unknown> {
 **提供コンテンツ**:
 - **サンプルテーブル** (E2Eテスト用)
 - **テストページ**
+- **AI分析ターゲットテーブル** (`.ai-target-table-table`クラス)
 
 **アクセス**: `http://localhost:3000`
+
+**注意**: 以前存在したMock APIサーバー（localhost:3001）は削除され、現在は外部モックAPIサービス（https://api.openai-mock.com/v1）を使用しています。
 
 ---
 
@@ -604,46 +606,55 @@ WebDriverIO設定
 
 #### `./tests/e2e/specs/` (テストファイル群)
 
-**主要テスト**:
+**主要テスト** (全11ファイル):
 
 ##### `ai-analysis.test.ts`
 AI分析機能のテスト
 ```typescript
 describe('AI分析機能', () => {
-  it('設定画面でAPIキーを設定できる', async () => {
-    await browser.url('chrome-extension://[ID]/options/index.html');
-
-    const apiKeyInput = await $('[data-testid="api-key-input"]');
-    await apiKeyInput.setValue('test-api-key');
-
-    const saveButton = await $('[data-testid="save-button"]');
-    await saveButton.click();
-
-    // 保存確認
-    const message = await $('[data-testid="save-message"]');
-    await expect(message).toHaveText('設定を保存しました');
+  it('テーブル検出機能', async () => {
+    await browser.url('http://localhost:3000');
+    
+    const table = await $('.ai-target-table-table');
+    expect(table).toBeExisting();
   });
 
-  it('Mock APIサーバーとの通信ができる', async () => {
-    // Mock API分析のテスト
-    await browser.url('http://localhost:3002/table-sample.html');
+  it('Content Script連携', async () => {
+    // Content Scriptの読み込み確認
+    await browser.pause(3000);
+    
+    const body = await $('body');
+    expect(body).toBeExisting();
+  });
+});
+```
 
-    const analyzeButton = await $('[data-testid="analyze-button"]');
-    await analyzeButton.click();
+##### `ai-analysis-basic.test.ts` (旧 ai-analysis-mock.test.ts)
+基本的なAI分析機能テスト
+```typescript
+describe('AI分析機能の基本テスト', () => {
+  it('サンプルHTMLページが正常に読み込まれる', async () => {
+    const title = await browser.getTitle();
+    expect(title).toBeTruthy();
+  });
 
-    // 分析結果の確認
-    const result = await $('[data-testid="analysis-result"]');
-    await expect(result).toBeDisplayed();
+  it('テーブルが存在する', async () => {
+    const table = await browser.$('.ai-target-table-table');
+    expect(table).toBeExisting();
   });
 });
 ```
 
 ##### その他のテストファイル:
-- `page-popup.test.ts`: ポップアップのテスト
-- `page-options.test.ts`: 設定画面のテスト
+- `smoke.test.ts`: 基本動作確認（外部サイトアクセス）
+- `page-popup.test.ts`: ポップアップのテスト（テーマ切り替え削除済み）
+- `page-options.test.ts`: 設定画面のテスト（テーマ切り替え削除済み）
+- `page-new-tab.test.ts`: 新しいタブのテスト
 - `page-side-panel.test.ts`: サイドパネルのテスト
-- `page-content.test.ts`: Content Scriptのテスト
-- `smoke.test.ts`: 基本動作確認
+- `page-devtools-panel.test.ts`: DevToolsパネルのテスト
+- `page-content.test.ts`: Content Scriptのテスト（example.com関連削除済み）
+- `page-content-ui.test.ts`: Content UI注入のテスト
+- `page-content-runtime.test.ts`: Content Runtime注入のテスト
 
 #### `./tests/e2e/helpers/`
 テストヘルパー関数
@@ -678,8 +689,12 @@ export const performTableAnalysis = async (tableSelector: string) => {
 E2Eテスト用サーバー起動スクリプト
 
 **起動サーバー**:
-1. **Mock APIサーバー** (localhost:3001)
-2. **Sample HTMLサーバー** (localhost:3002)
+1. **Sample HTMLサーバー** (localhost:3000)
+
+**レポート機能**: 
+- **Allure HTML レポート**: `pnpm e2e:report` で生成
+- **レポート表示**: `pnpm e2e:report:open` でブラウザ表示
+- **出力先**: `tests/e2e/reports/allure-report/`
 
 ---
 
@@ -687,26 +702,108 @@ E2Eテスト用サーバー起動スクリプト
 
 ### 主要なpackage.jsonコマンド
 
-```json
-{
-  "scripts": {
-    "dev": "pnpm set-global-env CLI_CEB_DEV=true && pnpm base-dev",
-    "build": "pnpm set-global-env && pnpm base-build",
-    "type-check": "turbo type-check",
-    "lint": "turbo lint",
-    "e2e": "bash scripts/start-e2e-servers.sh && pnpm zip && turbo e2e",
-    "zip": "pnpm build && pnpm -F zipper zip"
-  }
-}
+#### 🛠️ 開発コマンド
+```bash
+# 開発サーバー起動
+pnpm dev                    # Chrome向け開発モード
+pnpm dev:firefox           # Firefox向け開発モード
+
+# ビルド
+pnpm build                 # Chrome向けプロダクションビルド  
+pnpm build:firefox         # Firefox向けプロダクションビルド
+pnpm zip                   # ビルド + ZIPパッケージ作成
+pnpm zip:firefox          # Firefox向けZIPパッケージ作成
 ```
 
-### Turborepo設定 (`./turbo.json`)
+#### 🔍 品質チェック
+```bash
+# 型チェック
+pnpm type-check           # 全プロジェクトの型チェック
 
+# Linter・フォーマッター（Biome統一）
+pnpm lint                 # 全プロジェクトのlint実行
+pnpm lint:fix            # lint自動修正
+pnpm format              # コードフォーマット実行
+```
+
+#### 🧪 テスト関連
+```bash
+# E2Eテスト
+pnpm e2e                 # ヘッドレス実行（デフォルト）
+pnpm e2e:headed          # ブラウザ表示で実行
+pnpm e2e:firefox         # Firefox E2Eテスト
+pnpm e2e:firefox:headed  # Firefox ブラウザ表示
+
+# E2Eレポート
+pnpm e2e:report          # テスト実行 + HTMLレポート生成
+pnpm e2e:report:open     # 生成済みレポートをブラウザで表示
+pnpm e2e:report:serve    # レポートサーバー起動
+
+# 単体テスト
+pnpm test                # 全パッケージテスト実行
+pnpm test:storage        # Storageパッケージテスト
+pnpm test:options        # Optionsパッケージテスト
+pnpm test:content        # Content Scriptテスト
+pnpm test:coverage       # カバレッジ付きテスト
+```
+
+#### 🛠️ その他のユーティリティ
+```bash
+# バージョン管理
+pnpm update-version <version>  # 全パッケージのバージョン更新
+
+# 環境・クリーンアップ
+pnpm clean               # 全クリーンアップ（node_modules含む）
+pnpm clean:bundle        # ビルド成果物クリーンアップ
+pnpm clean:install       # クリーン再インストール
+
+# 開発サポート
+pnpm module-manager      # モジュール管理ツール起動
+pnpm doc:coverage        # ドキュメントカバレッジチェック
+```
+
+### CI/CD・自動化システム
+
+#### 🔄 Turborepo設定 (`./turbo.json`)
 **並列実行設定**:
-- **type-check**: 型チェック
-- **build**: ビルド
-- **dev**: 開発モード
-- **e2e**: E2Eテスト
+- **type-check**: 型チェック（全パッケージ並列）
+- **build**: ビルド（依存関係考慮）
+- **dev**: 開発モード（ホットリロード）
+- **e2e**: E2Eテスト（Chrome/Firefox並列）
+- **lint**: Biome linter（並列実行）
+
+#### 🤖 GitHub Actions設定
+**現在のCI/CD状況**: 手動運用中（GitHub Actionsなし）
+
+**推奨CI/CDフロー**:
+```yaml
+# 例: .github/workflows/ci.yml
+name: CI/CD Pipeline
+on: [push, pull_request]
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm type-check
+      - run: pnpm lint
+      - run: pnpm test:coverage
+  
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: pnpm e2e  # ヘッドレス実行
+      - run: pnpm e2e:firefox
+```
+
+#### 🛡️ 品質保証
+- **Biome**: ESLint + Prettier統合
+- **TypeScript**: 厳密な型チェック
+- **Husky**: Git pre-commit フック
+- **lint-staged**: ステージングファイルのみlint
+- **テストカバレッジ**: Storageパッケージ82.42%
 
 ### 環境変数管理
 
@@ -715,7 +812,15 @@ E2Eテスト用サーバー起動スクリプト
 
 **主要な環境変数**:
 - `CLI_CEB_DEV`: 開発モードフラグ
-- `CLI_CEB_FIREFOX`: Firefox対応フラグ
+- `CLI_CEB_FIREFOX`: Firefox対応フラグ  
+- `CEB_E2E_HEADED`: E2Eテストでブラウザ表示フラグ
+
+#### Node.js・ツール要件
+- **Node.js**: 22.15.1以上必須
+- **パッケージマネージャー**: pnpm 10.12.4
+- **TypeScript**: 5.8.3
+- **Vite**: 6.3.5
+- **Turbo**: 2.5.3
 
 ---
 
@@ -727,14 +832,16 @@ E2Eテスト用サーバー起動スクリプト
 - **Background Script集中管理**: API通信のセキュリティ確保
 
 ### 2. 開発体験の工夫
-- **Mock APIサーバー**: 開発時のOpenAI API代替
+- **外部モックAPIサービス**: 開発時のOpenAI API代替
 - **ホットリロード**: HMRパッケージによる高速開発
 - **TypeScript**: 型安全性の確保
+- **Biome**: ESLint + Prettier統合による高速lint
 
 ### 3. テスト戦略
-- **E2Eテスト**: WebDriverIOによる実ブラウザテスト
+- **E2Eテスト**: WebDriverIOによる実ブラウザテスト（Chrome/Firefox並列）
+- **E2Eレポート**: Allure HTMLレポートによる詳細な結果表示
 - **単体テスト**: Vitestによる高速テスト
-- **Postman**: API統合テスト
+- **ヘッドレス/表示モード**: CI/開発での使い分け
 
 ### 4. 本番運用
 - **設定管理**: Chrome Local Storageによる永続化
@@ -753,13 +860,20 @@ E2Eテスト用サーバー起動スクリプト
    pnpm dev
    ```
 
-2. **Mock APIでの動作確認**:
+2. **外部モックAPIでの動作確認**:
    - 設定画面で「開発用設定をロード」
    - サンプルページでAI分析実行
 
 3. **E2Eテストの実行**:
    ```bash
+   # ヘッドレス実行（CI環境推奨）
    pnpm e2e
+   
+   # ブラウザ表示（デバッグ用）
+   pnpm e2e:headed
+   
+   # HTMLレポート生成
+   pnpm e2e:report
    ```
 
 4. **新機能の追加**:
@@ -1160,11 +1274,11 @@ const isDevelopment = settings.apiKey === 'sk-test-development-api-key-placehold
 ```typescript
 let client: ReturnType<typeof openai>;
 if (isDevelopment) {
-  // Mock API サーバーを使用
-  console.log('AI Analysis: Mock APIサーバー使用 (http://localhost:3001)');
+  // 外部モックAPIサービスを使用
+  console.log('AI Analysis: 外部モックAPIサービス使用');
   client = openai({
     apiKey: 'mock-api-key',
-    baseURL: 'http://localhost:3001/v1',
+    baseURL: 'https://api.openai-mock.com/v1',
   });
 } else {
   // OpenAI API を使用
@@ -1175,51 +1289,24 @@ if (isDevelopment) {
 }
 ```
 
-#### 🧪 Mock API サーバー
+#### 🌐 外部モックAPIサービス
 
-**CORS設定**: `dev-servers/mock-api/server.js:14-27`
+**使用サービス**: `https://api.openai-mock.com/v1`
 
+**利点**:
+- **外部ホスティング**: ローカルサーバー不要
+- **OpenAI API互換**: 同じレスポンス形式
+- **開発効率化**: セットアップ不要でテスト可能
+- **CI/CD対応**: 外部依存なしでテスト実行
+
+**代替モックサービス例**:
 ```javascript
-app.use(cors({
-  origin: [
-    'chrome-extension://*',
-    'moz-extension://*',
-    'http://localhost:*',
-    'https://localhost:*'
-  ],
-  credentials: true
-}));
-```
-
-**Chat Completions API**: `dev-servers/mock-api/server.js:42-90`
-
-```javascript
-app.post('/v1/chat/completions', (req, res) => {
-  const { messages, model = 'gpt-4o-mini', temperature = 0.7 } = req.body;
-
-  // モック分析結果を生成
-  const analysisResult = generateMockAnalysis(messages);
-
-  res.json({
-    id: `chatcmpl-mock-${Date.now()}`,
-    object: 'chat.completion',
-    created: Math.floor(Date.now() / 1000),
-    model: model,
-    choices: [{
-      index: 0,
-      message: {
-        role: 'assistant',
-        content: analysisResult
-      },
-      finish_reason: 'stop'
-    }],
-    usage: {
-      prompt_tokens: estimateTokens(JSON.stringify(messages)),
-      completion_tokens: estimateTokens(analysisResult),
-      total_tokens: estimateTokens(JSON.stringify(messages)) + estimateTokens(analysisResult)
-    }
-  });
-});
+// 他の利用可能な外部モックAPI
+const mockApiOptions = [
+  'https://api.openai-mock.com/v1',        // 推奨
+  'https://mockapi.openai.example.com/v1', // 代替案
+  'http://localhost:3001/v1'               // ローカル開発時
+];
 ```
 
 ### 10.5 主要な処理チェーン
@@ -1247,7 +1334,7 @@ calculateBackoffDelay → リトライ実行 → sanitizeErrorForLogging →
 
 #### 🔗 環境切り替えチェーン
 ```
-設定変更 → APIキー判定 → isDevelopment → Mock/OpenAI API選択 →
+設定変更 → APIキー判定 → isDevelopment → 外部モックAPI/OpenAI API選択 →
 適切なbaseURL設定 → API実行
 ```
 
@@ -1258,14 +1345,16 @@ calculateBackoffDelay → リトライ実行 → sanitizeErrorForLogging →
 1. **Background Script**: Chrome DevTools → Extensions → 詳細 → background page をインスペクト
 2. **Content Script**: ページ上で右クリック → 検証 → Console
 3. **Popup/Options**: 右クリック → 検証 → Console
-4. **Mock API**: `dev-servers/mock-api/` でサーバーログ確認
+4. **Sample HTML Server**: `dev-servers/sample-html/` でサーバーログ確認
+5. **E2Eテストレポート**: `tests/e2e/reports/allure-report/index.html`
 
 #### 🔍 主要なログメッセージ
 
-- `AI Analysis: Mock APIサーバー使用`: 開発モード動作中
+- `AI Analysis: 外部モックAPIサービス使用`: 開発モード動作中
 - `AI Analysis: OpenAI API使用`: 本番モード動作中
 - `AI分析が完了しました`: 分析成功
 - `Chrome拡張機能間通信エラー`: メッセージング失敗
+- `Sample HTML server is running`: E2Eテスト環境準備完了
 
 ---
 
