@@ -192,6 +192,10 @@ describe('AIAPIHandler', () => {
         error: 'Invalid request: messages are required',
         errorCode: 'UNKNOWN_ERROR',
         requestId: 'test-request-456',
+        data: {
+          text: '',
+          processingTime: expect.any(Number),
+        },
       })
     })
   })
@@ -229,6 +233,10 @@ describe('AIAPIHandler', () => {
         error: 'Invalid API key provided',
         errorCode: 'INVALID_API_KEY',
         requestId: 'test-request-789',
+        data: {
+          text: '',
+          processingTime: expect.any(Number),
+        },
       })
     })
 
@@ -260,6 +268,10 @@ describe('AIAPIHandler', () => {
         error: 'Rate limit exceeded',
         errorCode: 'RATE_LIMIT_EXCEEDED',
         requestId: 'test-request-101',
+        data: {
+          text: '',
+          processingTime: expect.any(Number),
+        },
       })
     })
   })

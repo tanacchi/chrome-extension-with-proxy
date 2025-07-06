@@ -57,6 +57,8 @@
     "copy-env": "bash bash-scripts/copy_env.sh",
     "set-global-env": "bash bash-scripts/set_global_env.sh",
     "module-manager": "pnpm -F module-manager start",
+    "mutation-test": "rm -rf .stryker-tmp && stryker run",
+    "mutation-test:html": "rm -rf .stryker-tmp && stryker run && open reports/mutation/html/index.html",
     "postinstall": "pnpm copy-env"
   },
   "dependencies": {
@@ -71,6 +73,8 @@
     "@eslint/compat": "^1.2.9",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.27.0",
+    "@stryker-mutator/core": "^9.0.1",
+    "@stryker-mutator/vitest-runner": "^9.0.1",
     "@types/chrome": "^0.0.323",
     "@types/eslint-plugin-jsx-a11y": "^6.10.0",
     "@types/jsdoc-to-markdown": "^7.0.6",
@@ -104,6 +108,7 @@
     "postcss-load-config": "^6.0.1",
     "rimraf": "^6.0.1",
     "run-script-os": "^1.1.6",
+    "stryker-cli": "^1.0.2",
     "tailwindcss": "^3.4.17",
     "tslib": "^2.8.1",
     "tsx": "^4.19.4",

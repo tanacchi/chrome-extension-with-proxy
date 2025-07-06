@@ -184,6 +184,10 @@ export class AIAPIHandler {
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         errorCode: this.getErrorCode(error),
         requestId: message.requestId,
+        data: {
+          text: '',
+          processingTime,
+        },
       }
 
       sendResponse(errorResponse)

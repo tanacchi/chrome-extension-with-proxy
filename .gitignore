@@ -24,3 +24,8 @@ tsconfig.tsbuildinfo
 
 # compiled
 **/tailwind-output.css
+
+# Stryker Mutation Testing
+.stryker-tmp/
+reports/mutation/
+stryker.log
