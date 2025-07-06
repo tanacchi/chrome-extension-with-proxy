@@ -4,7 +4,7 @@ const config = {
   _comment:
     "Chrome Extension project mutation testing configuration",
   packageManager: "pnpm",
-  reporters: ["html", "clear-text", "progress"],
+  reporters: ["html", "clear-text", "progress", "json"],
   testRunner: "vitest",
   testRunner_comment:
     "Using vitest workspace configuration for unified testing",
@@ -26,7 +26,7 @@ const config = {
     "pages/options/src/**/*.{ts,tsx}",
     "pages/content/src/**/*.ts",
     "chrome-extension/src/**/*.ts",
-    "dev-servers/sample-html/src/**/*.js",
+    "dev-servers/sample-html/**/*.js",
     // 除外パターン
     "!**/*.spec.ts",
     "!**/*.test.ts",

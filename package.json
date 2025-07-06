@@ -58,7 +58,6 @@
     "set-global-env": "bash bash-scripts/set_global_env.sh",
     "module-manager": "pnpm -F module-manager start",
     "mutation-test": "rm -rf .stryker-tmp && stryker run",
-    "mutation-test:html": "rm -rf .stryker-tmp && stryker run && open reports/mutation/html/index.html",
     "postinstall": "pnpm copy-env"
   },
   "dependencies": {

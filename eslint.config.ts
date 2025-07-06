@@ -31,7 +31,7 @@ export default config(
       '**/node_modules/**',
       'chrome-extension/manifest.js',
       'dev-servers/**',
-      'packages/storage/lib/**/*.spec.ts', // Exclude storage test files from lint
+      '**/*.spec.ts', // Exclude storage test files from lint
     ],
   },
   // Node.js scripts configuration
