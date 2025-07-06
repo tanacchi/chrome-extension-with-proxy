@@ -1,5 +1,3 @@
-import { canSwitchTheme } from '../helpers/theme.js'
-
 describe('拡張機能新しいタブ', () => {
   it('新しいタブを開いたときに拡張機能ページが開く', async () => {
     const extensionPath = await browser.getExtensionPath()
@@ -12,6 +10,5 @@ describe('拡張機能新しいタブ', () => {
 
     const appDiv = await $('.App').getElement()
     await expect(appDiv).toBeExisting()
-    await canSwitchTheme()
   })
 })

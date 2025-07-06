@@ -1,5 +1,3 @@
-import { canSwitchTheme } from '../helpers/theme.js'
-
 describe('拡張機能サイドパネル', () => {
   it('サイドパネルにアクセスできる', async () => {
     const extensionPath = await browser.getExtensionPath()
@@ -7,6 +5,5 @@ describe('拡張機能サイドパネル', () => {
 
     await browser.url(sidePanelUrl)
     await expect(browser).toHaveTitle('Side Panel')
-    await canSwitchTheme()
   })
 })

@@ -1,10 +1,9 @@
 /**
- * モックAPIサーバーとの統合E2Eテスト（簡略化版）
+ * AI分析機能の基本E2Eテスト
  */
 
-describe('モックAPIサーバーを使用したAI分析', () => {
+describe('AI分析機能の基本テスト', () => {
   const SAMPLE_HTML_URL = 'http://localhost:3000'
-  const MOCK_API_URL = 'http://localhost:3001'
 
   before(async () => {
     // サンプルサーバーの稼働確認
@@ -14,14 +13,6 @@ describe('モックAPIサーバーを使用したAI分析', () => {
     } catch (_error) {
       console.warn('Sample HTML server not running. Tests may fail.')
     }
-
-    // モックAPIサーバーの稼働確認
-    try {
-      await browser.url(MOCK_API_URL)
-      console.log('Mock API server is accessible')
-    } catch (_error) {
-      console.warn('Mock API server not accessible. Tests may fail.')
-    }
   })
 
   beforeEach(async () => {
@@ -30,7 +21,7 @@ describe('モックAPIサーバーを使用したAI分析', () => {
     await browser.pause(1000)
   })
 
-  describe('モックAPI連携', () => {
+  describe('基本機能', () => {
     it('サンプルHTMLページが正常に読み込まれる', async () => {
       // ページが正常に読み込まれることを確認
       const title = await browser.getTitle()

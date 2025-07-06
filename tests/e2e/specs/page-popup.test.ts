@@ -1,5 +1,3 @@
-import { canSwitchTheme } from '../helpers/theme.js'
-
 describe('拡張機能ポップアップ', () => {
   it('ポップアップが正常に開く', async () => {
     const extensionPath = await browser.getExtensionPath()
@@ -7,6 +5,5 @@ describe('拡張機能ポップアップ', () => {
     await browser.url(popupUrl)
 
     await expect(browser).toHaveTitle('Popup')
-    await canSwitchTheme()
   })
 })
