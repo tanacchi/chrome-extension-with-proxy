@@ -6,7 +6,7 @@ const DEFAULT_PROMPT =
 
 interface AISettings {
   apiKey: string
-  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo'
+  model: 'gpt-4o' | 'gpt-4o' | 'gpt-4o'
   customPrompt?: string
   useCustomPrompt: boolean
 }
@@ -19,19 +19,19 @@ describe('AISettingsOptions Logic', () => {
   it('should validate AISettings structure', () => {
     const settings: AISettings = {
       apiKey: 'sk-test-key',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       useCustomPrompt: false,
     }
 
     expect(settings.apiKey).toBe('sk-test-key')
-    expect(settings.model).toBe('gpt-3.5-turbo')
+    expect(settings.model).toBe('gpt-4o')
     expect(settings.useCustomPrompt).toBe(false)
   })
 
   it('should support custom prompt when enabled', () => {
     const settings: AISettings = {
       apiKey: 'sk-test-key',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       customPrompt: 'カスタムプロンプト',
       useCustomPrompt: true,
     }
@@ -41,7 +41,7 @@ describe('AISettingsOptions Logic', () => {
   })
 
   it('should validate model options', () => {
-    const validModels: AISettings['model'][] = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']
+    const validModels: AISettings['model'][] = ['gpt-4o', 'gpt-4o', 'gpt-4o']
 
     validModels.forEach(model => {
       const settings: AISettings = {
@@ -57,7 +57,7 @@ describe('AISettingsOptions Logic', () => {
   it('should handle form state updates', () => {
     let formData: AISettings = {
       apiKey: '',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       useCustomPrompt: false,
     }
 
@@ -66,8 +66,8 @@ describe('AISettingsOptions Logic', () => {
     expect(formData.apiKey).toBe('sk-new-key')
 
     // Simulate model update
-    formData = { ...formData, model: 'gpt-4' }
-    expect(formData.model).toBe('gpt-4')
+    formData = { ...formData, model: 'gpt-4o' }
+    expect(formData.model).toBe('gpt-4o')
 
     // Simulate custom prompt toggle
     formData = { ...formData, useCustomPrompt: true, customPrompt: 'test prompt' }

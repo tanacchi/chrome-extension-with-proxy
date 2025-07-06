@@ -8,7 +8,7 @@
     "composite": true,
     "incremental": true
   },
-  "include": ["lib/**/*"],
+  "include": ["lib/**/*", "lib/**/*.spec.ts", "lib/**/*.test.ts"],
   "references": [
     {
       "path": "../shared"

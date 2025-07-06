@@ -24,7 +24,7 @@ global.chrome = {
       onChanged: mockStorageOnChanged,
     },
   },
-} as MockChrome;
+} as unknown as typeof chrome;
 
 // Import after mocking
 const { createAISettingsStorage, DEFAULT_AI_SETTINGS } = await import('./ai-settings-storage.js');
@@ -48,7 +48,7 @@ describe('Storage Integration Tests', () => {
     // Update settings
     const newSettings: AISettings = {
       apiKey: 'sk-test-key-123',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       customPrompt: 'カスタム分析プロンプト',
       useCustomPrompt: true,
     };
@@ -68,7 +68,7 @@ describe('Storage Integration Tests', () => {
   it('should handle partial updates using function syntax', async () => {
     const initialSettings: AISettings = {
       apiKey: 'existing-key',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       customPrompt: '',
       useCustomPrompt: false,
     };
@@ -81,13 +81,13 @@ describe('Storage Integration Tests', () => {
     // Update only the model
     await storage.set(prev => ({
       ...prev,
-      model: 'gpt-4-turbo',
+      model: 'gpt-4o',
     }));
 
     expect(mockStorageSet).toHaveBeenCalledWith({
       'ai-settings': JSON.stringify({
         ...initialSettings,
-        model: 'gpt-4-turbo',
+        model: 'gpt-4o',
       }),
     });
   });

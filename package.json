@@ -58,6 +58,9 @@
     "set-global-env": "bash bash-scripts/set_global_env.sh",
     "module-manager": "pnpm -F module-manager start",
     "mutation-test": "rm -rf .stryker-tmp && stryker run",
+    "mutation-analyze": "node scripts/analyze-mutation-results.cjs",
+    "mutation-summary": "node scripts/analyze-mutation-results.cjs --summary",
+    "mutation-priority": "node scripts/analyze-mutation-results.cjs --priority-only",
     "postinstall": "pnpm copy-env"
   },
   "dependencies": {
