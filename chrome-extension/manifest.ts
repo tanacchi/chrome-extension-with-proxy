@@ -35,10 +35,21 @@ const manifest = {
   icons: {
     '128': 'icon-128.png',
   },
+  chrome_url_overrides: {
+    newtab: 'new-tab/index.html',
+  },
   content_scripts: [
     {
       matches: ['http://*/*', 'https://*/*', '<all_urls>'],
       js: ['content/all.iife.js'],
+    },
+    {
+      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      js: ['content-ui/all.iife.js'],
+    },
+    {
+      matches: ['*://example.com/*'],
+      js: ['content-ui/example.iife.js'],
     },
     {
       matches: ['http://*/*', 'https://*/*', '<all_urls>'],
