@@ -7,5 +7,13 @@
     },
     "types": ["chrome", "node"]
   },
-  "include": ["src", "vite.config.mts", "tailwind.config.ts"]
+  "include": [
+    "src",
+    "vite.config.mts",
+    "tailwind.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ]
 }

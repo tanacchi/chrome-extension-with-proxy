@@ -42,6 +42,7 @@ const OptionsPage = () => {
 ```
 
 **提供機能:**
+
 - OpenAI APIキー設定
 - モデル選択（GPT-3.5, GPT-4, GPT-4 Turbo）
 - カスタムプロンプト設定
@@ -51,11 +52,13 @@ const OptionsPage = () => {
 ### 2. 設定項目
 
 #### API設定
+
 - **APIキー**: OpenAI APIキーの設定（マスク表示）
 - **モデル選択**: 利用するGPTモデルの選択
 - **接続テスト**: API接続の確認機能
 
 #### プロンプト設定
+
 - **カスタムプロンプト**: 独自の分析プロンプト設定
 - **デフォルトプロンプト**: システム標準プロンプトの表示
 - **プロンプト切り替え**: カスタム/デフォルトの選択
@@ -74,7 +77,7 @@ const SettingsPage = () => {
       <header>
         <h1>テーブルデータAI分析ツール設定</h1>
       </header>
-      
+
       <main>
         <AISettingsOptions />
       </main>
@@ -93,7 +96,7 @@ import { useStorage, aiSettingsStorage } from '@extension/storage';
 const MyComponent = () => {
   // リアクティブな設定データ取得
   const settings = useStorage(aiSettingsStorage);
-  
+
   // 設定の更新
   const updateSettings = async (newSettings: Partial<AISettings>) => {
     await aiSettingsStorage.set({
@@ -101,11 +104,11 @@ const MyComponent = () => {
       ...newSettings
     });
   };
-  
+
   return (
     <div>
       <p>現在のモデル: {settings.model}</p>
-      <button onClick={() => updateSettings({ model: 'gpt-4' })}>
+      <button onClick={() => updateSettings({ model: 'gpt-4o' })}>
         GPT-4に変更
       </button>
     </div>
@@ -120,7 +123,7 @@ const MyComponent = () => {
 ```typescript
 interface AISettings {
   apiKey: string;                                    // OpenAI APIキー
-  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo'; // 使用モデル
+  model: 'gpt-4o' | 'gpt-4o' | 'gpt-4o'; // 使用モデル
   customPrompt?: string;                             // カスタムプロンプト
   useCustomPrompt: boolean;                          // カスタムプロンプト使用フラグ
 }
@@ -131,7 +134,7 @@ interface AISettings {
 ```typescript
 const DEFAULT_AI_SETTINGS: AISettings = {
   apiKey: '',
-  model: 'gpt-3.5-turbo',
+  model: 'gpt-4o',
   customPrompt: '',
   useCustomPrompt: false,
 };
@@ -148,7 +151,7 @@ const DEFAULT_AI_SETTINGS: AISettings = {
     padding: 16px;
     margin: 8px;
   }
-  
+
   .form-group {
     margin-bottom: 16px;
   }
@@ -180,15 +183,15 @@ const validateApiKey = (apiKey: string): string | null => {
   if (!apiKey.trim()) {
     return 'APIキーは必須です';
   }
-  
+
   if (!apiKey.startsWith('sk-')) {
     return 'OpenAI APIキーは"sk-"で始まる必要があります';
   }
-  
+
   if (apiKey.length < 20) {
     return 'APIキーの形式が正しくありません';
   }
-  
+
   return null;
 };
 ```
@@ -200,7 +203,7 @@ const validatePrompt = (prompt: string): string | null => {
   if (prompt.length > 1000) {
     return 'プロンプトは1000文字以内で入力してください';
   }
-  
+
   return null;
 };
 ```
@@ -213,7 +216,7 @@ const validatePrompt = (prompt: string): string | null => {
 const handleSave = async () => {
   setIsSaving(true);
   setSaveMessage('');
-  
+
   try {
     // バリデーション
     const apiKeyError = validateApiKey(formData.apiKey);
@@ -221,14 +224,14 @@ const handleSave = async () => {
       setSaveMessage(apiKeyError);
       return;
     }
-    
+
     // 設定保存
     await aiSettingsStorage.set(formData);
     setSaveMessage('設定を保存しました！');
-    
+
     // 3秒後にメッセージをクリア
     setTimeout(() => setSaveMessage(''), 3000);
-    
+
   } catch (error) {
     setSaveMessage('設定の保存に失敗しました。再試行してください。');
     console.error('設定保存エラー:', error);
@@ -245,13 +248,13 @@ const [errors, setErrors] = useState<Record<string, string>>({});
 
 const validateForm = (data: AISettings): Record<string, string> => {
   const newErrors: Record<string, string> = {};
-  
+
   // APIキー検証
   const apiKeyError = validateApiKey(data.apiKey);
   if (apiKeyError) {
     newErrors.apiKey = apiKeyError;
   }
-  
+
   // カスタムプロンプト検証
   if (data.useCustomPrompt && data.customPrompt) {
     const promptError = validatePrompt(data.customPrompt);
@@ -259,7 +262,7 @@ const validateForm = (data: AISettings): Record<string, string> => {
       newErrors.customPrompt = promptError;
     }
   }
-  
+
   return newErrors;
 };
 ```
@@ -282,6 +285,7 @@ pnpm test:coverage
 ### テストカバレッジ
 
 現在のテストカバレッジ:
+
 - **AISettingsOptions.spec.tsx**: 5テスト（コンポーネント動作、状態管理、イベント処理）
 
 ### テストケース
@@ -290,21 +294,21 @@ pnpm test:coverage
 describe('AISettingsOptions', () => {
   it('should render all form elements', () => {
     render(<AISettingsOptions />);
-    
+
     expect(screen.getByLabelText(/APIキー/)).toBeInTheDocument();
     expect(screen.getByLabelText(/モデル/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /保存/ })).toBeInTheDocument();
   });
-  
+
   it('should save settings on form submission', async () => {
     const { getByLabelText, getByRole } = render(<AISettingsOptions />);
-    
+
     fireEvent.change(getByLabelText(/APIキー/), {
       target: { value: 'sk-test-api-key' }
     });
-    
+
     fireEvent.click(getByRole('button', { name: /保存/ }));
-    
+
     await waitFor(() => {
       expect(screen.getByText(/保存しました/)).toBeInTheDocument();
     });

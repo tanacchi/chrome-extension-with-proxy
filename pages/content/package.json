@@ -10,17 +10,18 @@
   ],
   "scripts": {
     "clean:bundle": "rimraf dist",
-    "clean:node_modules": "pnpx rimraf node_modules",
+    "clean:node_modules": "pnpm dlx rimraf node_modules",
     "clean:turbo": "rimraf .turbo",
     "clean": "pnpm clean:bundle && pnpm clean:turbo && pnpm clean:node_modules",
     "build": "tsx build.mts",
     "dev": "tsx build.mts",
-    "lint": "eslint .",
-    "lint:fix": "pnpm lint --fix",
-    "format": "prettier . --write --ignore-path ../../.prettierignore",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@extension/shared": "workspace:*",
@@ -32,6 +33,7 @@
     "@extension/hmr": "workspace:*",
     "@extension/tsconfig": "workspace:*",
     "@extension/vite-config": "workspace:*",
+    "@vitest/coverage-v8": "^3.2.3",
     "vitest": "^3.2.3",
     "@vitest/ui": "^3.2.3",
     "jsdom": "^25.0.1"

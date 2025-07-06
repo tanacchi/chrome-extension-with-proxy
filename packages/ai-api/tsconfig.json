@@ -1,17 +1,14 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./lib",
-    "rootDir": "./lib",
+    "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "composite": true,
     "incremental": true
   },
-  "include": [
-    "lib/**/*"
-  ],
+  "include": ["lib/**/*", "lib/**/*.spec.ts", "lib/**/*.test.ts"],
   "references": [
     {
       "path": "../shared"

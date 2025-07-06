@@ -13,8 +13,8 @@
    - エラーハンドリング
    - パフォーマンスとユーザビリティ
 
-2. **ai-analysis-mock.test.ts** - モックAPIサーバーとの統合テスト
-   - モックAPI統合
+2. **ai-analysis-mock.test.ts** - 基本的なAI分析機能テスト
+   - 基本機能の確認
    - パフォーマンステスト
    - 異なるテーブル構成への対応
 
@@ -34,13 +34,7 @@
    pnpm start
    ```
 
-2. **モックAPIサーバー** (ポート3001)
-   ```bash
-   cd dev-servers/mock-api
-   pnpm start
-   ```
-
-3. **Chrome拡張機能のビルド**
+2. **Chrome拡張機能のビルド**
    ```bash
    pnpm build
    ```
@@ -128,13 +122,12 @@ capabilities: [{
 }]
 ```
 
-### モックAPIサーバーの設定
+### AI API設定
 
-モックAPIサーバーは以下のエンドポイントを提供する必要があります：
+テストでは以下のAI APIエンドポイントを使用します：
 
-- `POST /chat/completions` - OpenAI互換のチャット補完API
-- `GET /models` - 利用可能モデル一覧
-- `GET /health` - ヘルスチェック
+- 外部モックAPIサービス（https://api.openai-mock.com/v1など）
+- 実際のOpenAI API（テスト時は注意が必要）
 
 ## 実際のAPIとの統合テスト
 
@@ -164,7 +157,6 @@ OPENAI_API_KEY=your-real-api-key pnpm e2e:real-api
   run: |
     # サンプルサーバー起動
     cd dev-servers/sample-html && pnpm start &
-    cd dev-servers/mock-api && pnpm start &
     
     # E2Eテスト実行
     pnpm e2e:ci

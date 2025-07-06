@@ -1,14 +1,14 @@
-import { config as baseConfig } from './wdio.conf.js';
-import { getChromeExtensionPath, getFirefoxExtensionPath } from '../utils/extension-path.js';
-import { IS_CI, IS_FIREFOX } from '@extension/env';
-import { readdir, readFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { config as baseConfig } from './wdio.conf.js'
+import { getChromeExtensionPath, getFirefoxExtensionPath } from '../utils/extension-path.js'
+import { IS_FIREFOX, E2E_HEADED } from '@extension/env'
+import { readdir, readFile } from 'node:fs/promises'
+import { extname, join } from 'node:path'
 
-const extName = IS_FIREFOX ? '.xpi' : '.zip';
-const extensions = await readdir(join(import.meta.dirname, '../../../dist-zip'));
-const latestExtension = extensions.filter(file => extname(file) === extName).at(-1);
-const extPath = join(import.meta.dirname, `../../../dist-zip/${latestExtension}`);
-const bundledExtension = (await readFile(extPath)).toString('base64');
+const extName = IS_FIREFOX ? '.xpi' : '.zip'
+const extensions = await readdir(join(import.meta.dirname, '../../../dist-zip'))
+const latestExtension = extensions.filter(file => extname(file) === extName).at(-1)
+const extPath = join(import.meta.dirname, `../../../dist-zip/${latestExtension}`)
+const bundledExtension = (await readFile(extPath)).toString('base64')
 
 const chromeCapabilities = {
   browserName: 'chrome',
@@ -19,40 +19,44 @@ const chromeCapabilities = {
       '--disable-gpu',
       '--no-sandbox',
       '--disable-dev-shm-usage',
-      ...(IS_CI ? ['--headless'] : []),
+      ...(!E2E_HEADED ? ['--headless'] : []),
     ],
     prefs: { 'extensions.ui.developer_mode': true },
     extensions: [bundledExtension],
   },
-};
+}
 
 const firefoxCapabilities = {
   browserName: 'firefox',
   acceptInsecureCerts: true,
   'moz:firefoxOptions': {
-    args: [...(IS_CI ? ['--headless'] : [])],
+    args: [...(!E2E_HEADED ? ['--headless'] : [])],
   },
-};
+}
 
 export const config: WebdriverIO.Config = {
   ...baseConfig,
   capabilities: IS_FIREFOX ? [firefoxCapabilities] : [chromeCapabilities],
 
-  maxInstances: IS_CI ? 10 : 1,
+  maxInstances: !E2E_HEADED ? 10 : 1,
   logLevel: 'error',
-  execArgv: IS_CI ? [] : ['--inspect'],
-  before: async ({ browserName }: WebdriverIO.Capabilities, _specs, browser: WebdriverIO.Browser) => {
+  execArgv: !E2E_HEADED ? [] : ['--inspect'],
+  before: async (
+    { browserName }: WebdriverIO.Capabilities,
+    _specs,
+    browser: WebdriverIO.Browser,
+  ) => {
     if (browserName === 'firefox') {
-      await browser.installAddOn(bundledExtension, true);
+      await browser.installAddOn(bundledExtension, true)
 
-      browser.addCommand('getExtensionPath', async () => getFirefoxExtensionPath(browser));
+      browser.addCommand('getExtensionPath', async () => getFirefoxExtensionPath(browser))
     } else if (browserName === 'chrome') {
-      browser.addCommand('getExtensionPath', async () => getChromeExtensionPath(browser));
+      browser.addCommand('getExtensionPath', async () => getChromeExtensionPath(browser))
     }
   },
   afterTest: async () => {
-    if (!IS_CI) {
-      await browser.pause(500);
+    if (E2E_HEADED) {
+      await browser.pause(500)
     }
   },
-};
+}

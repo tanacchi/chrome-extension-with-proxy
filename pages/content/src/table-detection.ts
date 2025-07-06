@@ -1,4 +1,10 @@
-import { TARGET_TABLE_SELECTOR, TABLE_BODY_TAG, TABLE_ROW_TAG, TABLE_CELL_TAG, TARGET_COLUMN_INDEX } from './constants';
+import {
+  TARGET_TABLE_SELECTOR,
+  TABLE_BODY_TAG,
+  TABLE_ROW_TAG,
+  TABLE_CELL_TAG,
+  TARGET_COLUMN_INDEX,
+} from './constants'
 
 /**
  * テーブルデータAI分析ツール用のテーブルを検出する
@@ -31,9 +37,9 @@ import { TARGET_TABLE_SELECTOR, TABLE_BODY_TAG, TABLE_ROW_TAG, TABLE_CELL_TAG, T
 export const detectTargetTable = (): HTMLTableElement | null => {
   // document.querySelector を使用してDOMから該当するテーブルを検索
   // constants.tsで定義されたセレクタを使用してテーブル要素を探す
-  const targetTable = document.querySelector(TARGET_TABLE_SELECTOR) as HTMLTableElement | null;
-  return targetTable;
-};
+  const targetTable = document.querySelector(TARGET_TABLE_SELECTOR) as HTMLTableElement | null
+  return targetTable
+}
 
 /**
  * テーブルの2列目からデータを抽出する
@@ -66,33 +72,33 @@ export const detectTargetTable = (): HTMLTableElement | null => {
  * @see {@link detectAndExtractTableData} テーブル検出とデータ抽出を一括で行う関数
  */
 export const extractTableData = (table: HTMLTableElement): string[] => {
-  const data: string[] = [];
+  const data: string[] = []
 
   // まずtbody要素を探し、見つからない場合は直接テーブルの行を取得
   // constants.tsで定義されたタグ名を使用
-  const tbody = table.querySelector(TABLE_BODY_TAG);
-  const rows = tbody ? tbody.querySelectorAll(TABLE_ROW_TAG) : table.querySelectorAll(TABLE_ROW_TAG);
+  const tbody = table.querySelector(TABLE_BODY_TAG)
+  const rows = tbody ? tbody.querySelectorAll(TABLE_ROW_TAG) : table.querySelectorAll(TABLE_ROW_TAG)
 
   // 各行を順次処理してデータを抽出
   rows.forEach(row => {
     // 現在の行のすべてのセル（td要素）を取得
-    const cells = row.querySelectorAll(TABLE_CELL_TAG);
+    const cells = row.querySelectorAll(TABLE_CELL_TAG)
 
     // 行に対象列より多くのセルがあることを確認
     if (cells.length > TARGET_COLUMN_INDEX) {
       // 対象列のテキストコンテンツを取得し、前後の空白を除去
-      const columnData = cells[TARGET_COLUMN_INDEX].textContent?.trim() || '';
+      const columnData = cells[TARGET_COLUMN_INDEX].textContent?.trim() || ''
 
       // 空でないデータのみを配列に追加
       // 空文字列、null、undefinedの場合は除外
       if (columnData) {
-        data.push(columnData);
+        data.push(columnData)
       }
     }
-  });
+  })
 
-  return data;
-};
+  return data
+}
 
 /**
  * テーブル検出とデータ抽出を一括で実行するメイン関数
@@ -133,13 +139,13 @@ export const extractTableData = (table: HTMLTableElement): string[] => {
  */
 export const detectAndExtractTableData = (): string[] => {
   // 対象テーブルを検出
-  const table = detectTargetTable();
+  const table = detectTargetTable()
 
   // テーブルが見つからない場合は空配列を返す
   if (!table) {
-    return [];
+    return []
   }
 
   // テーブルが見つかった場合はデータを抽出して返す
-  return extractTableData(table);
-};
+  return extractTableData(table)
+}

@@ -42,7 +42,7 @@ console.log('現在の設定:', settings);
 // AI設定の更新
 await aiSettingsStorage.set({
   apiKey: 'your-openai-api-key',
-  model: 'gpt-4',
+  model: 'gpt-4o',
   customPrompt: 'カスタムプロンプト',
   useCustomPrompt: true
 });
@@ -50,13 +50,13 @@ await aiSettingsStorage.set({
 // Reactフックでの使用（リアクティブ）
 const Component = () => {
   const storage = useStorage(aiSettingsStorage);
-  
+
   return (
     <div>
       <p>現在のモデル: {storage.model}</p>
       <button onClick={() => aiSettingsStorage.set({
         ...storage,
-        model: 'gpt-3.5-turbo'
+        model: 'gpt-4o'
       })}>
         モデルを変更
       </button>
@@ -103,7 +103,7 @@ export const DEFAULT_AI_SETTINGS: AISettings
 // AI設定の型定義
 export interface AISettings {
   apiKey: string;
-  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo';
+  model: 'gpt-4o' | 'gpt-4o' | 'gpt-4o';
   customPrompt?: string;
   useCustomPrompt: boolean;
 }
@@ -234,7 +234,7 @@ pnpm test
 # カバレッジ付きテスト
 pnpm test:coverage
 
-# ウォッチモードでテスト実行  
+# ウォッチモードでテスト実行
 pnpm test:watch
 ```
 
@@ -243,7 +243,7 @@ pnpm test:watch
 現在のテストカバレッジ: **82.42%**
 
 - **Statement Coverage**: 82.42%
-- **Branch Coverage**: 84.09%  
+- **Branch Coverage**: 84.09%
 - **Function Coverage**: 78.94%
 
 ### テストファイル
@@ -283,11 +283,11 @@ import { useStorage, aiSettingsStorage } from '@extension/storage';
 
 const OptionsPage = () => {
   const settings = useStorage(aiSettingsStorage);
-  
+
   const handleSave = async (newSettings: Partial<AISettings>) => {
     await aiSettingsStorage.set({ ...settings, ...newSettings });
   };
-  
+
   return <SettingsForm settings={settings} onSave={handleSave} />;
 };
 
@@ -323,6 +323,7 @@ const performAnalysis = async () => {
 ### よくある問題
 
 1. **ストレージクォータ超過**
+
    ```typescript
    // エラーハンドリング例
    try {
@@ -335,6 +336,7 @@ const performAnalysis = async () => {
    ```
 
 2. **同期エラー**
+
    ```typescript
    // Sync Storageの制限確認
    const info = await chrome.storage.sync.getBytesInUse();
@@ -344,6 +346,7 @@ const performAnalysis = async () => {
    ```
 
 3. **デシリアライゼーションエラー**
+
    ```typescript
    // 安全なデシリアライゼーション
    const storage = createStorage('data', defaultValue, {

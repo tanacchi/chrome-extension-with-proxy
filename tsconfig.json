@@ -7,5 +7,5 @@
     "noEmit": false,
     "target": "ESNext"
   },
-  "include": ["eslint.config.ts", "packages/ai-api/**/*", "packages/storage/**/*", "pages/options/**/*"]
+  "include": ["eslint.config.ts", "packages/**/*", "pages/**/*"]
 }

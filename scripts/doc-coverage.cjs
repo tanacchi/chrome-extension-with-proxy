@@ -15,9 +15,9 @@
  * @since 1.0.0
  */
 
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
+const fs = require('fs')
+const path = require('path')
+const glob = require('glob')
 
 /**
  * ドキュメントカバレッジ測定クラス
@@ -26,7 +26,7 @@ const glob = require('glob');
  */
 class DocumentationCoverage {
   constructor() {
-    this.config = this.loadConfig();
+    this.config = this.loadConfig()
     this.results = {
       totalFiles: 0,
       documentedFiles: 0,
@@ -35,7 +35,7 @@ class DocumentationCoverage {
       totalClasses: 0,
       documentedClasses: 0,
       files: [],
-    };
+    }
   }
 
   /**
@@ -44,12 +44,12 @@ class DocumentationCoverage {
    * @returns {Object} 設定オブジェクト
    */
   loadConfig() {
-    const configPath = path.join(process.cwd(), 'doc-coverage.config.cjs');
+    const configPath = path.join(process.cwd(), 'doc-coverage.config.cjs')
     if (!fs.existsSync(configPath)) {
-      console.warn('設定ファイルが見つかりません。デフォルト設定を使用します。');
-      return this.getDefaultConfig();
+      console.warn('設定ファイルが見つかりません。デフォルト設定を使用します。')
+      return this.getDefaultConfig()
     }
-    return require(configPath);
+    return require(configPath)
   }
 
   /**
@@ -64,7 +64,7 @@ class DocumentationCoverage {
       thresholds: { global: 80, perFile: 70, functions: 90, classes: 95 },
       requiredTags: ['description', 'param', 'returns', 'since'],
       reporting: { detailed: true, includeMissing: true, verbosity: 'normal' },
-    };
+    }
   }
 
   /**
@@ -73,18 +73,18 @@ class DocumentationCoverage {
    * @returns {string[]} ファイルパスの配列
    */
   collectFiles() {
-    const files = [];
+    const files = []
 
     for (const pattern of this.config.input) {
       const matchedFiles = glob.sync(pattern, {
         ignore: this.config.exclude,
         absolute: true,
-      });
-      files.push(...matchedFiles);
+      })
+      files.push(...matchedFiles)
     }
 
     // 重複を除去
-    return [...new Set(files)];
+    return [...new Set(files)]
   }
 
   /**
@@ -95,7 +95,7 @@ class DocumentationCoverage {
    */
   analyzeFile(filePath) {
     try {
-      const content = fs.readFileSync(filePath, 'utf8');
+      const content = fs.readFileSync(filePath, 'utf8')
 
       const analysis = {
         path: filePath,
@@ -106,55 +106,57 @@ class DocumentationCoverage {
         documentedItems: 0,
         coverage: 0,
         missingDocs: [],
-      };
+      }
 
       // 関数（アロー関数とexport const）を検出
       const functionRegex =
-        /export\s+const\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(?:\([^)]*\)\s*=>\s*\{|async\s*\([^)]*\)\s*=>\s*\{)/g;
-      let match;
+        /export\s+const\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(?:\([^)]*\)\s*=>\s*\{|async\s*\([^)]*\)\s*=>\s*\{)/g
+      let match
 
       while ((match = functionRegex.exec(content)) !== null) {
-        const functionName = match[1];
-        const beforeFunction = content.substring(0, match.index);
-        const hasJSDoc = this.hasJSDocComment(beforeFunction, functionName);
+        const functionName = match[1]
+        const beforeFunction = content.substring(0, match.index)
+        const hasJSDoc = this.hasJSDocComment(beforeFunction, functionName)
 
         analysis.functions.push({
           name: functionName,
           documented: hasJSDoc,
           missing: hasJSDoc ? [] : ['JSDoc comment'],
-        });
+        })
       }
 
       // クラスを検出
-      const classRegex = /export\s+class\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
+      const classRegex = /export\s+class\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g
       while ((match = classRegex.exec(content)) !== null) {
-        const className = match[1];
-        const beforeClass = content.substring(0, match.index);
-        const hasJSDoc = this.hasJSDocComment(beforeClass, className);
+        const className = match[1]
+        const beforeClass = content.substring(0, match.index)
+        const hasJSDoc = this.hasJSDocComment(beforeClass, className)
 
         analysis.classes.push({
           name: className,
           documented: hasJSDoc,
           missing: hasJSDoc ? [] : ['JSDoc comment'],
-        });
+        })
       }
 
       // カバレッジを計算
-      analysis.totalItems = analysis.functions.length + analysis.classes.length;
+      analysis.totalItems = analysis.functions.length + analysis.classes.length
       analysis.documentedItems =
-        analysis.functions.filter(f => f.documented).length + analysis.classes.filter(c => c.documented).length;
-      analysis.coverage = analysis.totalItems > 0 ? (analysis.documentedItems / analysis.totalItems) * 100 : 100;
+        analysis.functions.filter(f => f.documented).length +
+        analysis.classes.filter(c => c.documented).length
+      analysis.coverage =
+        analysis.totalItems > 0 ? (analysis.documentedItems / analysis.totalItems) * 100 : 100
 
       // 不足項目を集計
       analysis.missingDocs = [
         ...analysis.functions.filter(f => !f.documented).map(f => `関数: ${f.name}`),
         ...analysis.classes.filter(c => !c.documented).map(c => `クラス: ${c.name}`),
-      ];
+      ]
 
-      return analysis;
+      return analysis
     } catch (error) {
-      console.warn(`ファイル解析エラー: ${filePath}`, error.message);
-      return null;
+      console.warn(`ファイル解析エラー: ${filePath}`, error.message)
+      return null
     }
   }
 
@@ -167,20 +169,20 @@ class DocumentationCoverage {
    */
   hasJSDocComment(beforeContent) {
     // 最後のJSDocコメントを探す
-    const jsdocRegex = /\/\*\*([\s\S]*?)\*\//g;
-    const matches = [...beforeContent.matchAll(jsdocRegex)];
+    const jsdocRegex = /\/\*\*([\s\S]*?)\*\//g
+    const matches = [...beforeContent.matchAll(jsdocRegex)]
 
-    if (matches.length === 0) return false;
+    if (matches.length === 0) return false
 
     // 最後のJSDocコメントを取得
-    const lastMatch = matches[matches.length - 1];
-    const lastJSDocEnd = lastMatch.index + lastMatch[0].length;
+    const lastMatch = matches[matches.length - 1]
+    const lastJSDocEnd = lastMatch.index + lastMatch[0].length
 
     // JSDocコメントの後に空白文字以外があるかチェック
-    const afterJSDoc = beforeContent.substring(lastJSDocEnd);
-    const hasCodeBetween = /[^\s]/.test(afterJSDoc);
+    const afterJSDoc = beforeContent.substring(lastJSDocEnd)
+    const hasCodeBetween = /[^\s]/.test(afterJSDoc)
 
-    return !hasCodeBetween;
+    return !hasCodeBetween
   }
 
   /**
@@ -191,21 +193,21 @@ class DocumentationCoverage {
    */
   isWellDocumented(item) {
     // 基本的な説明があるかチェック
-    if (!item.description) return false;
+    if (!item.description) return false
 
     // パラメータがある場合、パラメータの説明があるかチェック
     if (item.params && item.params.length > 0) {
-      const documentedParams = item.params.filter(p => p.description);
-      if (documentedParams.length !== item.params.length) return false;
+      const documentedParams = item.params.filter(p => p.description)
+      if (documentedParams.length !== item.params.length) return false
     }
 
     // 戻り値がある場合、戻り値の説明があるかチェック
     if (item.returns && item.returns.length > 0) {
-      const documentedReturns = item.returns.filter(r => r.description);
-      if (documentedReturns.length === 0) return false;
+      const documentedReturns = item.returns.filter(r => r.description)
+      if (documentedReturns.length === 0) return false
     }
 
-    return true;
+    return true
   }
 
   /**
@@ -215,20 +217,20 @@ class DocumentationCoverage {
    * @returns {string[]} 不足しているタグの配列
    */
   getMissingTags(item) {
-    const missing = [];
+    const missing = []
 
-    if (!item.description) missing.push('description');
+    if (!item.description) missing.push('description')
     if (item.params && item.params.length > 0) {
-      const undocumentedParams = item.params.filter(p => !p.description);
+      const undocumentedParams = item.params.filter(p => !p.description)
       if (undocumentedParams.length > 0) {
-        missing.push(`param (${undocumentedParams.map(p => p.name).join(', ')})`);
+        missing.push(`param (${undocumentedParams.map(p => p.name).join(', ')})`)
       }
     }
     if (item.returns && item.returns.length > 0 && !item.returns[0].description) {
-      missing.push('returns');
+      missing.push('returns')
     }
 
-    return missing;
+    return missing
   }
 
   /**
@@ -237,40 +239,46 @@ class DocumentationCoverage {
    * @returns {Object} 測定結果
    */
   run() {
-    console.log('📊 ドキュメントカバレッジ測定を開始します...\n');
+    console.log('📊 ドキュメントカバレッジ測定を開始します...\n')
 
-    const files = this.collectFiles();
-    console.log(`対象ファイル数: ${files.length}`);
+    const files = this.collectFiles()
+    console.log(`対象ファイル数: ${files.length}`)
 
     for (const file of files) {
-      const analysis = this.analyzeFile(file);
+      const analysis = this.analyzeFile(file)
       if (analysis) {
-        this.results.files.push(analysis);
-        this.results.totalFiles++;
+        this.results.files.push(analysis)
+        this.results.totalFiles++
 
         if (analysis.coverage >= this.config.thresholds.perFile) {
-          this.results.documentedFiles++;
+          this.results.documentedFiles++
         }
 
-        this.results.totalFunctions += analysis.functions.length;
-        this.results.documentedFunctions += analysis.functions.filter(f => f.documented).length;
+        this.results.totalFunctions += analysis.functions.length
+        this.results.documentedFunctions += analysis.functions.filter(f => f.documented).length
 
-        this.results.totalClasses += analysis.classes.length;
-        this.results.documentedClasses += analysis.classes.filter(c => c.documented).length;
+        this.results.totalClasses += analysis.classes.length
+        this.results.documentedClasses += analysis.classes.filter(c => c.documented).length
       }
     }
 
     // 全体のカバレッジを計算
     this.results.globalCoverage =
-      this.results.totalFiles > 0 ? (this.results.documentedFiles / this.results.totalFiles) * 100 : 100;
+      this.results.totalFiles > 0
+        ? (this.results.documentedFiles / this.results.totalFiles) * 100
+        : 100
 
     this.results.functionCoverage =
-      this.results.totalFunctions > 0 ? (this.results.documentedFunctions / this.results.totalFunctions) * 100 : 100;
+      this.results.totalFunctions > 0
+        ? (this.results.documentedFunctions / this.results.totalFunctions) * 100
+        : 100
 
     this.results.classCoverage =
-      this.results.totalClasses > 0 ? (this.results.documentedClasses / this.results.totalClasses) * 100 : 100;
+      this.results.totalClasses > 0
+        ? (this.results.documentedClasses / this.results.totalClasses) * 100
+        : 100
 
-    return this.results;
+    return this.results
   }
 
   /**
@@ -279,31 +287,31 @@ class DocumentationCoverage {
    * @param {Object} results - 測定結果
    */
   generateReport(results) {
-    console.log('\n📋 ドキュメントカバレッジレポート');
-    console.log('='.repeat(50));
+    console.log('\n📋 ドキュメントカバレッジレポート')
+    console.log('='.repeat(50))
 
-    console.log(`\n📊 全体統計:`);
-    console.log(`  総ファイル数: ${results.totalFiles}`);
-    console.log(`  ドキュメント化済みファイル数: ${results.documentedFiles}`);
-    console.log(`  全体カバレッジ: ${results.globalCoverage.toFixed(1)}%`);
+    console.log('\n📊 全体統計:')
+    console.log(`  総ファイル数: ${results.totalFiles}`)
+    console.log(`  ドキュメント化済みファイル数: ${results.documentedFiles}`)
+    console.log(`  全体カバレッジ: ${results.globalCoverage.toFixed(1)}%`)
 
-    console.log(`\n🔧 関数統計:`);
-    console.log(`  総関数数: ${results.totalFunctions}`);
-    console.log(`  ドキュメント化済み関数数: ${results.documentedFunctions}`);
-    console.log(`  関数カバレッジ: ${results.functionCoverage.toFixed(1)}%`);
+    console.log('\n🔧 関数統計:')
+    console.log(`  総関数数: ${results.totalFunctions}`)
+    console.log(`  ドキュメント化済み関数数: ${results.documentedFunctions}`)
+    console.log(`  関数カバレッジ: ${results.functionCoverage.toFixed(1)}%`)
 
-    console.log(`\n🏗️  クラス統計:`);
-    console.log(`  総クラス数: ${results.totalClasses}`);
-    console.log(`  ドキュメント化済みクラス数: ${results.documentedClasses}`);
-    console.log(`  クラスカバレッジ: ${results.classCoverage.toFixed(1)}%`);
+    console.log('\n🏗️  クラス統計:')
+    console.log(`  総クラス数: ${results.totalClasses}`)
+    console.log(`  ドキュメント化済みクラス数: ${results.documentedClasses}`)
+    console.log(`  クラスカバレッジ: ${results.classCoverage.toFixed(1)}%`)
 
     // 閾値チェック
-    console.log(`\n🎯 閾値チェック:`);
-    this.checkThresholds(results);
+    console.log('\n🎯 閾値チェック:')
+    this.checkThresholds(results)
 
     // 詳細レポート
     if (this.config.reporting.detailed) {
-      this.generateDetailedReport(results);
+      this.generateDetailedReport(results)
     }
   }
 
@@ -329,21 +337,23 @@ class DocumentationCoverage {
         value: results.classCoverage,
         threshold: this.config.thresholds.classes,
       },
-    ];
+    ]
 
-    let allPassed = true;
+    let allPassed = true
 
     checks.forEach(check => {
-      const passed = check.value >= check.threshold;
-      const status = passed ? '✅' : '❌';
-      console.log(`  ${status} ${check.name}: ${check.value.toFixed(1)}% (閾値: ${check.threshold}%)`);
-      if (!passed) allPassed = false;
-    });
+      const passed = check.value >= check.threshold
+      const status = passed ? '✅' : '❌'
+      console.log(
+        `  ${status} ${check.name}: ${check.value.toFixed(1)}% (閾値: ${check.threshold}%)`,
+      )
+      if (!passed) allPassed = false
+    })
 
     if (allPassed) {
-      console.log('\n🎉 すべての閾値をクリアしています！');
+      console.log('\n🎉 すべての閾値をクリアしています！')
     } else {
-      console.log('\n⚠️  一部の閾値を下回っています。ドキュメントの追加を検討してください。');
+      console.log('\n⚠️  一部の閾値を下回っています。ドキュメントの追加を検討してください。')
     }
   }
 
@@ -353,24 +363,24 @@ class DocumentationCoverage {
    * @param {Object} results - 測定結果
    */
   generateDetailedReport(results) {
-    console.log('\n📄 ファイル別詳細:');
+    console.log('\n📄 ファイル別詳細:')
 
     const lowCoverageFiles = results.files
       .filter(file => file.coverage < this.config.thresholds.perFile)
-      .sort((a, b) => a.coverage - b.coverage);
+      .sort((a, b) => a.coverage - b.coverage)
 
     if (lowCoverageFiles.length > 0) {
-      console.log('\n⚠️  カバレッジが低いファイル:');
+      console.log('\n⚠️  カバレッジが低いファイル:')
       lowCoverageFiles.forEach(file => {
-        const relativePath = path.relative(process.cwd(), file.path);
-        console.log(`  📁 ${relativePath} (${file.coverage.toFixed(1)}%)`);
+        const relativePath = path.relative(process.cwd(), file.path)
+        console.log(`  📁 ${relativePath} (${file.coverage.toFixed(1)}%)`)
 
         if (this.config.reporting.includeMissing && file.missingDocs.length > 0) {
-          console.log(`     不足項目: ${file.missingDocs.join(', ')}`);
+          console.log(`     不足項目: ${file.missingDocs.join(', ')}`)
         }
-      });
+      })
     } else {
-      console.log('\n✅ すべてのファイルが閾値をクリアしています！');
+      console.log('\n✅ すべてのファイルが閾値をクリアしています！')
     }
   }
 }
@@ -380,30 +390,30 @@ class DocumentationCoverage {
  */
 function main() {
   try {
-    const coverage = new DocumentationCoverage();
-    const results = coverage.run();
-    coverage.generateReport(results);
+    const coverage = new DocumentationCoverage()
+    const results = coverage.run()
+    coverage.generateReport(results)
 
     // 閾値チェックが有効な場合、失敗時に終了コード1で終了
-    const args = process.argv.slice(2);
+    const args = process.argv.slice(2)
     if (args.includes('--check')) {
-      const globalPassed = results.globalCoverage >= coverage.config.thresholds.global;
-      const functionPassed = results.functionCoverage >= coverage.config.thresholds.functions;
-      const classPassed = results.classCoverage >= coverage.config.thresholds.classes;
+      const globalPassed = results.globalCoverage >= coverage.config.thresholds.global
+      const functionPassed = results.functionCoverage >= coverage.config.thresholds.functions
+      const classPassed = results.classCoverage >= coverage.config.thresholds.classes
 
       if (!globalPassed || !functionPassed || !classPassed) {
-        process.exit(1);
+        process.exit(1)
       }
     }
   } catch (error) {
-    console.error('❌ ドキュメントカバレッジ測定中にエラーが発生しました:', error);
-    process.exit(1);
+    console.error('❌ ドキュメントカバレッジ測定中にエラーが発生しました:', error)
+    process.exit(1)
   }
 }
 
 // スクリプト実行
 if (require.main === module) {
-  main();
+  main()
 }
 
-module.exports = DocumentationCoverage;
+module.exports = DocumentationCoverage
