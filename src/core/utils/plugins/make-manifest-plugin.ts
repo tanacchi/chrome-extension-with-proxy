@@ -14,7 +14,7 @@ const refreshFilePath = resolve(
   '..',
   '..',
   '..',
-  'packages',
+  'lib',
   'hmr',
   'dist',
   'lib',

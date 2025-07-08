@@ -16,7 +16,7 @@ const currentDirname = path.dirname(currentFilename)
 async function generateManifest() {
   try {
     const projectRoot = path.resolve(currentDirname, '..')
-    const manifestPath = path.join(projectRoot, 'chrome-extension', 'manifest.js')
+    const manifestPath = path.join(projectRoot, 'src/core', 'manifest.js')
     const distDir = path.join(projectRoot, 'dist')
     const outputPath = path.join(distDir, 'manifest.json')
 
@@ -28,7 +28,7 @@ async function generateManifest() {
     if (!fs.existsSync(manifestPath)) {
       console.error(`❌ エラー: manifest.jsが見つかりません: ${manifestPath}`)
       console.log('💡 以下のコマンドを実行してmanifest.jsを生成してください:')
-      console.log('   cd chrome-extension && pnpm ready')
+      console.log('   cd src/core && pnpm ready')
       process.exit(1)
     }
 

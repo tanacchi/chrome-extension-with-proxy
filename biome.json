@@ -64,10 +64,11 @@
       "**",
       "!**/build/**",
       "!**/dist/**",
+      "!**/dist-temp/**",
       "!**/node_modules/**",
-      "!**/chrome-extension/manifest.js",
+      "!**/src/core/manifest.js",
       "!**/dev-servers/**",
-      "!**/packages/storage/lib/**/*.spec.ts",
+      "!**/src/lib/storage/lib/**/*.spec.ts",
       "!**/coverage/**",
       "!**/reports/**",
       "!**/scripts/**"

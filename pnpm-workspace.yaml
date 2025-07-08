@@ -1,7 +1,7 @@
 packages:
-  - chrome-extension
-  - pages/*
-  - packages/*
+  - src/core
+  - src/ui/*
+  - src/lib/*
   - tests/*
   - dev-servers/*
 

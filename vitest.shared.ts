@@ -93,10 +93,11 @@ export const projectExcludes = {
  * エイリアス設定のヘルパー
  */
 export const createAliases = (baseDir: string) => ({
-  '@extension/shared': resolve(baseDir, 'packages/shared/lib'),
-  '@extension/storage': resolve(baseDir, 'packages/storage/lib'),
-  '@extension/ui': resolve(baseDir, 'packages/ui/lib'),
-  '@extension/i18n': resolve(baseDir, 'packages/i18n/lib'),
+  '@extension/shared': resolve(baseDir, 'src/lib/shared/lib'),
+  '@extension/storage': resolve(baseDir, 'src/lib/storage/lib'),
+  '@extension/ui': resolve(baseDir, 'src/lib/ui/lib'),
+  '@extension/i18n': resolve(baseDir, 'src/lib/i18n/lib'),
+  '@extension/ai-api': resolve(baseDir, 'src/lib/ai-api/lib'),
 })
 
 /**

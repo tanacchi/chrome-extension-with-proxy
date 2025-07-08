@@ -10,7 +10,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 const rootDir = resolve(import.meta.dirname)
 const srcDir = resolve(rootDir, 'src')
 
-const outDir = resolve(rootDir, '..', 'dist')
+const outDir = resolve(rootDir, '..', '..', 'dist')
 export default defineConfig({
   define: {
     'process.env': env,
