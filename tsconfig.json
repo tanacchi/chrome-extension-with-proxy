@@ -4,9 +4,10 @@
   "extends": "./packages/tsconfig/base.json",
   "compilerOptions": {
     "noImplicitAny": false,
-    "noEmit": false,
-    "target": "ESNext"
+    "noEmit": true,
+    "target": "ESNext",
+    "strict": true
   },
-  "include": ["eslint.config.ts", "packages/**/*", "pages/**/*"],
-  "exclude": ["**/dist/**/*.js"]
+  "include": ["eslint.config.ts", "packages/**/*", "pages/**/*", "chrome-extension/**/*"],
+  "exclude": ["**/dist/**", "**/node_modules/**", "**/*.spec.ts"]
 }

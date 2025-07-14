@@ -1,16 +1,17 @@
-# Chrome Extension with Proxy - テーブルデータAI分析ツール
+{ Chrome Extension with Proxy - テーブルデータAI分析ツール
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "ESLint",るChrome拡張機能**
+  "extends": "./packages/tsconfig/base.json",
+  "compilerOptions": {I APIを使用して自動的にデータ分析・洞察を提供するモダンなChrome拡張機能です。React + TypeScript + Viteを使用した高速開発環境で、Chrome Extensions Manifest V3をサポートし、Turborepoを使用したモノレポ構成で効率的な開発体験を提供します。
+    "noImplicitAny": false,
+    "noEmit": true,
+    "target": "ESNext",
+    "strict": true主要機能
+  },
+  "include": ["eslint.config.ts", "packages/**/*", "pages/**/*", "chrome-extension/**/*"],ーブルを自動識別
+  "exclude": ["**/dist/**", "**/node_modules/**", "**/*.spec.ts"] **🧠 AI分析エンジン**: OpenAI GPTによる高度なデータ分析・洞察生成
+}- **🔧 開発/本番切り替え**: モックAPIと本番APIの自動切り替え
 
-> **テーブルデータの瞬間AI分析を実現するChrome拡張機能**
-
-Webページ上のテーブルを検出し、OpenAI APIを使用して自動的にデータ分析・洞察を提供するモダンなChrome拡張機能です。React + TypeScript + Viteを使用した高速開発環境で、Chrome Extensions Manifest V3をサポートし、Turborepoを使用したモノレポ構成で効率的な開発体験を提供します。
-
-## 🎯 プロダクト概要
-
-### 主要機能
-
-- **📊 テーブル自動検出**: Webページ内のHTMLテーブルを自動識別
-- **🧠 AI分析エンジン**: OpenAI GPTによる高度なデータ分析・洞察生成
-- **🔧 開発/本番切り替え**: モックAPIと本番APIの自動切り替え
 - **⚙️ 直感的な設定画面**: APIキー、AIモデル、カスタムプロンプトの簡単設定
 - **📱 多様なUI**: ポップアップ、サイドパネル、設定画面、DevTools統合
 - **🔥 ホットリロード**: カスタムHMRによる高速開発サイクル
