@@ -1,3 +1,4 @@
+/// <reference types="@testing-library/jest-dom" />
 import { defineConfig } from 'vitest/config'
 import { createProjectConfig, createAliases } from '../../vitest.shared'
 import { resolve } from 'path'

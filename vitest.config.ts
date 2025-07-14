@@ -1,9 +1,14 @@
+/// <reference types="@testing-library/jest-dom" />
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
   test: {
+    // テスト環境の設定
+    globals: true,
+    environment: 'jsdom',
+
     // Workspace projectsを使用して各パッケージのテストを統合
     projects: [
       // Node.js環境のプロジェクト
@@ -17,8 +22,9 @@ export default defineConfig({
       {
         root: './chrome-extension',
         test: {
-          environment: 'node',
+          environment: 'jsdom',
           globals: true,
+          setupFiles: ['../vitest.setup.ts'],
         },
       },
       {
@@ -51,7 +57,7 @@ export default defineConfig({
         plugins: [react()],
         test: {
           environment: 'jsdom',
-          setupFiles: ['./vitest.setup.ts'],
+          setupFiles: ['../../vitest.setup.ts'],
           globals: true,
         },
         resolve: {
@@ -97,17 +103,34 @@ export default defineConfig({
       },
       {
         root: './pages/devtools-panel',
+        plugins: [react()],
         test: {
+          name: 'devtools-panel',
           environment: 'jsdom',
           globals: true,
+          setupFiles: ['../../vitest.setup.ts'],
+        },
+        resolve: {
+          alias: {
+            '@src': resolve(__dirname, 'pages/devtools-panel/src'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
+            '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
+            '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
+            '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
+          },
         },
       },
       {
         root: './pages/new-tab',
         plugins: [react()],
         test: {
+          name: 'new-tab',
           environment: 'jsdom',
           globals: true,
+          setupFiles: ['../../vitest.setup.ts'],
         },
         resolve: {
           alias: {
@@ -128,6 +151,7 @@ export default defineConfig({
         test: {
           environment: 'jsdom',
           globals: true,
+          setupFiles: ['../../vitest.setup.ts'],
         },
         resolve: {
           alias: {
@@ -148,6 +172,7 @@ export default defineConfig({
         test: {
           environment: 'jsdom',
           globals: true,
+          setupFiles: ['../../vitest.setup.ts'],
         },
         resolve: {
           alias: {
@@ -173,6 +198,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'dist/',
+        '**/dist/**/*',
         'build/',
         '**/*.d.ts',
         '**/*.config.*',
