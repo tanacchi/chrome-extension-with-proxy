@@ -49,8 +49,8 @@
     "test:mock-api": "pnpm --filter=mock-api-server test",
     "test:mock-api:postman": "pnpm --filter=mock-api-server test:e2e",
     "prepare": "husky",
-    "copy-env": "bash bash-scripts/copy_env.sh",
-    "set-global-env": "bash bash-scripts/set_global_env.sh",
+    "copy-env": "bash scripts/copy_env.sh",
+    "set-global-env": "bash scripts/set_global_env.sh",
     "module-manager": "pnpm -F module-manager start",
     "mutation-test": "stryker run",
     "postinstall": "pnpm copy-env"

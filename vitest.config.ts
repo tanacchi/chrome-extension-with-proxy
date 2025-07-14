@@ -198,7 +198,6 @@ export default defineConfig({
         '**/*.spec.ts',
         '**/*.test.ts',
         'scripts/',
-        'bash-scripts/',
         'tests/e2e/',
         'dev-servers/',
         '.turbo/',
