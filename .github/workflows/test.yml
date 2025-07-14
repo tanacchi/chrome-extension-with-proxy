@@ -1,4 +1,4 @@
-name: Lint Check
+name: Lint Check & Tech
 
 on: [ pull_request_target ]
 
@@ -15,3 +15,5 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --prefer-offline
       - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
