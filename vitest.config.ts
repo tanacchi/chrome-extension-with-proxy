@@ -8,61 +8,20 @@ export default defineConfig({
     projects: [
       // Node.js環境のプロジェクト
       {
-        name: 'storage',
         root: './packages/storage',
         test: {
           environment: 'node',
           globals: true,
-          coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-            thresholds: {
-              lines: 78,
-              functions: 78,
-              branches: 78,
-              statements: 78,
-            },
-            exclude: ['dist/**', '**/*.spec.ts', '**/*.test.ts', 'vitest.config.ts', 'index.mts'],
-          },
         },
       },
       {
-        name: 'chrome-extension',
         root: './chrome-extension',
         test: {
           environment: 'node',
           globals: true,
-          coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-            exclude: [
-              'node_modules/',
-              'dist/',
-              'build/',
-              '**/*.d.ts',
-              '**/*.config.*',
-              '**/index.ts',
-              '**/*.spec.ts',
-              '**/*.test.ts',
-              'scripts/',
-              'utils/',
-              'pre-build.tsconfig.json',
-            ],
-            thresholds: {
-              global: {
-                branches: 75,
-                functions: 75,
-                lines: 75,
-                statements: 75,
-              },
-            },
-          },
         },
       },
       {
-        name: 'sample-html',
         root: './dev-servers/sample-html',
         test: {
           environment: 'node',
@@ -72,31 +31,10 @@ export default defineConfig({
 
       // jsdom環境のプロジェクト
       {
-        name: 'ai-api',
         root: './packages/ai-api',
         test: {
           environment: 'jsdom',
           globals: true,
-          coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-            exclude: [
-              'node_modules/',
-              'tests/',
-              '**/*.d.ts',
-              '**/*.config.*',
-              '**/index.ts', // エクスポート専用ファイル
-            ],
-            thresholds: {
-              global: {
-                branches: 80,
-                functions: 80,
-                lines: 80,
-                statements: 80,
-              },
-            },
-          },
         },
         resolve: {
           alias: {
@@ -106,37 +44,12 @@ export default defineConfig({
         },
       },
       {
-        name: 'options',
         root: './pages/options',
         plugins: [react()],
         test: {
           environment: 'jsdom',
           setupFiles: ['./vitest.setup.ts'],
           globals: true,
-          coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-            exclude: [
-              'node_modules/',
-              'dist/',
-              'build/',
-              '**/*.d.ts',
-              '**/*.config.*',
-              '**/index.ts',
-              '**/*.spec.ts',
-              '**/*.test.ts',
-              'vitest.setup.ts',
-            ],
-            thresholds: {
-              global: {
-                branches: 75,
-                functions: 75,
-                lines: 75,
-                statements: 75,
-              },
-            },
-          },
         },
         resolve: {
           alias: {
@@ -149,34 +62,88 @@ export default defineConfig({
         },
       },
       {
-        name: 'content',
         root: './pages/content',
         test: {
           environment: 'jsdom',
           globals: true,
-          coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-            exclude: [
-              'node_modules/',
-              'dist/',
-              'build/',
-              '**/*.d.ts',
-              '**/*.config.*',
-              '**/index.ts',
-              '**/*.spec.ts',
-              '**/*.test.ts',
-              'build.mts',
-            ],
-            thresholds: {
-              global: {
-                branches: 75,
-                functions: 75,
-                lines: 75,
-                statements: 75,
-              },
-            },
+        },
+      },
+      {
+        root: './pages/content-runtime',
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+      },
+      {
+        root: './pages/content-ui',
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+      },
+      {
+        root: './pages/devtools',
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+      },
+      {
+        root: './pages/devtools-panel',
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+      },
+      {
+        root: './pages/new-tab',
+        plugins: [react()],
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+        resolve: {
+          alias: {
+            '@src': resolve(__dirname, 'pages/new-tab/src'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
+            '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
+            '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
+          },
+        },
+      },
+      {
+        root: './pages/popup',
+        plugins: [react()],
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+        resolve: {
+          alias: {
+            '@src': resolve(__dirname, 'pages/popup/src'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
+            '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
+            '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
+          },
+        },
+      },
+      {
+        root: './pages/side-panel',
+        plugins: [react()],
+        test: {
+          environment: 'jsdom',
+          globals: true,
+        },
+        resolve: {
+          alias: {
+            '@src': resolve(__dirname, 'pages/side-panel/src'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
+            '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
+            '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
           },
         },
       },
@@ -202,7 +169,26 @@ export default defineConfig({
         'dev-servers/',
         '.turbo/',
         'coverage/',
+        'build.mts',
+        '**/*.js',
+        'public/',
+        'src/assets/',
+        'manifest.*',
+        'vite.config.*',
+        'rollup.config.*',
+        'tailwind.config.*',
+        'tsconfig.json',
+        'chrome-extension/src/background/',
+        'packages/ui/lib/components/ui/',
       ],
+      thresholds: {
+        global: {
+          branches: 75,
+          functions: 75,
+          lines: 75,
+          statements: 75,
+        },
+      },
     },
   },
 })

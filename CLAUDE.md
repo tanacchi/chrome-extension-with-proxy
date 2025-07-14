@@ -1,47 +1,47 @@
 # Chrome Extension with Proxy - AI Assistant Guidelines
 
-**CRITICAL: このガイドラインは絶対に遵守すること。違反は一切許可されない。**
+**重要: このガイドラインは必ず遵守しなければならない。**
 
-**AI ASSISTANT STRICT REQUIREMENTS:**
+**AI ASSISTANT 要件:**
 
-- 全ての指示を文字通り実行すること
+- 全ての指示を正確に実行すること
 - 独断での判断・省略・簡略化は禁止
 - 不明な点は必ず確認を求めること
 - 作業前に必ず計画を提示し、承認を得ること
 
-🚨 **絶対厳守事項 - ABSOLUTE REQUIREMENTS**
+🚨 **必須遵守事項**
 
-以下は例外なく遵守すること。違反した場合は即座に作業を停止し、問題を報告すること。
+以下は例外なく遵守しなければならない。違反した場合は即座に作業を停止し、問題を報告すること。
 
-1. **コード品質の絶対保証**
+1. **コード品質の保証**
 
 ```bash
-# 全ての作業完了前に必須実行 - NO EXCEPTIONS
+# 全ての作業完了前に必ず実行すること
 pnpm lint && pnpm type-check && pnpm build
 ```
 
-2. **SPECIFICATION.md の絶対同期**
+2. **仕様書の同期管理**
 
-- 仕様追加・変更時は**必ず**SPECIFICATION.mdを更新
-- 実装前に**必ず**仕様書の内容を確認
-- 仕様変更時は関連ドキュメントも**必ず**同期更新
+- 仕様追加・変更時は**必ず**README.mdを更新しなければならない
+- 実装前に**必ず**仕様の内容を確認すること
+- 仕様変更時は関連ドキュメントも**必ず**同期更新すること
 
-3. **テスト駆動開発の絶対実践**
+3. **テスト駆動開発の実践**
 
-- **必ず**テスト実装→本体実装の順序を守る
-- テストのskip・削除は**絶対禁止**
-- 全てのテストは**必ず**日本語で記述
+- **必ず**テスト実装→本体実装の順序を守ること
+- テストのskip・削除は**禁止**
+- 全てのテストは**必ず**日本語で記述すること
 
-4. **Git操作の絶対禁止事項**
+4. **Git操作の禁止事項**
 
-- `git reset`、`git reflog`の使用は**絶対禁止**
-- 破壊的変更は**一切許可しない**
+- `git reset`、`git reflog`の使用は**禁止**
+- 破壊的変更は許可しない
 
-📋 プロジェクト概要
+## 📋 プロジェクト概要
 
 Chrome Extension with Proxy は、テーブルデータAI分析機能を提供するChrome拡張機能です。
 
-技術スタック
+## 🔧 技術スタック
 
 - **React**: 19.1.0
 - **TypeScript**: 5.8.3
@@ -53,17 +53,17 @@ Chrome Extension with Proxy は、テーブルデータAI分析機能を提供�
 - **AI SDK**: @ai-sdk/react + @ai-sdk/openai
 - **テスト**: Vitest + WebdriverIO (E2E)
 
-仕様書管理
+## 📚 仕様書管理
 
-プロダクトの詳細仕様は [SPECIFICATION.md](./SPECIFICATION.md) で管理されています。
+プロダクトの詳細仕様は [README.md](./README.md) で管理されています。
 
 **重要事項:**
 
-- **仕様追加・変更時は必ずSPECIFICATION.mdを更新すること**
-- **実装前に仕様書の内容を確認すること**
-- **仕様変更がある場合は関連ドキュメント（README.md、CLAUDE.md等）も合わせて更新すること**
+- **仕様追加・変更時は必ずREADME.mdを更新しなければならない**
+- **実装前に仕様書の内容を注意深く確認すること**
+- **仕様変更がある場合は関連ドキュメント（CLAUDE.md等）も合わせて更新すること**
 
-📁 ディレクトリ構造
+## 📁 ディレクトリ構造
 
 ```
 chrome-extension-with-proxy/
@@ -93,26 +93,24 @@ chrome-extension-with-proxy/
 └── CLAUDE.md                # このファイル
 ```
 
-🔧 **強制開発ルール - MANDATORY DEVELOPMENT RULES**
+## 🔧 開発ルール
 
-**CRITICAL EXECUTION FLOW - 絶対実行フロー**
+### 重要な実行フロー
 
-全ての作業完了前に以下のコマンドを**例外なく**実行すること：
+全ての作業完了前に以下のコマンドを必ず実行しなければならない：
 
 ```bash
 pnpm lint && pnpm type-check && pnpm build
 ```
 
-**FAILURE IS NOT ACCEPTABLE - 失敗は許可されない**
+### パッケージ管理規則
 
-**PACKAGE MANAGEMENT - 絶対的パッケージ管理規則**
+- pnpm以外のパッケージマネージャー使用は禁止
+- npm、yarn使用は禁止
+- `@extension/`プレフィックス以外の共有パッケージ命名は禁止
+- `workspace:*`以外の参照方式は禁止
 
-- pnpm以外のパッケージマネージャー使用は**絶対禁止**
-- npm、yarn使用は**完全禁止**
-- `@extension/`プレフィックス以外の共有パッケージ命名は**禁止**
-- `workspace:*`以外の参照方式は**禁止**
-
-**MANDATORY COMMANDS - 強制実行コマンド群**
+### 必須実行コマンド群
 
 ```bash
 # 開発
@@ -138,24 +136,24 @@ pnpm e2e:headed    # Chrome E2Eテスト（ブラウザ表示）
 pnpm zip           # 拡張機能のZIPパッケージ作成
 ```
 
-⚡ **NON-NEGOTIABLE CODING STANDARDS - 絶対遵守コーディング規約**
+## ⚡ コーディング規約
 
-**TypeScript・React - ABSOLUTE REQUIREMENTS**
+### TypeScript・React要件
 
-- **MANDATORY**: アロー関数のみ使用（関数宣言は**絶対禁止**）
-- **MANDATORY**: `import-x/order`ルール厳格遵守
-- **MANDATORY**: `@typescript-eslint/consistent-type-imports`強制使用
-- **MANDATORY**: any型使用は**完全禁止**（テスト以外）
-- **MANDATORY**: JSXでのReactインポート**絶対禁止**
+- **必須**: アロー関数のみ使用（関数宣言は禁止）
+- **必須**: `import-x/order`ルール厳格遵守
+- **必須**: `@typescript-eslint/consistent-type-imports`強制使用
+- **必須**: any型使用は禁止（テスト以外）
+- **必須**: JSXでのReactインポート禁止
 
-**TEST REQUIREMENTS - 絶対的テスト要件**
+### テスト要件
 
-- **MANDATORY**: 全テストのdescribe()・it()は**日本語のみ**
-- **MANDATORY**: `*.spec.ts`形式のみ許可
-- **MANDATORY**: テスト対象と**完全同一**ディレクトリ配置
-- **ABSOLUTE PROHIBITION**: テストのskip・削除は**死罪レベル**で禁止
+- **必須**: 全テストのdescribe()・it()は**日本語のみ**
+- **必須**: `*.spec.ts`形式のみ許可
+- **必須**: テスト対象と**完全同一**ディレクトリ配置
+- **禁止**: テストのskip・削除は厳禁
 
-🧪 **MANDATORY TEST EXECUTION - 強制テスト実行**
+## 🧪 テスト実行
 
 ```bash
 # E2E テスト
@@ -220,80 +218,78 @@ pnpm lint && pnpm type-check && pnpm build
 **ABSOLUTE DEVELOPMENT ENVIRONMENT REQUIREMENTS**
 
 - Windows: 管理者権限なしでの`pnpm dev`実行は**完全禁止**
-- Node.js 22.15.1未満は**動作不保証**
-- WSL環境でのRemote-WSL拡張未使用は**環境違反**
+- Node.js 22.15.1未満は動作不保証
+- WSL環境でのRemote-WSL拡張未使用は環境違反
 
-⸻
+---
 
-🎯 **MANDATORY WORKFLOW EXECUTION - 強制ワークフロー実行**
+## 🎯 ワークフロー実行
 
-**ZERO DEVIATION ALLOWED - 逸脱は一切許可されない**
+### 1. 課題の把握と計画立案
 
-### 1. 課題の把握と計画立案 - MANDATORY PHASE
+**要件:**
 
-**ABSOLUTE REQUIREMENTS:**
-
-- 問題発生時は**完全な徹底調査**を実行すること
+- 問題発生時は注意深く徹底調査を実行すること
 - コードベースの関連ファイル**全て**を読むこと
-- SPECIFICATION.mdの仕様確認は**絶対必須**
-- TASKS.mdへの計画記載は**完全義務**
-- ToDo形式以外のチェックリストは**禁止**
+- README.mdの仕様確認は**必須**
+- 計画記載は必須
+- ToDo形式以外のチェックリストは禁止
 
-### 2. 作業前のレビュー - MANDATORY APPROVAL PHASE
+### 2. 作業前のレビュー
 
-**CRITICAL CHECKPOINT:**
+**チェックポイント:**
 
 - 計画とToDoリスト**完全作成後**にレビュワーへ連絡**必須**
-- 広範囲開発時の設計図作成は**絶対必須**
+- 広範囲開発時の設計図作成は**必須**
 - 類似コード存在時は**完全準拠**必須
-- 類似コード非存在時のサンプル作成・承認は**絶対必須**
+- 類似コード非存在時のサンプル作成・承認は**必須**
 
-### 3. 実施と追跡 - MANDATORY EXECUTION PHASE
+### 3. 実施と追跡
 
-**STRICT EXECUTION RULES:**
+**実行規則:**
 
-- ToDo項目ベースの作業進行は**絶対必須**
+- ToDo項目ベースの作業進行は**必須**
 - 完了時のチェックマーク**即座付与**必須
-- 各ステップの変更説明は**完全義務**
-- シンプル実装以外は**完全禁止**
-- TDD実践（テスト→実装）は**絶対順序**
-- 小単位実装・動作確認は**強制実行**
+- 各ステップの変更説明は**必須**
+- シンプル実装以外は禁止
+- TDD実践（テスト→実装）は**必須順序**
+- 小単位実装・動作確認は必須
 
-### 4. 作業記録とコミット - MANDATORY COMPLETION PHASE
+### 4. 作業記録とコミット
 
-**FINAL CHECKPOINT:**
+**最終チェックポイント:**
 
-- 変更内容の記録・共有は**完全義務**
-- 仕様変更時のSPECIFICATION.md更新は**絶対必須**
-- git commit前の**完全確認**は絶対必須
+- 変更内容の記録・共有は**必須**
+- 仕様変更時のREADME.md更新は**必須**
+- git commit前の**完全確認**は必須
 
-📋 **ABSOLUTE GIT MANAGEMENT RULES - 絶対Git管理規則**
+## 📋 Git管理規則
 
-**BRANCH STRATEGY - 絶対ブランチ戦略**
+### ブランチ戦略
 
-- フェーズ管理での`phase-X`ブランチ作成は**絶対必須**
-- 作業単位での定期的`git commit`は**強制実行**
-- コミットメッセージの明確記述は**完全義務**
+- フェーズ管理での`phase-X`ブランチ作成は**必須**
+- 作業単位での定期的`git commit`は必須
+- コミットメッセージの明確記述は**必須**
 
-**ABSOLUTE PROHIBITION - 絶対禁止事項**
+### 禁止事項
 
-- `git reset`、`git reflog`使用は**死罪レベル**違反
-- 破壊的変更は**プロジェクト終了レベル**違反
+- `git reset`、`git reflog`使用は禁止
+- 破壊的変更は禁止
 
-**MANDATORY ALTERNATIVES - 強制代替手段**
+### 代替手段
 
 - 変更一時保存: `git stash`**のみ**許可
 - 変更取消: `git revert`**のみ**許可
 - ファイル復元: `git restore`**のみ**許可
 
-**BRANCH NAMING ENFORCEMENT - ブランチ命名強制**
+### ブランチ命名規則
 
 - フェーズブランチ: `phase-X`**以外禁止**
 - 機能ブランチ: `feature/`**プレフィックス必須**
 - 修正ブランチ: `fix/`**プレフィックス必須**
 
-⸻
+---
 
-🚨 **FINAL WARNING - 最終警告**
+## 🚨 最終警告
 
-このガイドラインは**法的契約**レベルで遵守すること。違反は**即座に作業停止**し、**完全な再計画**を要求する。品質と安定性は**交渉不可能**な絶対要件である。テスト実行なしの変更報告は**重大な契約違反**とみなす。
+このガイドラインは必ず遵守しなければならない。違反は即座に作業停止し、再計画を要求する。品質と安定性は重要な要件である。テスト実行なしの変更報告は重大な違反とみなす。

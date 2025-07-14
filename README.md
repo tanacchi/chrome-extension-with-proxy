@@ -1,5 +1,5 @@
 { Chrome Extension with Proxy - テーブルデータAI分析ツール
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "$schema": "<https://json.schemastore.org/tsconfig>",
   "display": "ESLint",るChrome拡張機能**
   "extends": "./packages/tsconfig/base.json",
   "compilerOptions": {I APIを使用して自動的にデータ分析・洞察を提供するモダンなChrome拡張機能です。React + TypeScript + Viteを使用した高速開発環境で、Chrome Extensions Manifest V3をサポートし、Turborepoを使用したモノレポ構成で効率的な開発体験を提供します。
@@ -402,7 +402,7 @@ pnpm zip
 #### 重要テストファイル
 
 - `tests/e2e/specs/ai-analysis.test.ts` - AI分析機能の包括的テスト
-- `tests/e2e/specs/ai-analysis-basic.test.ts` - 基本的なAI分析機能テスト  
+- `tests/e2e/specs/ai-analysis-basic.test.ts` - 基本的なAI分析機能テスト
 - `tests/e2e/helpers/ai-analysis-helpers.ts` - AI分析テスト用ヘルパー
 
 ### 🌐 開発サーバー
@@ -462,16 +462,16 @@ pnpm dev
 
 ### ❓ よくある質問
 
-**Q: OpenAI APIキーが必要ですか？**  
+**Q: OpenAI APIキーが必要ですか？**
 A: 開発時は不要です。「開発用設定をロード」で外部モックAPIを使用できます。
 
-**Q: どのブラウザで開発すべきですか？**  
+**Q: どのブラウザで開発すべきですか？**
 A: Chrome推奨。Firefox開発時は`pnpm dev:firefox`を使用。
 
-**Q: テストはどう実行しますか？**  
+**Q: テストはどう実行しますか？**
 A: `pnpm e2e`でE2Eテスト、`pnpm test`で単体テスト実行。
 
-**Q: コード修正後の確認方法は？**  
+**Q: コード修正後の確認方法は？**
 A: `pnpm lint && pnpm type-check && pnpm build`で品質チェック必須。
 
 **🎯 新規参画者へ**: まずこのREADMEで全体を把握し、[CLAUDE.md](./CLAUDE.md)の開発ガイドラインを確認してから開発を開始してください。
