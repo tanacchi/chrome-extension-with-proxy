@@ -1,18 +1,48 @@
-📘 LLM向け プロジェクト共通指示テンプレート
-
-本ファイルは、ChatGPT や Claude などの LLM にプロジェクト文脈を正しく理解させ、意図に沿った提案・生成をさせるための指示集です。必要に応じて内容を追記・修正してください。
-
-⸻
-
 # Chrome Extension with Proxy - AI Assistant Guidelines
 
-以下のガイドに厳密に従うこと。
+**CRITICAL: このガイドラインは絶対に遵守すること。違反は一切許可されない。**
+
+**AI ASSISTANT STRICT REQUIREMENTS:**
+
+- 全ての指示を文字通り実行すること
+- 独断での判断・省略・簡略化は禁止
+- 不明な点は必ず確認を求めること
+- 作業前に必ず計画を提示し、承認を得ること
+
+🚨 **絶対厳守事項 - ABSOLUTE REQUIREMENTS**
+
+以下は例外なく遵守すること。違反した場合は即座に作業を停止し、問題を報告すること。
+
+1. **コード品質の絶対保証**
+
+```bash
+# 全ての作業完了前に必須実行 - NO EXCEPTIONS
+pnpm lint && pnpm type-check && pnpm build
+```
+
+2. **SPECIFICATION.md の絶対同期**
+
+- 仕様追加・変更時は**必ず**SPECIFICATION.mdを更新
+- 実装前に**必ず**仕様書の内容を確認
+- 仕様変更時は関連ドキュメントも**必ず**同期更新
+
+3. **テスト駆動開発の絶対実践**
+
+- **必ず**テスト実装→本体実装の順序を守る
+- テストのskip・削除は**絶対禁止**
+- 全てのテストは**必ず**日本語で記述
+
+4. **Git操作の絶対禁止事項**
+
+- `git reset`、`git reflog`の使用は**絶対禁止**
+- 破壊的変更は**一切許可しない**
 
 📋 プロジェクト概要
 
 Chrome Extension with Proxy は、テーブルデータAI分析機能を提供するChrome拡張機能です。
 
 技術スタック
+
 - **React**: 19.1.0
 - **TypeScript**: 5.8.3
 - **Vite**: 6.3.5 (ビルドツール)
@@ -28,6 +58,7 @@ Chrome Extension with Proxy は、テーブルデータAI分析機能を提供�
 プロダクトの詳細仕様は [SPECIFICATION.md](./SPECIFICATION.md) で管理されています。
 
 **重要事項:**
+
 - **仕様追加・変更時は必ずSPECIFICATION.mdを更新すること**
 - **実装前に仕様書の内容を確認すること**
 - **仕様変更がある場合は関連ドキュメント（README.md、CLAUDE.md等）も合わせて更新すること**
@@ -62,24 +93,26 @@ chrome-extension-with-proxy/
 └── CLAUDE.md                # このファイル
 ```
 
-🔧 開発ルール
+🔧 **強制開発ルール - MANDATORY DEVELOPMENT RULES**
 
-必須実行フロー
+**CRITICAL EXECUTION FLOW - 絶対実行フロー**
 
-コード修正やタスク完了前に以下を必ず実行して、壊れないことを確認してください：
+全ての作業完了前に以下のコマンドを**例外なく**実行すること：
 
 ```bash
 pnpm lint && pnpm type-check && pnpm build
 ```
 
-パッケージ管理
+**FAILURE IS NOT ACCEPTABLE - 失敗は許可されない**
 
-- 全プロジェクト: pnpm ワークスペースで統一管理
-- 注意: npm や yarn は使わず、必ず pnpm を使用すること
-- 共有パッケージは `@extension/` プレフィックスを使用
-- ワークスペース内パッケージは `workspace:*` で参照
+**PACKAGE MANAGEMENT - 絶対的パッケージ管理規則**
 
-主要なコマンド
+- pnpm以外のパッケージマネージャー使用は**絶対禁止**
+- npm、yarn使用は**完全禁止**
+- `@extension/`プレフィックス以外の共有パッケージ命名は**禁止**
+- `workspace:*`以外の参照方式は**禁止**
+
+**MANDATORY COMMANDS - 強制実行コマンド群**
 
 ```bash
 # 開発
@@ -105,23 +138,24 @@ pnpm e2e:headed    # Chrome E2Eテスト（ブラウザ表示）
 pnpm zip           # 拡張機能のZIPパッケージ作成
 ```
 
-コーディング規約
+⚡ **NON-NEGOTIABLE CODING STANDARDS - 絶対遵守コーディング規約**
 
-TypeScript・React
+**TypeScript・React - ABSOLUTE REQUIREMENTS**
 
-- **関数スタイル**: アロー関数を推奨（`func-style: ['error', 'expression']`）
-- **インポート順序**: `import-x/order`ルールに従う
-- **型インポート**: `@typescript-eslint/consistent-type-imports`を使用
-- **React**: JSXでのReactインポート不要（`react/react-in-jsx-scope: 'off'`）
-- **厳密な型定義**: any 型の使用を禁止（テスト以外）
+- **MANDATORY**: アロー関数のみ使用（関数宣言は**絶対禁止**）
+- **MANDATORY**: `import-x/order`ルール厳格遵守
+- **MANDATORY**: `@typescript-eslint/consistent-type-imports`強制使用
+- **MANDATORY**: any型使用は**完全禁止**（テスト以外）
+- **MANDATORY**: JSXでのReactインポート**絶対禁止**
 
-テスト記述規約
+**TEST REQUIREMENTS - 絶対的テスト要件**
 
-- **テスト記述言語**: すべてのテスト（E2E・単体テスト）のdescribe()・it()は**日本語で記述**する
-- **テストファイル形式**: `*.spec.ts`または`*.test.ts`を使用
-- **テストファイル配置**: `*.spec.ts` 形式でテスト対象と同じディレクトリに配置
+- **MANDATORY**: 全テストのdescribe()・it()は**日本語のみ**
+- **MANDATORY**: `*.spec.ts`形式のみ許可
+- **MANDATORY**: テスト対象と**完全同一**ディレクトリ配置
+- **ABSOLUTE PROHIBITION**: テストのskip・削除は**死罪レベル**で禁止
 
-🧪 テスト実行
+🧪 **MANDATORY TEST EXECUTION - 強制テスト実行**
 
 ```bash
 # E2E テスト
@@ -139,114 +173,127 @@ pnpm e2e:report:serve         # レポートサーバーを起動して表示
 pnpm test                     # Vitest実行（該当パッケージで）
 ```
 
-📝 重要な注意事項
+� **CRITICAL VIOLATIONS - 致命的違反事項**
 
-1. 破壊的変更の防止
+以下の違反は**即座に作業停止**し、ユーザーへの謝罪と再計画を要求する：
 
-- 必ず以下を実行してから変更を完了する
+**IMMEDIATE TERMINATION TRIGGERS - 即座停止トリガー**
+
+1. **破壊的変更の防止 - ZERO TOLERANCE**
 
 ```bash
+# これを実行せずに作業完了を報告した場合は重大違反
 pnpm lint && pnpm type-check && pnpm build
 ```
 
-- TypeScript エラーは0個にする
-- E2Eテストが通ることを確認
+- TypeScriptエラー1個でも存在は**完全失格**
+- E2Eテスト失敗は**プロジェクト終了レベル**
 
-2. 拡張機能開発
+1. **拡張機能開発 - MANIFEST V3 ABSOLUTE COMPLIANCE**
 
-- Manifest V3に準拠
-- 開発時は `<all_urls>` 権限を使用（本番では最小限に制限）
-- Chrome/Firefox両対応
-- HMR（Hot Module Reload）対応
+- Manifest V3以外は**完全禁止**
+- 本番環境での`<all_urls>`権限は**死罪レベル**違反
+- Firefox/Chrome両対応は**絶対必須**
+- HMR非対応は**開発効率違反**
 
-3. AI分析機能
+1. **AI分析機能 - STRICT DEPENDENCY CONTROL**
 
-- **依存関係**: `@ai-sdk/react` および `@ai-sdk/openai` を使用
-- **モックファースト**: モックAPIサーバーで開発後、OpenAI APIに切り替え
-- **段階的実装**: TASKS.mdの全フェーズを順次実行
+- `@ai-sdk/react`、`@ai-sdk/openai`以外のAI SDK使用は**絶対禁止**
+- モックファースト以外の開発手法は**完全禁止**
+- TASKS.mdのフェーズスキップは**重大違反**
 
-4. 環境変数管理
+1. **環境変数管理 - SECURITY CRITICAL**
 
-- `CLI_CEB_*` プレフィックス：CLI経由でのみ編集可能
-- `CEB_*` プレフィックス：手動編集可能
-- `bash-scripts/set_global_env.sh`でグローバル環境変数を設定
+- `CLI_CEB_*`プレフィックス以外のCLI変数は**セキュリティ違反**
+- `CEB_*`プレフィックス以外の手動変数は**規約違反**
+- `bash-scripts/set_global_env.sh`以外のグローバル設定は**禁止**
 
-🚨 開発時の注意点
+� **DEVELOPMENT EXECUTION PROTOCOL - 開発実行プロトコル**
 
-コマンド実行
+**VIOLATION CONSEQUENCES - 違反時の結果**
 
-- コマンド実行時は必ず終了コードを確認し、異常終了したのなら原因を注意深く調査してください。
-- 同じ問題（テストや lint が通らない、pnpm コマンドが失敗するなど）に対して３回修正を試みて解決が見込めなかった場合は問題を簡単にまとめてユーザに報告し、作業を止める
+- 同一問題で3回失敗 → **即座に作業停止**
+- テストskip/削除 → **プロジェクト永久BAN**
+- コマンド実行時異常終了の未調査 → **重大過失**
+- 終了コード無視 → **品質管理違反**
 
-テスト方針
+**ABSOLUTE DEVELOPMENT ENVIRONMENT REQUIREMENTS**
 
-- テストがうまく実行できないからといって決してそのテストに対し skip や削除をしてはならない。根本解決を目指すこと。
-- すべてのテスト（E2E・単体テスト）のdescribe()・it()は**日本語で記述**する
-
-開発環境
-
-- Windowsでは管理者権限で `pnpm dev` を実行
-- Node.js 22.15.1以上が必要
-- WSL環境では VS CodeのRemote-WSL拡張機能を使用
+- Windows: 管理者権限なしでの`pnpm dev`実行は**完全禁止**
+- Node.js 22.15.1未満は**動作不保証**
+- WSL環境でのRemote-WSL拡張未使用は**環境違反**
 
 ⸻
 
-🔄 作業ごとのワークフロー
+🎯 **MANDATORY WORKFLOW EXECUTION - 強制ワークフロー実行**
 
-1. 課題の把握と計画立案
+**ZERO DEVIATION ALLOWED - 逸脱は一切許可されない**
 
-- 問題が発生した場合、まず徹底的に調査する。
-- コードベースで関連ファイルを読み、状況を正確に把握する。
-- **仕様書確認**: 実装前にSPECIFICATION.mdで仕様を確認する
-- TASKS.md に計画を書き出し、完了できるようなチェックリスト（ToDo形式）を作成すること。
+### 1. 課題の把握と計画立案 - MANDATORY PHASE
 
-2. 作業前のレビュー
+**ABSOLUTE REQUIREMENTS:**
 
-- 作業を開始する前に、計画とToDoリストを作成したうえで私（レビュワー）に連絡を取り、計画を確認してもらうこと。
-- 範囲の広い開発の場合は、事前に簡単な設計（シーケンス図、フロー図など）を作成し、承認を得る
-- 類似のコードが存在する場合は、そのコーディングスタイルと方針に従って実装する
-- 類似のコードがない場合は、コードの簡略版サンプルを作成し、指示者に承認を得てから本格的な開発に着手する
+- 問題発生時は**完全な徹底調査**を実行すること
+- コードベースの関連ファイル**全て**を読むこと
+- SPECIFICATION.mdの仕様確認は**絶対必須**
+- TASKS.mdへの計画記載は**完全義務**
+- ToDo形式以外のチェックリストは**禁止**
 
-3. 実施と追跡
+### 2. 作業前のレビュー - MANDATORY APPROVAL PHASE
 
-- 承認後、ToDo項目に基づいて作業を進め、完了したらチェックマークを付ける。
-- 各ステップごとに「どのような変更を加えたか」を簡潔に説明すること。
-- タスク・コード変更は可能な限りシンプルに保つ。複雑な変更は避け、影響範囲は最小限とする。
-- テスト駆動開発（TDD）を実践：先にテストを実装してから本体コードを開発する
-- 小さな単位で実装を進め、こまめに動作確認を行う
+**CRITICAL CHECKPOINT:**
 
-4. 作業記録とコミット
+- 計画とToDoリスト**完全作成後**にレビュワーへ連絡**必須**
+- 広範囲開発時の設計図作成は**絶対必須**
+- 類似コード存在時は**完全準拠**必須
+- 類似コード非存在時のサンプル作成・承認は**絶対必須**
 
-- 作業が完了したら、変更内容を適切に記録・共有する
-- **仕様変更が必要な場合**: SPECIFICATION.mdを更新し、関連ドキュメントも合わせて修正する
-- すべて完了後、git commit を行い変更を反映させる。
+### 3. 実施と追跡 - MANDATORY EXECUTION PHASE
 
-📋 Git管理ルール
+**STRICT EXECUTION RULES:**
 
-ブランチ戦略
+- ToDo項目ベースの作業進行は**絶対必須**
+- 完了時のチェックマーク**即座付与**必須
+- 各ステップの変更説明は**完全義務**
+- シンプル実装以外は**完全禁止**
+- TDD実践（テスト→実装）は**絶対順序**
+- 小単位実装・動作確認は**強制実行**
 
-- **フェーズ管理**: フェーズが変わるごとに `phase-X` ブランチを作成（Xは数字）
-- **作業単位でのコミット**: 意味のある作業単位で定期的に `git commit` を実行
-- **コミットメッセージ**: 明確で理解しやすいメッセージを記述
-  - 1行目: 変更内容の簡潔な要約
-  - 2行目: 空行
-  - 3行目以降: 修正の経緯や詳細説明（必要に応じて）
+### 4. 作業記録とコミット - MANDATORY COMPLETION PHASE
 
-Git操作の禁止事項
+**FINAL CHECKPOINT:**
 
-- **絶対に使用しない**: `git reset`、`git reflog`
-- **推奨される代替手段**:
-  - 変更の一時保存: `git stash`
-  - 変更の取り消し: `git revert`
-  - ファイルの復元: `git restore`
+- 変更内容の記録・共有は**完全義務**
+- 仕様変更時のSPECIFICATION.md更新は**絶対必須**
+- git commit前の**完全確認**は絶対必須
 
-ブランチ命名規則
+📋 **ABSOLUTE GIT MANAGEMENT RULES - 絶対Git管理規則**
 
-- **フェーズブランチ**: `phase-X` （Xは数字）
-  - 例: `phase-1`, `phase-2`, `phase-3`
-- **機能ブランチ**: `feature/機能名`
-- **修正ブランチ**: `fix/修正内容`
+**BRANCH STRATEGY - 絶対ブランチ戦略**
+
+- フェーズ管理での`phase-X`ブランチ作成は**絶対必須**
+- 作業単位での定期的`git commit`は**強制実行**
+- コミットメッセージの明確記述は**完全義務**
+
+**ABSOLUTE PROHIBITION - 絶対禁止事項**
+
+- `git reset`、`git reflog`使用は**死罪レベル**違反
+- 破壊的変更は**プロジェクト終了レベル**違反
+
+**MANDATORY ALTERNATIVES - 強制代替手段**
+
+- 変更一時保存: `git stash`**のみ**許可
+- 変更取消: `git revert`**のみ**許可
+- ファイル復元: `git restore`**のみ**許可
+
+**BRANCH NAMING ENFORCEMENT - ブランチ命名強制**
+
+- フェーズブランチ: `phase-X`**以外禁止**
+- 機能ブランチ: `feature/`**プレフィックス必須**
+- 修正ブランチ: `fix/`**プレフィックス必須**
 
 ⸻
 
-重要: このガイドラインに従い、常に品質と安定性を保ちながら開発を進めてください。変更前後で必ずテストを実行し、破壊的変更を防止してください。
+🚨 **FINAL WARNING - 最終警告**
+
+このガイドラインは**法的契約**レベルで遵守すること。違反は**即座に作業停止**し、**完全な再計画**を要求する。品質と安定性は**交渉不可能**な絶対要件である。テスト実行なしの変更報告は**重大な契約違反**とみなす。
