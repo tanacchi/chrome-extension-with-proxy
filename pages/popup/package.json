@@ -14,6 +14,7 @@
     "clean": "pnpm clean:turbo && pnpm clean:node_modules",
     "build": "vite build",
     "dev": "vite build --mode development",
+    "test": "vitest run --coverage",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
@@ -28,7 +29,13 @@
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",
     "@extension/tsconfig": "workspace:*",
-    "@extension/vite-config": "workspace:*"
+    "@extension/vite-config": "workspace:*",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "vitest": "^3.2.4"
   },
   "postcss": {
     "plugins": {

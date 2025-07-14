@@ -93,7 +93,7 @@ export const projectExcludes = {
  * エイリアス設定のヘルパー
  */
 export const createAliases = (baseDir: string) => ({
-  '@extension/shared': resolve(baseDir, 'packages/shared/lib'),
+  '@extension/shared': resolve(baseDir, 'packages/shared/dist'),
   '@extension/storage': resolve(baseDir, 'packages/storage/lib'),
   '@extension/ui': resolve(baseDir, 'packages/ui/lib'),
   '@extension/i18n': resolve(baseDir, 'packages/i18n/lib'),
