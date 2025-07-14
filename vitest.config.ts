@@ -38,7 +38,10 @@ export default defineConfig({
         },
         resolve: {
           alias: {
-            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
             '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
           },
         },
@@ -54,7 +57,10 @@ export default defineConfig({
         resolve: {
           alias: {
             '@src': resolve(__dirname, 'pages/options/src'),
-            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
             '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
             '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
             '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
@@ -106,7 +112,10 @@ export default defineConfig({
         resolve: {
           alias: {
             '@src': resolve(__dirname, 'pages/new-tab/src'),
-            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
             '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
             '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
             '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
@@ -123,7 +132,10 @@ export default defineConfig({
         resolve: {
           alias: {
             '@src': resolve(__dirname, 'pages/popup/src'),
-            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
             '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
             '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
             '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
@@ -140,7 +152,10 @@ export default defineConfig({
         resolve: {
           alias: {
             '@src': resolve(__dirname, 'pages/side-panel/src'),
-            '@extension/shared': resolve(__dirname, 'packages/shared/lib'),
+            '@extension/shared': resolve(__dirname, 'packages/shared/index.mts'),
+            '@extension/shared/utils': resolve(__dirname, 'packages/shared/lib/utils'),
+            '@extension/shared/hooks': resolve(__dirname, 'packages/shared/lib/hooks'),
+            '@extension/shared/hoc': resolve(__dirname, 'packages/shared/lib/hoc'),
             '@extension/storage': resolve(__dirname, 'packages/storage/lib'),
             '@extension/ui': resolve(__dirname, 'packages/ui/lib'),
             '@extension/i18n': resolve(__dirname, 'packages/i18n/lib'),
