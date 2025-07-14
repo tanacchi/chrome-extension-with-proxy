@@ -1,4 +1,4 @@
-name: Lint Check & Tech
+name: Lint Check & Test
 
 on: [ pull_request_target ]
 
